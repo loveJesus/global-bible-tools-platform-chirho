@@ -1,0 +1,3 @@
+[submodule "nextjs-platform-chirho"]
+	path = nextjs-platform-chirho
+	url = https://github.com/globalbibletools/platform.git
