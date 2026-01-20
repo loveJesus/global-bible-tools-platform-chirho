@@ -1,3 +1,7 @@
 [submodule "nextjs-platform-chirho"]
 	path = nextjs-platform-chirho
 	url = https://github.com/globalbibletools/platform.git
+[submodule "translations-chirho"]
+	path = translations-chirho
+	url = https://github.com/loveJesus/bible-translations-chirho.git
+	branch = main_chirho

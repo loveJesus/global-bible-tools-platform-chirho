@@ -3,19 +3,22 @@
 // — John 3:16
 
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
-import { dbChirho, eqChirho, andChirho, sqlChirho } from '$lib/server/db-chirho';
-import {
-	languageTableChirho,
-	bookTableChirho,
-	verseTableChirho,
-	wordTableChirho,
-	phraseWordTableChirho,
-	phraseTableChirho,
-	glossTableChirho,
-	lemmaFormTableChirho
-} from '$lib/server/schema-chirho';
+import { dbChirho, eqChirho, andChirho, queryRawChirho } from '$lib/server/db-chirho';
+import { languageTableChirho, bookTableChirho, verseTableChirho } from '$lib/server/schema-chirho';
 import { error as errorChirho } from '@sveltejs/kit';
 import { parseChapterIdChirho } from '$lib/modules-chirho/bible-core-chirho/queries-chirho';
+
+// NOTE: Raw SQL queries reference upstream database tables (word, phrase, gloss, etc.)
+// which don't have Chirho suffix - they're from the nextjs-platform-chirho schema.
+
+interface WordWithGlossRowChirho {
+	wordId: string;
+	text: string;
+	lemmaId: string | null;
+	grammar: string | null;
+	gloss: string | null;
+	state: string | null;
+}
 
 export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 	const codeChirho = paramsChirho.code_chirho;
@@ -64,42 +67,46 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		throw errorChirho(404, `Chapter not found`);
 	}
 
-	// Get words with glosses for each verse
+	// Get words with glosses for each verse using raw SQL with lateral join
+	// to avoid duplicates when a word has phrases in multiple languages
 	const versesWithWordsChirho = await Promise.all(
 		versesChirho.map(async (verseChirho) => {
-			// Get words for this verse with their glosses
-			const wordsResultChirho = await dbChirho
-				.select({
-					wordIdChirho: wordTableChirho.idChirho,
-					textChirho: wordTableChirho.textChirho,
-					formIdChirho: wordTableChirho.formIdChirho,
-					lemmaIdChirho: lemmaFormTableChirho.lemmaIdChirho,
-					glossChirho: glossTableChirho.glossChirho,
-					stateChirho: glossTableChirho.stateChirho
-				})
-				.from(wordTableChirho)
-				.leftJoin(lemmaFormTableChirho, eqChirho(wordTableChirho.formIdChirho, lemmaFormTableChirho.idChirho))
-				.leftJoin(phraseWordTableChirho, eqChirho(wordTableChirho.idChirho, phraseWordTableChirho.wordIdChirho))
-				.leftJoin(
-					phraseTableChirho,
-					andChirho(
-						eqChirho(phraseWordTableChirho.phraseIdChirho, phraseTableChirho.idChirho),
-						eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho),
-						sqlChirho`${phraseTableChirho.deletedAtChirho} IS NULL`
-					)
-				)
-				.leftJoin(glossTableChirho, eqChirho(phraseTableChirho.idChirho, glossTableChirho.phraseIdChirho))
-				.where(eqChirho(wordTableChirho.verseIdChirho, verseChirho.idChirho))
-				.orderBy(wordTableChirho.idChirho);
+			const wordsResultChirho = await queryRawChirho<WordWithGlossRowChirho>(
+				`
+				SELECT
+					w.id AS "wordId",
+					w.text,
+					lf.lemma_id AS "lemmaId",
+					lf.grammar,
+					ph.gloss,
+					ph.state
+				FROM word AS w
+				LEFT JOIN lemma_form AS lf ON lf.id = w.form_id
+				LEFT JOIN LATERAL (
+					SELECT g.gloss, g.state
+					FROM phrase_word AS pw
+					JOIN phrase AS p ON p.id = pw.phrase_id
+					LEFT JOIN gloss AS g ON g.phrase_id = p.id
+					WHERE pw.word_id = w.id
+						AND p.language_id = $2
+						AND p.deleted_at IS NULL
+					LIMIT 1
+				) AS ph ON true
+				WHERE w.verse_id = $1
+				ORDER BY w.id
+				`,
+				[verseChirho.idChirho, languageChirho.idChirho]
+			);
 
 			return {
 				verseIdChirho: verseChirho.idChirho,
 				verseNumberChirho: verseChirho.numberChirho,
-				wordsChirho: wordsResultChirho.map((wordItemChirho) => ({
-					wordIdChirho: wordItemChirho.wordIdChirho,
-					textChirho: wordItemChirho.textChirho,
-					lemmaIdChirho: wordItemChirho.lemmaIdChirho,
-					glossChirho: wordItemChirho.stateChirho === 'APPROVED' ? wordItemChirho.glossChirho : null
+				wordsChirho: wordsResultChirho.map((rowChirho) => ({
+					wordIdChirho: rowChirho.wordId,
+					textChirho: rowChirho.text,
+					lemmaIdChirho: rowChirho.lemmaId,
+					grammarChirho: rowChirho.grammar,
+					glossChirho: rowChirho.state === 'APPROVED' ? rowChirho.gloss : null
 				}))
 			};
 		})

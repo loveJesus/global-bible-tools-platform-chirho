@@ -3,7 +3,7 @@
 // — John 3:16
 
 import type { PageServerLoad as PageServerLoadChirho, Actions as ActionsChirho } from './$types';
-import { dbChirho, eqChirho, andChirho, sqlChirho } from '$lib/server/db-chirho';
+import { dbChirho, eqChirho, andChirho, sqlChirho, queryRawChirho } from '$lib/server/db-chirho';
 import {
 	languageTableChirho,
 	bookTableChirho,
@@ -17,6 +17,20 @@ import {
 } from '$lib/server/schema-chirho';
 import { error as errorChirho, fail as failChirho } from '@sveltejs/kit';
 import { parseVerseIdChirho } from '$lib/modules-chirho/bible-core-chirho/queries-chirho';
+
+// NOTE: Raw SQL queries reference upstream database tables (word, phrase, gloss, etc.)
+// which don't have Chirho suffix - they're from the nextjs-platform-chirho schema.
+
+interface WordWithGlossRowChirho {
+	wordId: string;
+	text: string;
+	formId: string | null;
+	lemmaId: string | null;
+	grammar: string | null;
+	phraseId: number | null;
+	gloss: string | null;
+	state: string | null;
+}
 
 export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 	const codeChirho = paramsChirho.code_chirho;
@@ -61,32 +75,47 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		throw errorChirho(404, `Verse not found`);
 	}
 
-	// Get words with glosses
-	const wordsChirho = await dbChirho
-		.select({
-			wordIdChirho: wordTableChirho.idChirho,
-			textChirho: wordTableChirho.textChirho,
-			formIdChirho: wordTableChirho.formIdChirho,
-			lemmaIdChirho: lemmaFormTableChirho.lemmaIdChirho,
-			grammarChirho: lemmaFormTableChirho.grammarChirho,
-			phraseIdChirho: phraseTableChirho.idChirho,
-			glossChirho: glossTableChirho.glossChirho,
-			stateChirho: glossTableChirho.stateChirho
-		})
-		.from(wordTableChirho)
-		.leftJoin(lemmaFormTableChirho, eqChirho(wordTableChirho.formIdChirho, lemmaFormTableChirho.idChirho))
-		.leftJoin(phraseWordTableChirho, eqChirho(wordTableChirho.idChirho, phraseWordTableChirho.wordIdChirho))
-		.leftJoin(
-			phraseTableChirho,
-			andChirho(
-				eqChirho(phraseWordTableChirho.phraseIdChirho, phraseTableChirho.idChirho),
-				eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho),
-				sqlChirho`${phraseTableChirho.deletedAtChirho} IS NULL`
-			)
-		)
-		.leftJoin(glossTableChirho, eqChirho(phraseTableChirho.idChirho, glossTableChirho.phraseIdChirho))
-		.where(eqChirho(wordTableChirho.verseIdChirho, verseIdChirho))
-		.orderBy(wordTableChirho.idChirho);
+	// Get words with glosses - using raw SQL with lateral join to avoid duplicates
+	// when a word has phrases in multiple languages
+	const wordsResultChirho = await queryRawChirho<WordWithGlossRowChirho>(
+		`
+		SELECT
+			w.id AS "wordId",
+			w.text,
+			w.form_id AS "formId",
+			lf.lemma_id AS "lemmaId",
+			lf.grammar,
+			ph.phrase_id AS "phraseId",
+			ph.gloss,
+			ph.state
+		FROM word AS w
+		LEFT JOIN lemma_form AS lf ON lf.id = w.form_id
+		LEFT JOIN LATERAL (
+			SELECT p.id AS phrase_id, g.gloss, g.state
+			FROM phrase_word AS pw
+			JOIN phrase AS p ON p.id = pw.phrase_id
+			LEFT JOIN gloss AS g ON g.phrase_id = p.id
+			WHERE pw.word_id = w.id
+				AND p.language_id = $2
+				AND p.deleted_at IS NULL
+			LIMIT 1
+		) AS ph ON true
+		WHERE w.verse_id = $1
+		ORDER BY w.id
+		`,
+		[verseIdChirho, languageChirho.idChirho]
+	);
+
+	const wordsChirho = wordsResultChirho.map((rowChirho) => ({
+		wordIdChirho: rowChirho.wordId,
+		textChirho: rowChirho.text,
+		formIdChirho: rowChirho.formId,
+		lemmaIdChirho: rowChirho.lemmaId,
+		grammarChirho: rowChirho.grammar,
+		phraseIdChirho: rowChirho.phraseId,
+		glossChirho: rowChirho.gloss,
+		stateChirho: rowChirho.state
+	}));
 
 	// Calculate prev/next verse IDs
 	const prevVerseChirho = await dbChirho
