@@ -15,8 +15,9 @@ export const languageTableChirho = pgTable('language', {
 	codeChirho: text('code').notNull().unique(), // e.g., "spa", "fra", "deu"
 	nameChirho: text('name').notNull(),
 	fontChirho: text('font').default('Noto Sans').notNull(),
-	bibleTranslationIdsChirho: text('bible_translation_ids').array(),
-	textDirectionChirho: textDirectionEnumChirho('text_direction').default('ltr').notNull()
+	translationIdsChirho: text('translation_ids').array(),
+	textDirectionChirho: textDirectionEnumChirho('text_direction').default('ltr').notNull(),
+	referenceLanguageIdChirho: uuid('reference_language_id')
 });
 
 // LanguageMember table - User membership in a language
