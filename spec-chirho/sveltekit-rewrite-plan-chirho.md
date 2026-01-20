@@ -274,46 +274,46 @@ export const load: PageServerLoad = async ({ params }) => {
 ## Implementation Phases
 
 ### Phase 1: Foundation (Week 1-2)
-- [ ] Create `sveltekit2-platform-chirho/` scaffolding
-- [ ] Set up Drizzle ORM with all schema definitions
-- [ ] Implement session management in `hooks.server.ts`
-- [ ] Create base layouts and navigation
-- [ ] Configure Tailwind CSS
+- [x] Create `sveltekit2-platform-chirho/` scaffolding
+- [x] Set up Drizzle ORM with all schema definitions
+- [x] Implement session management in `hooks.server.ts`
+- [x] Create base layouts and navigation
+- [x] Configure Tailwind CSS
 - [ ] Set up i18n
 
 ### Phase 2: Authentication (Week 2-3)
-- [ ] Login page with form actions
-- [ ] Registration/invite flow
-- [ ] Password reset flow
-- [ ] Email verification
-- [ ] Session cookie management
+- [x] Login page with form actions
+- [x] Registration/invite flow
+- [x] Password reset flow
+- [x] Email verification
+- [x] Session cookie management
 
 ### Phase 3: Bible Core (Week 3-4)
-- [ ] Book/Verse/Word read models
-- [ ] Lemma/LemmaForm queries
-- [ ] Read view (`/read-chirho/[code]/[chapter]`)
+- [x] Book/Verse/Word read models
+- [x] Lemma/LemmaForm queries
+- [x] Read view (`/read-chirho/[code]/[chapter]`)
 - [ ] Audio playback
 
 ### Phase 4: Translation Module (Week 4-6) - CRITICAL
-- [ ] Phrase/Gloss repositories
-- [ ] TranslateWordChirho component
-- [ ] Translation view with word selection
-- [ ] Gloss approval workflow
+- [x] Phrase/Gloss repositories
+- [x] TranslateWordChirho component
+- [x] Translation view with word selection
+- [x] Gloss approval workflow
 - [ ] Machine translation integration
-- [ ] Footnotes
+- [x] Footnotes (Notes panel)
 
 ### Phase 5: Languages Module (Week 6-7)
-- [ ] Language CRUD
-- [ ] Member management
+- [x] Language CRUD
+- [x] Member management
 - [ ] Settings page
-- [ ] Import functionality
+- [x] Import functionality
 
 ### Phase 6: Admin & Remaining (Week 7-8)
-- [ ] User administration
+- [x] User administration
 - [ ] Snapshots module
 - [ ] Reporting/analytics
-- [ ] Dashboard
-- [ ] Job worker integration
+- [x] Dashboard (admin panel)
+- [x] Job worker integration (import jobs page)
 
 ---
 
