@@ -1,0 +1,36 @@
+{
+  "name": "sveltekit2-platform-chirho",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev-chirho": "vite dev",
+    "build-chirho": "vite build",
+    "preview-chirho": "vite preview",
+    "check-chirho": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch-chirho": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "db:generate-chirho": "drizzle-kit generate",
+    "db:push-chirho": "drizzle-kit push",
+    "db:studio-chirho": "drizzle-kit studio"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^6.0.0",
+    "@sveltejs/kit": "^2.50.0",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/pg": "^8.16.0",
+    "autoprefixer": "^10.4.23",
+    "drizzle-kit": "^0.31.8",
+    "postcss": "^8.5.6",
+    "svelte": "^5",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.1",
+    "oslo": "^1.2.1",
+    "pg": "^8.17.1"
+  }
+}
