@@ -15,7 +15,7 @@ import {
 	glossHistoryTableChirho,
 	lemmaFormTableChirho
 } from '$lib/server/schema-chirho';
-import { error as errorChirho, fail as failChirho } from '@sveltejs/kit';
+import { error as errorChirho, fail as failChirho, redirect as redirectChirho } from '@sveltejs/kit';
 import { parseVerseIdChirho } from '$lib/modules-chirho/bible-core-chirho/queries-chirho';
 
 // NOTE: Raw SQL queries reference upstream database tables (word, phrase, gloss, etc.)
@@ -33,6 +33,11 @@ interface WordWithGlossRowChirho {
 }
 
 export const load: PageServerLoadChirho = async ({ params: paramsChirho, locals: localsChirho }) => {
+	// Require authentication for translate pages
+	if (!localsChirho.userChirho) {
+		throw redirectChirho(302, '/login-chirho');
+	}
+
 	const codeChirho = paramsChirho.code_chirho;
 	const verseIdChirho = paramsChirho.verse_id_chirho;
 	const userChirho = localsChirho.userChirho;

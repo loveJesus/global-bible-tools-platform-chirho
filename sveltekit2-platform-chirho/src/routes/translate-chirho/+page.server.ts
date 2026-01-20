@@ -3,10 +3,15 @@
 // — John 3:16
 
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
+import { redirect as redirectChirho } from '@sveltejs/kit';
 import { dbChirho } from '$lib/server/db-chirho';
 import { languageTableChirho } from '$lib/server/schema-chirho';
 
 export const load: PageServerLoadChirho = async ({ locals: localsChirho }) => {
+	// Require authentication for translate pages
+	if (!localsChirho.userChirho) {
+		throw redirectChirho(302, '/login-chirho');
+	}
 	const languagesChirho = await dbChirho
 		.select({
 			idChirho: languageTableChirho.idChirho,

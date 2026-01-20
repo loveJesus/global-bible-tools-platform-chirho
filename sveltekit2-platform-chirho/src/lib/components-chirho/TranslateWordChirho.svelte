@@ -70,6 +70,8 @@
 	let inputRefChirho: HTMLInputElement = $state(null!);
 	let rootRefChirho: HTMLLIElement = $state(null!);
 	let autosaveQueuedChirho = $state(false);
+	// Track local save state until page refresh
+	let savedStateChirho = $state<'APPROVED' | 'UNAPPROVED' | null>(null);
 
 	// Computed values
 	const editableChirho = $derived(languageChirho.isMemberChirho);
@@ -97,6 +99,10 @@
 
 	const statusChirho = $derived.by(() => {
 		if (savingChirho) return 'saving';
+		// Use local saved state if we saved in this session
+		if (savedStateChirho) {
+			return savedStateChirho === 'APPROVED' ? 'approved' : 'saved';
+		}
 		if (phraseChirho?.glossChirho?.textChirho) {
 			return phraseChirho.glossChirho.stateChirho === 'APPROVED' ? 'approved' : 'saved';
 		}
@@ -132,7 +138,10 @@
 				body: formDataChirho
 			});
 
-			if (!responseChirho.ok) {
+			if (responseChirho.ok) {
+				// Track local saved state until page refresh
+				savedStateChirho = stateChirho;
+			} else {
 				console.error('Failed to save gloss');
 			}
 		} catch (errorChirho) {
@@ -414,7 +423,9 @@
 		<div
 			class="mt-1 text-sm {statusChirho === 'approved'
 				? 'text-green-600'
-				: 'text-slate-500'} {isHebrewChirho ? 'text-right' : 'text-left'}"
+				: statusChirho === 'saved'
+					? 'text-blue-600'
+					: 'text-slate-500'} {isHebrewChirho ? 'text-right' : 'text-left'}"
 		>
 			{#if statusChirho === 'saving'}
 				<span class="flex items-center gap-1">
@@ -442,6 +453,14 @@
 						></path>
 					</svg>
 					Approved
+				</span>
+			{:else if statusChirho === 'saved'}
+				<span class="flex items-center gap-1">
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+						></path>
+					</svg>
+					Saved
 				</span>
 			{/if}
 		</div>

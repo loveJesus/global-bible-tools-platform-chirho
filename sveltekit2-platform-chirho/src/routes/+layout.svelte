@@ -4,11 +4,15 @@
 
 <script lang="ts">
 	import '../app.css';
+	import { page as pageChirho } from '$app/state';
 	import type { LayoutData as LayoutDataChirho } from './$types';
 
 	let { children, data }: { children: any; data: LayoutDataChirho } = $props();
 
 	let userMenuOpenChirho = $state(false);
+
+	// Hide the default header/footer on landing page (it has its own)
+	const isLandingPageChirho = $derived(pageChirho.url.pathname === '/');
 
 	function getInitialsChirho(nameChirho: string | null | undefined, emailChirho: string): string {
 		if (nameChirho) {
@@ -29,6 +33,7 @@
 </svelte:head>
 
 <div class="min-h-screen flex flex-col">
+	{#if !isLandingPageChirho}
 	<header class="bg-white border-b border-slate-200">
 		<div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
 			<div class="flex items-center gap-6">
@@ -114,14 +119,17 @@
 			</div>
 		</div>
 	</header>
+	{/if}
 
 	<main class="flex-1">
 		{@render children()}
 	</main>
 
+	{#if !isLandingPageChirho}
 	<footer class="bg-slate-100 border-t border-slate-200 py-6">
 		<div class="mx-auto max-w-6xl px-4 text-center text-sm text-slate-500">
 			Global Bible Tools - Collaborative Bible translation platform
 		</div>
 	</footer>
+	{/if}
 </div>
