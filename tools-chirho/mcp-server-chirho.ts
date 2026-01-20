@@ -233,6 +233,10 @@ serverChirho.setRequestHandler(ListToolsRequestSchema, async () => {
               description: 'Minimal word ID to gloss map: {"6500100101": "Ioudas", "6500100102": "de–Iēsoû"}',
               additionalProperties: { type: "string" },
             },
+            source_chirho: {
+              type: "string",
+              description: 'Model/source identifier (default: "opus-4.5-chirho")',
+            },
           },
           required: ["language_code_chirho", "book_name_chirho", "glosses_chirho"],
         },
@@ -499,33 +503,26 @@ serverChirho.setRequestHandler(CallToolRequestSchema, async (requestChirho) => {
           for (const glossChirho of verseChirho.glosses_chirho) {
             const escapedGlossChirho = escapeChirho(glossChirho.gloss_chirho);
             sqlChirho += `-- Word ${glossChirho.word_id_chirho}\n`;
-            sqlChirho += `WITH ensure_phrase AS (
+            // Fixed: Two separate statements to handle both new and existing phrases
+            sqlChirho += `WITH np AS (
   INSERT INTO phrase (language_id, created_at)
   SELECT (SELECT id FROM language WHERE code = '${languageCodeChirho}'), NOW()
   WHERE NOT EXISTS (
-    SELECT 1 FROM phrase p
-    JOIN phrase_word pw ON pw.phrase_id = p.id
+    SELECT 1 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
     WHERE pw.word_id = '${glossChirho.word_id_chirho}'
       AND p.language_id = (SELECT id FROM language WHERE code = '${languageCodeChirho}')
       AND p.deleted_at IS NULL
   )
   RETURNING id
-), ensure_phrase_word AS (
-  INSERT INTO phrase_word (phrase_id, word_id)
-  SELECT id, '${glossChirho.word_id_chirho}' FROM ensure_phrase
-  ON CONFLICT DO NOTHING
 )
+INSERT INTO phrase_word (phrase_id, word_id) SELECT id, '${glossChirho.word_id_chirho}' FROM np ON CONFLICT DO NOTHING;
 INSERT INTO gloss (phrase_id, gloss, state, updated_at, source)
 SELECT p.id, '${escapedGlossChirho}', 'UNAPPROVED', NOW(), 'IMPORT'
-FROM phrase p
-JOIN phrase_word pw ON pw.phrase_id = p.id
+FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
 WHERE pw.word_id = '${glossChirho.word_id_chirho}'
   AND p.language_id = (SELECT id FROM language WHERE code = '${languageCodeChirho}')
   AND p.deleted_at IS NULL
-ON CONFLICT (phrase_id) DO UPDATE SET
-  gloss = EXCLUDED.gloss,
-  updated_at = EXCLUDED.updated_at
-WHERE gloss.gloss IS DISTINCT FROM EXCLUDED.gloss;\n\n`;
+ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLUDED.updated_at;\n\n`;
           }
         }
 
@@ -543,6 +540,10 @@ WHERE gloss.gloss IS DISTINCT FROM EXCLUDED.gloss;\n\n`;
         const langCodeChirho = argsChirho?.language_code_chirho as string;
         const bookNameChirho = argsChirho?.book_name_chirho as string;
         const glossesChirho = argsChirho?.glosses_chirho as Record<string, string>;
+        // Note: source column is enum {USER, IMPORT} - use IMPORT for AI translations
+        // Model identifier passed via source_chirho is stored in SQL comments for tracking
+        const modelChirho = (argsChirho?.source_chirho as string) ?? 'opus-4.5-chirho';
+        const sourceChirho = 'IMPORT'; // enum value for database
 
         const wordIdsChirho = Object.keys(glossesChirho);
 
@@ -557,24 +558,26 @@ WHERE gloss.gloss IS DISTINCT FROM EXCLUDED.gloss;\n\n`;
           ORDER BY w.id
         `);
 
-        const wordMapChirho = new Map(wordInfoChirho.map(w => [w.word_id, w]));
+        const wordMapChirho = new Map(wordInfoChirho.map(wChirho => [wChirho.word_id, wChirho]));
 
-        // Group by verse
-        const verseGroupsChirho = new Map<number, Array<{ wordIdChirho: string; glossChirho: string; textChirho: string; lemmaIdChirho: string }>>();
+        // Group by chapter-verse (key format: "028-011" for chapter 28, verse 11)
+        const verseGroupsChirho = new Map<string, Array<{ wordIdChirho: string; glossChirho: string; textChirho: string; lemmaIdChirho: string; chapterChirho: number; verseNumChirho: number }>>();
         for (const [wordIdChirho, glossChirho] of Object.entries(glossesChirho)) {
           const infoChirho = wordMapChirho.get(wordIdChirho);
           if (!infoChirho) continue;
-          const vChirho = infoChirho.verse_num;
-          if (!verseGroupsChirho.has(vChirho)) verseGroupsChirho.set(vChirho, []);
-          verseGroupsChirho.get(vChirho)!.push({
+          const chapterVerseKeyChirho = `${String(infoChirho.chapter).padStart(3, '0')}-${String(infoChirho.verse_num).padStart(3, '0')}`;
+          if (!verseGroupsChirho.has(chapterVerseKeyChirho)) verseGroupsChirho.set(chapterVerseKeyChirho, []);
+          verseGroupsChirho.get(chapterVerseKeyChirho)!.push({
             wordIdChirho,
             glossChirho,
             textChirho: infoChirho.text,
             lemmaIdChirho: infoChirho.lemma_id,
+            chapterChirho: infoChirho.chapter,
+            verseNumChirho: infoChirho.verse_num,
           });
         }
 
-        const sortedVersesChirho = Array.from(verseGroupsChirho.entries()).sort((a, b) => a[0] - b[0]);
+        const sortedVersesChirho = Array.from(verseGroupsChirho.entries()).sort((aChirho, bChirho) => aChirho[0].localeCompare(bChirho[0]));
 
         // Create output directory
         const outDirChirho = joinChirho(process.cwd(), 'translations-chirho', `${bookNameChirho.toLowerCase()}-${langCodeChirho}-chirho`);
@@ -585,32 +588,55 @@ WHERE gloss.gloss IS DISTINCT FROM EXCLUDED.gloss;\n\n`;
 -- — John 3:16\n\n`;
 
         const escChirho = (sChirho: string) => sChirho.replace(/'/g, "''");
-        const genWordSqlChirho = (wIdChirho: string, glChirho: string, txtChirho: string, lemChirho: string) => `-- ${wIdChirho}: ${txtChirho} (${lemChirho}) → "${glChirho}"
-WITH ep AS (INSERT INTO phrase (language_id, created_at) SELECT (SELECT id FROM language WHERE code = '${langCodeChirho}'), NOW() WHERE NOT EXISTS (SELECT 1 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL) RETURNING id), epw AS (INSERT INTO phrase_word (phrase_id, word_id) SELECT id, '${wIdChirho}' FROM ep ON CONFLICT DO NOTHING) INSERT INTO gloss (phrase_id, gloss, state, updated_at, source) SELECT p.id, '${escChirho(glChirho)}', 'UNAPPROVED', NOW(), 'IMPORT' FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLUDED.updated_at WHERE gloss.gloss IS DISTINCT FROM EXCLUDED.gloss;\n`;
+        // Fixed SQL: Two separate statements to handle both new and existing phrases
+        // Statement 1: Creates phrase + phrase_word if they don't exist
+        // Statement 2: Always inserts/updates gloss (works whether phrase existed or was just created)
+        // Note: source is enum {USER, IMPORT}, model tracked in comments
+        const genWordSqlChirho = (wIdChirho: string, glChirho: string, txtChirho: string, lemChirho: string) => `-- ${wIdChirho}: ${txtChirho} (${lemChirho}) → "${glChirho}" [${modelChirho}]
+WITH np AS (
+  INSERT INTO phrase (language_id, created_at)
+  SELECT (SELECT id FROM language WHERE code = '${langCodeChirho}'), NOW()
+  WHERE NOT EXISTS (
+    SELECT 1 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
+    WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL
+  )
+  RETURNING id
+)
+INSERT INTO phrase_word (phrase_id, word_id) SELECT id, '${wIdChirho}' FROM np ON CONFLICT DO NOTHING;
+INSERT INTO gloss (phrase_id, gloss, state, updated_at, source)
+SELECT p.id, '${escChirho(glChirho)}', 'UNAPPROVED', NOW(), '${sourceChirho}'
+FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
+WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL
+ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLUDED.updated_at, source = EXCLUDED.source;\n`;
 
         let filesGeneratedChirho = 0;
         let combinedSqlChirho = headerChirho + `-- ${bookNameChirho.toUpperCase()} - ${langCodeChirho.toUpperCase()} Combined\n-- Generated: ${new Date().toISOString()}\n\n`;
 
-        for (const [verseNumChirho, wordsChirho] of sortedVersesChirho) {
-          wordsChirho.sort((a, b) => a.wordIdChirho.localeCompare(b.wordIdChirho));
-          const summaryChirho = wordsChirho.map(w => w.glossChirho).join(' ');
+        for (const [chapterVerseKeyChirho, wordsChirho] of sortedVersesChirho) {
+          wordsChirho.sort((aChirho, bChirho) => aChirho.wordIdChirho.localeCompare(bChirho.wordIdChirho));
+          const summaryChirho = wordsChirho.map(wChirho => wChirho.glossChirho).join(' ');
+          const [chapterStrChirho, verseStrChirho] = chapterVerseKeyChirho.split('-');
+          const chapterNumChirho = parseInt(chapterStrChirho, 10);
+          const verseNumChirho = parseInt(verseStrChirho, 10);
 
-          let verseSqlChirho = headerChirho + `-- ${bookNameChirho.toUpperCase()} v${verseNumChirho} - ${langCodeChirho.toUpperCase()}\n-- ${summaryChirho}\n\nBEGIN;\n`;
+          let verseSqlChirho = headerChirho + `-- ${bookNameChirho.toUpperCase()} c${chapterNumChirho}-v${verseNumChirho} - ${langCodeChirho.toUpperCase()}\n-- ${summaryChirho}\n\nBEGIN;\n`;
           for (const wChirho of wordsChirho) {
             verseSqlChirho += genWordSqlChirho(wChirho.wordIdChirho, wChirho.glossChirho, wChirho.textChirho, wChirho.lemmaIdChirho);
           }
           verseSqlChirho += 'COMMIT;\n';
 
-          writeFileSyncChirho(joinChirho(outDirChirho, `v${String(verseNumChirho).padStart(2, '0')}-chirho.sql`), verseSqlChirho);
+          // Use c028-v011-chirho.sql naming format
+          writeFileSyncChirho(joinChirho(outDirChirho, `c${chapterStrChirho}-v${verseStrChirho}-chirho.sql`), verseSqlChirho);
           filesGeneratedChirho++;
 
-          combinedSqlChirho += `-- v${verseNumChirho}: ${summaryChirho}\n`;
+          combinedSqlChirho += `-- c${chapterStrChirho}-v${verseStrChirho}: ${summaryChirho}\n`;
         }
 
         combinedSqlChirho += '\n';
-        for (const [verseNumChirho, wordsChirho] of sortedVersesChirho) {
-          wordsChirho.sort((a, b) => a.wordIdChirho.localeCompare(b.wordIdChirho));
-          combinedSqlChirho += `BEGIN;\n`;
+        for (const [chapterVerseKeyChirho, wordsChirho] of sortedVersesChirho) {
+          wordsChirho.sort((aChirho, bChirho) => aChirho.wordIdChirho.localeCompare(bChirho.wordIdChirho));
+          const [chapterStrChirho, verseStrChirho] = chapterVerseKeyChirho.split('-');
+          combinedSqlChirho += `BEGIN;\n-- === Chapter ${parseInt(chapterStrChirho, 10)} Verse ${parseInt(verseStrChirho, 10)} ===\n`;
           for (const wChirho of wordsChirho) {
             combinedSqlChirho += genWordSqlChirho(wChirho.wordIdChirho, wChirho.glossChirho, wChirho.textChirho, wChirho.lemmaIdChirho);
           }

@@ -111,6 +111,36 @@ export async function closePgChirho(): Promise<void> {
   }
 }
 
+// Alias for consistency
+export const closePgConnectionChirho = closePgChirho;
+
+/**
+ * Execute a parameterized query on PostgreSQL
+ * Uses docker exec fallback if direct connection failed during init
+ */
+export async function queryPgChirho<TChirho = Record<string, unknown>>(
+  queryChirho: string,
+  paramsChirho?: unknown[]
+): Promise<TChirho[]> {
+  if (useDockerExecChirho) {
+    // For docker exec, we need to substitute params manually (simplified)
+    let finalQueryChirho = queryChirho;
+    if (paramsChirho) {
+      paramsChirho.forEach((paramChirho, idxChirho) => {
+        const valueChirho = typeof paramChirho === 'string'
+          ? `'${paramChirho.replace(/'/g, "''")}'`
+          : paramChirho;
+        finalQueryChirho = finalQueryChirho.replace(`$${idxChirho + 1}`, String(valueChirho));
+      });
+    }
+    return await dockerExecJsonQueryChirho(finalQueryChirho) as TChirho[];
+  }
+
+  const pgChirho = getPgChirho();
+  const resultChirho = await pgChirho.unsafe(queryChirho, paramsChirho as never[]);
+  return resultChirho as TChirho[];
+}
+
 // =============================================================================
 // SQLite Connection (Tracking Database)
 // =============================================================================

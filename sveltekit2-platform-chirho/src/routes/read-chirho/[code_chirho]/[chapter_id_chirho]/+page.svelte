@@ -4,8 +4,50 @@
 
 <script lang="ts">
 	import type { PageData as PageDataChirho } from './$types';
+	import { goto as gotoChirho } from '$app/navigation';
 
 	let { data: dataChirho }: { data: PageDataChirho } = $props();
+
+	// Reference display mode state
+	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('hidden');
+
+	// Get CSS class for gloss based on state - improved styling
+	function getGlossClassChirho(stateChirho: string | null, sourceChirho: string | null): string {
+		if (!stateChirho) return 'text-slate-400 italic'; // No translation
+		if (stateChirho === 'APPROVED') return 'text-emerald-700 font-medium'; // Approved
+		if (sourceChirho === 'MACHINE') return 'text-purple-600 underline decoration-purple-400 decoration-2'; // Machine - purple underline
+		return 'text-amber-700 bg-amber-50 rounded px-0.5'; // Pending - amber background always visible
+	}
+
+	// Navigate to selected book/chapter
+	function navigateToChapterChirho(bookIdChirho: number, chapterNumChirho: number): void {
+		const chapterIdChirho = `${bookIdChirho.toString().padStart(2, '0')}${chapterNumChirho.toString().padStart(3, '0')}`;
+		gotoChirho(`/read-chirho/${dataChirho.codeChirho}/${chapterIdChirho}`);
+	}
+
+	function onBookChangeChirho(eventChirho: Event): void {
+		const selectChirho = eventChirho.target as HTMLSelectElement;
+		const bookIdChirho = parseInt(selectChirho.value, 10);
+		navigateToChapterChirho(bookIdChirho, 1);
+	}
+
+	function onChapterChangeChirho(eventChirho: Event): void {
+		const selectChirho = eventChirho.target as HTMLSelectElement;
+		const chapterNumChirho = parseInt(selectChirho.value, 10);
+		navigateToChapterChirho(dataChirho.bookChirho?.idChirho ?? 1, chapterNumChirho);
+	}
+
+	function onLanguageChangeChirho(eventChirho: Event): void {
+		const selectChirho = eventChirho.target as HTMLSelectElement;
+		const langCodeChirho = selectChirho.value;
+		const chapterIdChirho = `${(dataChirho.bookChirho?.idChirho ?? 1).toString().padStart(2, '0')}${(dataChirho.chapterChirho ?? 1).toString().padStart(3, '0')}`;
+		gotoChirho(`/read-chirho/${langCodeChirho}/${chapterIdChirho}`);
+	}
+
+	// Get reference text for a verse
+	function getReferenceTextChirho(verseIdChirho: string): string {
+		return dataChirho.referenceVersesMapChirho?.[verseIdChirho] ?? '';
+	}
 </script>
 
 <svelte:head>
@@ -30,23 +72,174 @@
 			{dataChirho.bookChirho?.nameChirho} {dataChirho.chapterChirho}
 		</h1>
 
-		<div class="mt-6 space-y-4">
+		<!-- Navigation: Language / Book / Chapter -->
+		<div class="mt-4 flex flex-wrap gap-4 items-center">
+			<!-- Language Switcher -->
+			<label class="flex items-center gap-2">
+				<span class="text-sm text-slate-600">Language:</span>
+				<select
+					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					value={dataChirho.codeChirho}
+					onchange={onLanguageChangeChirho}
+				>
+					{#each dataChirho.languagesWithTranslationsChirho ?? [] as langChirho}
+						<option value={langChirho.code}>{langChirho.name}</option>
+					{/each}
+					{#if !dataChirho.languagesWithTranslationsChirho?.some((lChirho) => lChirho.code === dataChirho.codeChirho)}
+						<option value={dataChirho.codeChirho}>{dataChirho.languageChirho?.nameChirho}</option>
+					{/if}
+				</select>
+			</label>
+
+			<label class="flex items-center gap-2">
+				<span class="text-sm text-slate-600">Book:</span>
+				<select
+					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					value={String(dataChirho.bookChirho?.idChirho ?? '')}
+					onchange={onBookChangeChirho}
+				>
+					{#each dataChirho.allBooksChirho ?? [] as bookOptionChirho}
+						<option value={String(bookOptionChirho.id)}>{bookOptionChirho.name}</option>
+					{/each}
+				</select>
+			</label>
+
+			<label class="flex items-center gap-2">
+				<span class="text-sm text-slate-600">Chapter:</span>
+				<select
+					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					value={String(dataChirho.chapterChirho ?? '')}
+					onchange={onChapterChangeChirho}
+				>
+					{#each dataChirho.chaptersInBookChirho ?? [] as chapterNumChirho}
+						<option value={String(chapterNumChirho)}>{chapterNumChirho}</option>
+					{/each}
+				</select>
+			</label>
+		</div>
+
+		<!-- Reference Version Controls -->
+		<div class="mt-3 flex flex-wrap gap-3 items-center text-sm">
+			<span class="text-slate-600">Reference:</span>
+			<div class="flex rounded border border-slate-300 overflow-hidden">
+				<button
+					type="button"
+					class="px-2 py-1 {referenceDisplayModeChirho === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (referenceDisplayModeChirho = 'hidden')}
+				>
+					Hidden
+				</button>
+				<button
+					type="button"
+					class="px-2 py-1 border-x border-slate-300 {referenceDisplayModeChirho === 'below' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (referenceDisplayModeChirho = 'below')}
+				>
+					Below
+				</button>
+				<button
+					type="button"
+					class="px-2 py-1 {referenceDisplayModeChirho === 'side' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (referenceDisplayModeChirho = 'side')}
+				>
+					Side
+				</button>
+			</div>
+			{#if dataChirho.referenceVersionsChirho?.length}
+				<select class="border border-slate-300 rounded px-2 py-1 bg-white text-sm">
+					{#each dataChirho.referenceVersionsChirho as versionChirho}
+						<option value={versionChirho.codeChirho}>{versionChirho.nameChirho}</option>
+					{/each}
+				</select>
+			{/if}
+		</div>
+
+		<!-- Legend for gloss styling -->
+		<div class="mt-4 flex flex-wrap gap-4 text-xs">
+			<span class="flex items-center gap-1">
+				<span class="text-emerald-700 font-medium">text</span>
+				<span class="text-slate-600">Approved</span>
+			</span>
+			<span class="flex items-center gap-1">
+				<span class="text-amber-700 bg-amber-50 rounded px-1">text</span>
+				<span class="text-slate-600">Pending review</span>
+			</span>
+			<span class="flex items-center gap-1">
+				<span class="text-purple-600 underline decoration-purple-400 decoration-2">text</span>
+				<span class="text-slate-600">Machine</span>
+			</span>
+			<span class="flex items-center gap-1">
+				<span class="text-slate-400 italic">—</span>
+				<span class="text-slate-600">No translation</span>
+			</span>
+		</div>
+
+		<div class="mt-6 space-y-6 {referenceDisplayModeChirho === 'side' ? 'mr-80' : ''}">
 			{#each dataChirho.versesChirho as verseChirho}
-				<div class="flex gap-2">
-					<span class="text-sm font-semibold text-slate-400 w-8">
-						{verseChirho.verseNumberChirho}
-					</span>
-					<p class="text-slate-800 leading-relaxed" style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}">
-						{#each verseChirho.wordsChirho as wordChirho, indexChirho}
-							<span
-								class="inline hover:bg-yellow-100 cursor-pointer rounded"
-								title={wordChirho.lemmaIdChirho ?? ''}
-							>{wordChirho.glossChirho ?? wordChirho.textChirho}{indexChirho < verseChirho.wordsChirho.length - 1 ? ' ' : ''}</span>
-						{/each}
-					</p>
+				<div class="verse-container-chirho">
+					<!-- Word-by-word gloss view -->
+					<div class="flex gap-3">
+						<span class="text-sm font-semibold text-slate-400 w-8 pt-1 flex-shrink-0">
+							{verseChirho.verseNumberChirho}
+						</span>
+						<div class="flex flex-wrap gap-x-1 gap-y-3">
+							{#each verseChirho.wordsChirho as wordChirho}
+								<span
+									class="inline-flex flex-col items-center hover:bg-yellow-50 cursor-pointer rounded px-1 py-0.5 transition-colors"
+									title="{wordChirho.lemmaIdChirho ?? ''} | {wordChirho.grammarChirho ?? ''}"
+								>
+									<span class="text-slate-800 text-sm">{wordChirho.textChirho}</span>
+									<span
+										class="text-xs leading-tight {getGlossClassChirho(wordChirho.glossStateChirho, wordChirho.glossSourceChirho)}"
+										style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}"
+									>
+										{wordChirho.glossChirho ?? '—'}
+									</span>
+								</span>
+							{/each}
+						</div>
+					</div>
+
+					<!-- Reference translation (below mode) -->
+					{#if referenceDisplayModeChirho === 'below'}
+						{@const refTextChirho = getReferenceTextChirho(verseChirho.verseIdChirho)}
+						{#if refTextChirho}
+							<div class="ml-8 mt-2 text-sm text-slate-600 italic border-l-2 border-slate-200 pl-3">
+								{refTextChirho}
+							</div>
+						{/if}
+					{/if}
 				</div>
 			{/each}
 		</div>
+
+		<!-- Side panel mode for reference translations -->
+		{#if referenceDisplayModeChirho === 'side'}
+			<aside class="fixed right-0 top-0 w-80 h-full bg-white shadow-lg border-l border-slate-200 overflow-y-auto z-40">
+				<div class="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center">
+					<h3 class="font-semibold text-slate-800">Reference (KJV)</h3>
+					<button
+						type="button"
+						class="text-slate-500 hover:text-slate-700"
+						onclick={() => (referenceDisplayModeChirho = 'hidden')}
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="p-4 space-y-4">
+					{#each dataChirho.versesChirho as verseChirho}
+						{@const refTextChirho = getReferenceTextChirho(verseChirho.verseIdChirho)}
+						{#if refTextChirho}
+							<p class="text-sm">
+								<strong class="text-slate-500">{verseChirho.verseNumberChirho}</strong>
+								<span class="text-slate-700">{refTextChirho}</span>
+							</p>
+						{/if}
+					{/each}
+				</div>
+			</aside>
+		{/if}
 
 		<!-- Chapter navigation -->
 		<div class="mt-8 flex justify-between">
