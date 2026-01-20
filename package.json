@@ -4,8 +4,20 @@
   "description": "Bun tooling for Global Bible Tools Platform",
   "type": "module",
   "scripts": {
-    "translate-chirho": "bun run tools-chirho/translate-chirho.ts",
-    "build-translations-chirho": "bun run tools-chirho/build-translations-chirho.ts"
+    "init-db-chirho": "bun run tools-chirho/init-db-chirho.ts",
+    "list-books-chirho": "bun run tools-chirho/list-books-chirho.ts",
+    "get-verse-chirho": "bun run tools-chirho/get-verse-chirho.ts",
+    "get-chapter-chirho": "bun run tools-chirho/get-chapter-chirho.ts",
+    "query-lemma-chirho": "bun run tools-chirho/query-lemma-chirho.ts",
+    "set-decision-chirho": "bun run tools-chirho/set-decision-chirho.ts",
+    "check-consistency-chirho": "bun run tools-chirho/check-consistency-chirho.ts",
+    "generate-sql-chirho": "bun run tools-chirho/generate-translation-sql-chirho.ts",
+    "generate-verse-sql-chirho": "bun run tools-chirho/generate-verse-sql-chirho.ts",
+    "expand-glosses-chirho": "bun run tools-chirho/expand-glosses-chirho.ts"
+  },
+  "dependencies": {
+    "postgres": "^3.4.4",
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

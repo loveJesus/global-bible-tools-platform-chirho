@@ -1,0 +1,57 @@
+erDiagram
+  book{
+    ~integer~ id
+    ~text~ name
+  }
+
+  lemma{
+    ~text~ id
+  }
+
+  lemma_form{
+    ~text~ id
+    ~text~ grammar
+    ~text~ lemma_id
+  }
+
+  lemma_resource{
+    ~text~ lemma_id
+    ~resource_code~ resource_code
+    ~text~ content
+  }
+
+  recording{
+    ~text~ id
+    ~text~ name
+  }
+
+  verse{
+    ~text~ id
+    ~integer~ number
+    ~integer~ book_id
+    ~integer~ chapter
+  }
+
+  verse_audio_timing{
+    ~integer~ id
+    ~text~ verse_id
+    ~text~ recording_id
+    ~double precision~ start
+    ~double precision~ end
+  }
+
+  word{
+    ~text~ id
+    ~text~ text
+    ~text~ verse_id
+    ~text~ form_id
+  }
+
+  lemma_form }|..|| lemma : lemma_form_lemma_id_fkey
+  lemma_resource }|..|| lemma : lemma_resource_lemma_id_fkey
+  verse }|..|| book : verse_book_id_fkey
+  verse_audio_timing }|..|| verse : verse_audio_timing_verse_id_fkey
+  verse_audio_timing }|..|| recording : verse_audio_timing_recording_id_fkey
+  word }|..|| verse : word_verse_id_fkey
+  word }|..|| lemma_form : word_form_id_fkey
+

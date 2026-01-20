@@ -31,3 +31,12 @@ npm-debug.log*
 
 # Test coverage
 coverage/
+
+# SQLite database files (keep schema.sql)
+*.db
+*.db-shm
+*.db-wal
+
+# Claude Code local config
+.claude/
+.mcp.json

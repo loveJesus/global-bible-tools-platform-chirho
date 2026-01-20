@@ -2,10 +2,19 @@
 
 # Global Bible Tools Platform - Agent Instructions
 
-This is a Bun-based tooling project that supports the Next.js `platform/` application running in Docker. This project provides:
+This is a Bun-based tooling project that supports the Next.js application running in Docker. This project provides:
 - Translation generation and management tools
 - Build scripts and utilities
+- Database tooling and queries
 - Development helpers
+
+## Architecture Documentation
+
+**Read these first to understand the platform:**
+- `spec-chirho/platform-overview-chirho.md` - High-level architecture and workflow
+- `spec-chirho/database-architecture-chirho.md` - Database schema and access patterns
+- `erd-bible-chirho.txt` - Bible data ERD (books, verses, words, lemmas)
+- `erd-translation-chirho.txt` - Translation workflow ERD (phrases, glosses)
 
 ## Runtime
 
@@ -13,7 +22,8 @@ This is a Bun-based tooling project that supports the Next.js `platform/` applic
 
 ## The Suffix Rule
 
-ALL identifiers created by us must have the `Chirho` suffix in the appropriate case.
+**IMPORTANT:** The `nextjs-platform-chirho/` submodule is upstream code and does NOT follow Chirho naming.
+ALL identifiers created by us (outside the submodule) must have the `Chirho` suffix in the appropriate case.
 
 | Type                                                  | Case Style        | Suffix                  | Example                                                                                                     |
 |-------------------------------------------------------|-------------------|-------------------------|-------------------------------------------------------------------------------------------------------------|
@@ -33,21 +43,95 @@ ALL identifiers created by us must have the `Chirho` suffix in the appropriate c
 ## Project Structure
 
 ```
-global-bible-tools-platform-chirho/
-├── AGENTS.md                 # This file - AI agent instructions
-├── CLAUDE.md                 # Points to AGENTS.md
-├── package.json              # Bun package configuration
+platform-chirho/
+├── AGENTS.md                     # This file - AI agent instructions
+├── CLAUDE.md                     # Points to AGENTS.md
+├── package.json                  # Bun package configuration
 ├── .gitignore
-├── .env                      # Environment variables
-├── tools-chirho/             # Bun tooling scripts
-├── scripts-chirho/           # Build and utility scripts
-├── translations-chirho/      # Translation files and generators
-└── spec-chirho/              # Specifications and documentation
+├── .gitmodules                   # Submodule config
+├── .env                          # Environment variables
+├── erd-bible-chirho.txt          # Bible data ERD diagram
+├── erd-translation-chirho.txt    # Translation workflow ERD
+├── nextjs-platform-chirho/       # [SUBMODULE] Next.js app (upstream code)
+│   ├── src/modules/              # Feature modules
+│   ├── db/migrations/            # SQL migrations
+│   └── compose.yaml              # Docker services
+├── tools-chirho/                 # Bun tooling scripts
+├── scripts-chirho/               # Build and utility scripts
+├── translations-chirho/          # Translation files and generators
+└── spec-chirho/                  # Specifications and AI notes
+    ├── platform-overview-chirho.md
+    └── database-architecture-chirho.md
 ```
 
-## Related Projects
+## Next.js Platform (Submodule)
 
-- `../platform/` - The main Next.js application (runs in Docker)
+The `nextjs-platform-chirho/` directory is a git submodule pointing to:
+`https://github.com/globalbibletools/platform.git`
+
+### Key Paths in Submodule
+- `src/db.ts` - Database connection (Kysely + pg)
+- `src/modules/` - Feature modules (translation, languages, users, etc.)
+- `db/migrations/` - SQL migrations
+- `compose.yaml` - Docker services
+
+### Running the Platform
+```bash
+cd nextjs-platform-chirho
+docker compose up -d        # Start all services
+docker compose logs -f      # View logs
+```
+
+### Services (when Docker is up)
+| Service | Port | URL |
+|---------|------|-----|
+| Next.js Server | 3000 | http://localhost:3000 |
+| PostgreSQL | 5432 | postgresql://postgres:asdfasdf@localhost:5432/postgres |
+| Test DB | 5433 | postgresql://postgres:asdfasdf@localhost:5433/postgres |
+| LocalStack S3 | 4566 | http://localhost:4566 |
+| Job Worker | 9000 | http://localhost:9000 |
+| Docs | 4000 | http://localhost:4000 |
+
+## Database Quick Reference
+
+### Key Tables
+**Bible Data (read-only):**
+- `Book`, `Verse`, `Word` - Bible text
+- `Lemma`, `LemmaForm`, `LemmaResource` - Lexicon data
+
+**Translation Data (per language):**
+- `Language` - Target languages
+- `Phrase`, `PhraseWord` - Translation units
+- `Gloss`, `GlossHistory` - Translations and audit trail
+- `MachineGloss` - AI suggestions
+
+**Users:**
+- `User`, `Session`, `LanguageMemberRole`
+
+### Connecting from Bun Tools
+
+**IMPORTANT:** PostgreSQL runs inside Docker. The tools automatically detect connection issues
+and fall back to `docker exec` if a local PostgreSQL is intercepting the port.
+
+```typescript
+// tools-chirho/db-chirho.ts provides:
+import { queryPgChirho, initPgConnectionChirho, dockerExecJsonQueryChirho } from './db-chirho';
+
+// Initialize connection (auto-detects docker exec fallback)
+await initPgConnectionChirho();
+
+// Query using raw SQL (works with both direct and docker exec)
+const booksChirho = await queryPgChirho(`SELECT * FROM book ORDER BY id`);
+```
+
+**Direct Query via Docker (for debugging):**
+```bash
+docker exec nextjs-platform-chirho-db-1 psql -U postgres -c "SELECT * FROM book LIMIT 5"
+```
+
+**If you have local PostgreSQL running (Homebrew, etc.):**
+The MCP server and tools will automatically fall back to docker exec.
+No action needed - just ensure Docker is running.
 
 ## File Headers
 
@@ -60,16 +144,109 @@ All new source files must include the John 3:16 header as a comment at the top:
 // — John 3:16
 ```
 
-**CSS/SCSS:**
-```css
-/* For God so loved the world, that He gave His only begotten Son,
-   that all who believe in Him should not perish but have everlasting life.
-   — John 3:16 */
+**SQL:**
+```sql
+-- For God so loved the world, that He gave His only begotten Son,
+-- that all who believe in Him should not perish but have everlasting life.
+-- — John 3:16
 ```
 
-## Commands
+**Markdown:**
+```markdown
+# For God so loved the world, that He gave His only begotten Son,
+# that all who believe in Him should not perish but have everlasting life.
+# — John 3:16
+```
 
-Run tools using Bun:
+## Translation Tools
+
+### MCP Server
+The `bible-translation-chirho` MCP server provides these tools directly to Claude:
+- `list_books_chirho` - List all Bible books
+- `get_verse_chirho` - Get verse with words and glosses
+- `get_chapter_chirho` - Get entire chapter as JSON
+- `query_lemma_chirho` - Get lemma info with lexicon entries
+- `set_decision_chirho` - Record translation decision for consistency
+- `get_decisions_chirho` - List all recorded decisions
+- `check_consistency_chirho` - Find inconsistent translations
+- `generate_translation_sql_chirho` - Generate idempotent SQL
+
+### CLI Commands
 ```bash
-bun run <script-name>
+bun run init-db-chirho              # Initialize SQLite tracking DB
+bun run list-books-chirho           # List all Bible books
+bun run get-verse-chirho "Gen 1:1"  # Get single verse
+bun run get-chapter-chirho "Gen 1"  # Get chapter as JSON
+bun run query-lemma-chirho H3820    # Query lemma info
+bun run set-decision-chirho H3820 "heart" "Always literal"
+bun run check-consistency-chirho    # Find inconsistencies
+bun run generate-sql-chirho fra translations.json
+```
+
+### Translation Philosophy
+1. **Literal word-for-word** - Each Hebrew/Greek word gets a translation
+2. **Lemma consistency** - Same root word → same translation
+3. **Particles hyphenated** with n-dash: "the–heavens", "in–beginning"
+4. **Names transliterated from Greek** with accents (e.g., Iēsoûs, Christós, Pétros)
+5. **Word order preserved** unless meaning would be lost
+
+### Token-Efficient Translation Workflow (MCP Tools)
+
+**IMPORTANT:** Use MCP tools directly for maximum token efficiency:
+
+1. **Get words to translate** via MCP tool:
+   ```
+   get_words_for_translation_chirho(book: "jude")
+   ```
+   Returns: `{"6500100101":"Ἰούδας","6500100102":"Ἰησοῦ",...}`
+
+2. **Create translation** - output ONLY the gloss values:
+   ```json
+   {
+     "6500100101": "Ioudas",
+     "6500100102": "de–Iēsoû",
+     "6500100103": "Christoû"
+   }
+   ```
+
+3. **Generate SQL files** via MCP tool:
+   ```
+   expand_glosses_chirho(
+     language_code: "spa",
+     book_name: "jude",
+     glosses: {"6500100101": "Ioudas", ...}
+   )
+   ```
+   This fetches Greek/lemmas from DB and writes SQL files automatically.
+
+**Token savings:** ~70% vs verbose JSON. Agent outputs only gloss decisions.
+
+### SQLite Tracking Database
+Located at `data-chirho/translation-tracking-chirho.db`:
+- `lemma_decision_chirho` - Decided translations for lemmas
+- `lemma_sense_chirho` - Multiple senses for polysemous words
+- `particle_rule_chirho` - How to handle particles
+- `semantic_domain_chirho` - Word categorization
+
+### Claude Command
+Use `/translate-chirho <language> <scope>` to create translations:
+```
+/translate-chirho fra "Genesis 1"
+/translate-chirho deu "Psalm 23"
+```
+
+## Common Tasks
+
+### Query the database directly
+```bash
+docker compose -f nextjs-platform-chirho/compose.yaml exec db psql -U postgres
+```
+
+### Update submodule to latest
+```bash
+cd nextjs-platform-chirho
+git pull origin main
+cd ..
+git add nextjs-platform-chirho
+git commit -m "Update platform submodule"
 ```

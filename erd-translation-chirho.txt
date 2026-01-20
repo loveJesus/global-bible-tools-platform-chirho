@@ -1,0 +1,100 @@
+erDiagram
+  footnote{
+    ~uuid~ author_id
+    ~timestamp(3) without time zone~ timestamp
+    ~text~ content
+    ~integer~ phrase_id
+  }
+
+  gloss{
+    ~text~ gloss
+    ~gloss_state~ state
+    ~integer~ phrase_id
+    ~gloss_source~ source
+    ~timestamp without time zone~ updated_at
+    ~uuid~ updated_by
+  }
+
+  gloss_history{
+    ~integer~ id
+    ~integer~ phrase_id
+    ~text~ gloss
+    ~gloss_state~ state
+    ~gloss_source~ source
+    ~timestamp without time zone~ updated_at
+    ~uuid~ updated_by
+  }
+
+  lemma_form_suggestion{
+    ~integer~ id
+    ~uuid~ language_id
+    ~text~ form_id
+    ~text~ gloss
+    ~integer~ count
+  }
+  
+  machine_gloss{
+    ~text~ word_id
+    ~uuid~ language_id
+    ~text~ gloss
+    ~integer~ id
+    ~integer~ model_id
+    ~timestamp without time zone~ updated_at
+    ~uuid~ updated_by
+  }
+
+  machine_gloss_history{
+    ~integer~ id
+    ~integer~ machine_gloss_id
+    ~text~ gloss
+    ~timestamp without time zone~ updated_at
+    ~uuid~ updated_by
+  }
+
+  machine_gloss_model{
+    ~integer~ id
+    ~text~ code
+  }
+
+  phrase{
+    ~integer~ id
+    ~uuid~ language_id
+    ~timestamp(3) without time zone~ created_at
+    ~uuid~ created_by
+    ~timestamp(3) without time zone~ deleted_at
+    ~uuid~ deleted_by
+  }
+
+  phrase_word{
+    ~integer~ phrase_id
+    ~text~ word_id
+  }
+
+  translator_note{
+    ~uuid~ author_id
+    ~timestamp(3) without time zone~ timestamp
+    ~text~ content
+    ~integer~ phrase_id
+  }
+
+  lemma_form_suggestion }|..|| language : lemma_form_suggestion_language_id_fkey
+  lemma_form_suggestion }|..|| lemma_form : lemma_form_suggestion_form_id_fkey
+  footnote }|..|| phrase : footnote_phrase_id_fkey
+  footnote }|..|| users : footnote_author_id_fkey
+  machine_gloss }|..|| word : machine_gloss_word_id_fkey
+  machine_gloss }|..|| language : machine_gloss_language_id_fkey
+  machine_gloss }|..|| users : machine_gloss_updated_by_fkey
+  machine_gloss }|..|| machine_gloss_model : machine_gloss_model_id_fkey
+  phrase }|..|| language : phrase_language_id_fkey
+  phrase }|..|| users : phrase_deleted_by_fkey
+  phrase }|..|| users : phrase_created_by_fkey
+  phrase_word }|..|| word : phrase_word_word_id_fkey
+  phrase_word }|..|| phrase : phrase_word_phrase_id_fkey
+  translator_note }|..|| phrase : translator_note_phase_id_fkey
+  translator_note }|..|| users : translator_note_author_id_fkey
+  gloss_history }|..|| phrase : gloss_history_phrase_id_fkey
+  gloss }|..|| users : gloss_updated_by_fkey
+  gloss }|..|| phrase : gloss_phrase_id_fkey
+  machine_gloss_history }|..|| users : machine_gloss_history_updated_by_fkey
+  machine_gloss_history }|..|| machine_gloss : machine_gloss_history_machine_gloss_id_fkey
+
