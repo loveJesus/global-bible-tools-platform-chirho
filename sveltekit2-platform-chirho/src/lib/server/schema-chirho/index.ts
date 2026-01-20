@@ -16,3 +16,6 @@ export * from './languages-chirho';
 
 // Translation tables
 export * from './translation-chirho';
+
+// Relations (for Drizzle relational queries)
+export * from './relations-chirho';
