@@ -126,14 +126,8 @@
 		formDataChirho.set('state', stateChirho);
 		formDataChirho.set('gloss', inputValueChirho);
 
-		// Determine approval method
-		if (inputValueChirho === wordChirho.suggestionsChirho[0]) {
-			formDataChirho.set('method', 'MACHINE_SUGGESTION');
-		} else if (inputValueChirho === googleTranslateSuggestionChirho) {
-			formDataChirho.set('method', 'GOOGLE_SUGGESTION');
-		} else {
-			formDataChirho.set('method', 'USER_INPUT');
-		}
+		// Source is always USER for manual input (database only accepts USER or IMPORT)
+		formDataChirho.set('method', 'USER');
 
 		try {
 			const responseChirho = await fetch('/api-chirho/gloss-chirho', {
