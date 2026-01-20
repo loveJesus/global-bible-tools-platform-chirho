@@ -17,7 +17,7 @@ export interface LanguageWithStatsChirho {
 	nameChirho: string;
 	fontChirho: string;
 	textDirectionChirho: 'ltr' | 'rtl';
-	bibleTranslationIdsChirho: string[] | null;
+	translationIdsChirho: string[] | null;
 }
 
 export interface LanguageMemberWithRolesChirho {
@@ -38,7 +38,7 @@ export async function getAllLanguagesChirho(): Promise<LanguageWithStatsChirho[]
 			nameChirho: languageTableChirho.nameChirho,
 			fontChirho: languageTableChirho.fontChirho,
 			textDirectionChirho: languageTableChirho.textDirectionChirho,
-			bibleTranslationIdsChirho: languageTableChirho.bibleTranslationIdsChirho
+			translationIdsChirho: languageTableChirho.translationIdsChirho
 		})
 		.from(languageTableChirho)
 		.orderBy(languageTableChirho.nameChirho);
@@ -59,7 +59,7 @@ export async function getLanguageByCodeChirho(
 			nameChirho: languageTableChirho.nameChirho,
 			fontChirho: languageTableChirho.fontChirho,
 			textDirectionChirho: languageTableChirho.textDirectionChirho,
-			bibleTranslationIdsChirho: languageTableChirho.bibleTranslationIdsChirho
+			translationIdsChirho: languageTableChirho.translationIdsChirho
 		})
 		.from(languageTableChirho)
 		.where(eqChirho(languageTableChirho.codeChirho, codeChirho))
@@ -81,7 +81,7 @@ export async function getLanguageByIdChirho(
 			nameChirho: languageTableChirho.nameChirho,
 			fontChirho: languageTableChirho.fontChirho,
 			textDirectionChirho: languageTableChirho.textDirectionChirho,
-			bibleTranslationIdsChirho: languageTableChirho.bibleTranslationIdsChirho
+			translationIdsChirho: languageTableChirho.translationIdsChirho
 		})
 		.from(languageTableChirho)
 		.where(eqChirho(languageTableChirho.idChirho, idChirho))
@@ -108,7 +108,7 @@ export async function getUserLanguagesChirho(
 		return [];
 	}
 
-	const languageIdsChirho = membershipChirho.map((mChirho) => mChirho.languageIdChirho);
+	const languageIdsChirho = membershipChirho.map((membershipItemChirho) => membershipItemChirho.languageIdChirho);
 
 	const resultsChirho: Array<LanguageWithStatsChirho & { rolesChirho: string[] }> = [];
 
@@ -128,7 +128,7 @@ export async function getUserLanguagesChirho(
 
 		resultsChirho.push({
 			...languageChirho,
-			rolesChirho: rolesChirho.map((rChirho) => rChirho.roleChirho)
+			rolesChirho: rolesChirho.map((roleItemChirho) => roleItemChirho.roleChirho)
 		});
 	}
 
@@ -169,7 +169,7 @@ export async function getLanguageMembersChirho(
 
 		resultsChirho.push({
 			...memberChirho,
-			rolesChirho: rolesChirho.map((rChirho) => rChirho.roleChirho)
+			rolesChirho: rolesChirho.map((roleItemChirho) => roleItemChirho.roleChirho)
 		});
 	}
 

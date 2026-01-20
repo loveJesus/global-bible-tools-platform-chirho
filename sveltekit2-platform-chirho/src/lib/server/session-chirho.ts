@@ -86,7 +86,7 @@ function generateSessionIdChirho(): string {
 	const bytesChirho = new Uint8Array(32);
 	crypto.getRandomValues(bytesChirho);
 	return Array.from(bytesChirho)
-		.map((bChirho) => bChirho.toString(16).padStart(2, '0'))
+		.map((byteChirho) => byteChirho.toString(16).padStart(2, '0'))
 		.join('');
 }
 

@@ -22,7 +22,7 @@ export const claimsRepositoryChirho = {
 
 		return {
 			idChirho: userIdChirho,
-			systemRolesChirho: resultChirho.map((rChirho) => rChirho.roleChirho as SystemRoleRawChirho)
+			systemRolesChirho: resultChirho.map((roleItemChirho) => roleItemChirho.roleChirho as SystemRoleRawChirho)
 		};
 	},
 

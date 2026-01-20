@@ -2,6 +2,9 @@
 // that all who believe in Him should not perish but have everlasting life.
 // — John 3:16
 
+// NOTE: Raw SQL queries reference upstream database tables (word, phrase, gloss, etc.)
+// which don't have Chirho suffix - they're from the nextjs-platform-chirho schema.
+
 import { queryRawChirho } from '$lib/server/db-chirho';
 import type {
 	DbGlossChirho,
@@ -170,8 +173,8 @@ export const glossRepositoryChirho = {
                 WHERE excluded.state <> gloss.state OR excluded.gloss <> gloss.gloss
       `,
 			[
-				optionsChirho.phrasesChirho.map((phChirho) => phChirho.phraseIdChirho),
-				optionsChirho.phrasesChirho.map((phChirho) => phChirho.glossChirho),
+				optionsChirho.phrasesChirho.map((phraseItemChirho) => phraseItemChirho.phraseIdChirho),
+				optionsChirho.phrasesChirho.map((phraseItemChirho) => phraseItemChirho.glossChirho),
 				optionsChirho.updatedByChirho
 			]
 		);

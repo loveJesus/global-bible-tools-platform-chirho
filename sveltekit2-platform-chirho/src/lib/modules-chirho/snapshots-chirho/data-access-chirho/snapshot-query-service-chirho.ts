@@ -68,9 +68,9 @@ export const snapshotQueryServiceChirho = {
 		return {
 			totalChirho: parseInt(rowChirho.total, 10),
 			pageChirho: (rowChirho.page || []).map(
-				(pChirho): PaginatedSnapshotChirho => ({
-					idChirho: pChirho.id,
-					timestampChirho: new Date(pChirho.timestamp)
+				(snapshotItemChirho): PaginatedSnapshotChirho => ({
+					idChirho: snapshotItemChirho.id,
+					timestampChirho: new Date(snapshotItemChirho.timestamp)
 				})
 			)
 		};

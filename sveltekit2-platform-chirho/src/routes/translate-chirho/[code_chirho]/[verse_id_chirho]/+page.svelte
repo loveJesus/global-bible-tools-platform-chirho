@@ -64,7 +64,7 @@
 				<h2 class="text-lg font-semibold text-slate-900 mb-4">Translation</h2>
 
 				{#if selectedWordIdChirho}
-					{@const selectedWordChirho = dataChirho.wordsChirho.find((wChirho) => wChirho.wordIdChirho === selectedWordIdChirho)}
+					{@const selectedWordChirho = dataChirho.wordsChirho.find((wordItemChirho) => wordItemChirho.wordIdChirho === selectedWordIdChirho)}
 					{#if selectedWordChirho}
 						<div class="space-y-4">
 							<div>

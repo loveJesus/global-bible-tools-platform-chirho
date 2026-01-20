@@ -248,9 +248,9 @@ async function selectUserFieldsChirho(
 		emailChirho: userChirho.emailChirho,
 		emailStatusChirho: userChirho.emailStatusChirho,
 		statusChirho: userChirho.statusChirho,
-		passwordResetsChirho: passwordResetsChirho.map((rChirho) => ({
-			tokenChirho: rChirho.tokenChirho,
-			expiresAtChirho: new Date(Number(rChirho.expiresChirho))
+		passwordResetsChirho: passwordResetsChirho.map((resetItemChirho) => ({
+			tokenChirho: resetItemChirho.tokenChirho,
+			expiresAtChirho: new Date(Number(resetItemChirho.expiresChirho))
 		})),
 		emailVerificationChirho:
 			emailVerificationsChirho.length > 0
@@ -260,11 +260,11 @@ async function selectUserFieldsChirho(
 						expiresAtChirho: new Date(Number(emailVerificationsChirho[0].expiresChirho))
 					}
 				: null,
-		invitationsChirho: invitationsChirho.map((iChirho) => ({
-			tokenChirho: iChirho.tokenChirho,
-			expiresAtChirho: new Date(Number(iChirho.expiresChirho))
+		invitationsChirho: invitationsChirho.map((invitationItemChirho) => ({
+			tokenChirho: invitationItemChirho.tokenChirho,
+			expiresAtChirho: new Date(Number(invitationItemChirho.expiresChirho))
 		})),
-		systemRolesChirho: systemRolesChirho.map((rChirho) => rChirho.roleChirho)
+		systemRolesChirho: systemRolesChirho.map((roleItemChirho) => roleItemChirho.roleChirho)
 	};
 }
 

@@ -2,6 +2,9 @@
 // that all who believe in Him should not perish but have everlasting life.
 // — John 3:16
 
+// NOTE: Raw SQL queries reference upstream database tables (verse, word, phrase, etc.)
+// which don't have Chirho suffix - they're from the nextjs-platform-chirho schema.
+
 import { queryRawChirho } from '$lib/server/db-chirho';
 import type { VerseChirho, LemmaResourceChirho } from '../model-chirho';
 
@@ -79,15 +82,15 @@ export const readingQueryServiceChirho = {
 		return resultChirho.map((rowChirho) => ({
 			idChirho: rowChirho.id,
 			numberChirho: rowChirho.number,
-			wordsChirho: (rowChirho.words || []).map((wChirho) => ({
-				idChirho: wChirho.id,
-				textChirho: wChirho.text,
-				glossChirho: wChirho.gloss,
-				linkedWordsChirho: wChirho.linkedWords,
-				lemmaChirho: wChirho.lemma,
-				grammarChirho: wChirho.grammar,
-				footnoteChirho: wChirho.footnote,
-				nativeLexiconChirho: wChirho.nativeLexicon
+			wordsChirho: (rowChirho.words || []).map((wordItemChirho) => ({
+				idChirho: wordItemChirho.id,
+				textChirho: wordItemChirho.text,
+				glossChirho: wordItemChirho.gloss,
+				linkedWordsChirho: wordItemChirho.linkedWords,
+				lemmaChirho: wordItemChirho.lemma,
+				grammarChirho: wordItemChirho.grammar,
+				footnoteChirho: wordItemChirho.footnote,
+				nativeLexiconChirho: wordItemChirho.nativeLexicon
 			}))
 		}));
 	},

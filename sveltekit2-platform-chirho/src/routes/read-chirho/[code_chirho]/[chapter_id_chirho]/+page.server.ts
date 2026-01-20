@@ -3,7 +3,7 @@
 // — John 3:16
 
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
-import { dbChirho, eqChirho, andChirho } from '$lib/server/db-chirho';
+import { dbChirho, eqChirho, andChirho, sqlChirho } from '$lib/server/db-chirho';
 import {
 	languageTableChirho,
 	bookTableChirho,
@@ -84,7 +84,8 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 					phraseTableChirho,
 					andChirho(
 						eqChirho(phraseWordTableChirho.phraseIdChirho, phraseTableChirho.idChirho),
-						eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho)
+						eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho),
+						sqlChirho`${phraseTableChirho.deletedAtChirho} IS NULL`
 					)
 				)
 				.leftJoin(glossTableChirho, eqChirho(phraseTableChirho.idChirho, glossTableChirho.phraseIdChirho))
@@ -94,11 +95,11 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 			return {
 				verseIdChirho: verseChirho.idChirho,
 				verseNumberChirho: verseChirho.numberChirho,
-				wordsChirho: wordsResultChirho.map((wChirho) => ({
-					wordIdChirho: wChirho.wordIdChirho,
-					textChirho: wChirho.textChirho,
-					lemmaIdChirho: wChirho.lemmaIdChirho,
-					glossChirho: wChirho.stateChirho === 'APPROVED' ? wChirho.glossChirho : null
+				wordsChirho: wordsResultChirho.map((wordItemChirho) => ({
+					wordIdChirho: wordItemChirho.wordIdChirho,
+					textChirho: wordItemChirho.textChirho,
+					lemmaIdChirho: wordItemChirho.lemmaIdChirho,
+					glossChirho: wordItemChirho.stateChirho === 'APPROVED' ? wordItemChirho.glossChirho : null
 				}))
 			};
 		})

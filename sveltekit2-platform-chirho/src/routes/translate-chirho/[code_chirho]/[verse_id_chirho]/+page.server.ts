@@ -80,7 +80,8 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 			phraseTableChirho,
 			andChirho(
 				eqChirho(phraseWordTableChirho.phraseIdChirho, phraseTableChirho.idChirho),
-				eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho)
+				eqChirho(phraseTableChirho.languageIdChirho, languageChirho.idChirho),
+				sqlChirho`${phraseTableChirho.deletedAtChirho} IS NULL`
 			)
 		)
 		.leftJoin(glossTableChirho, eqChirho(phraseTableChirho.idChirho, glossTableChirho.phraseIdChirho))
