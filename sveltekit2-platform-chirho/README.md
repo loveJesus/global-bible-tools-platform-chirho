@@ -50,6 +50,8 @@ docker compose logs -f server-chirho
 
 The app will be available at http://localhost:5173
 
+**Note:** On first startup, PostgreSQL automatically runs all SQL files in `migrations-chirho/` via the `docker-entrypoint-initdb.d` mount. This seeds the database with the schema and reference Bible versions (KJV, WEB, RV1909, Hindi IRV).
+
 ### Development without Docker
 
 ```bash
@@ -89,6 +91,24 @@ docker compose logs -f server-chirho
 ```
 
 ### Running Database Migrations
+
+**Fresh database:** Migrations run automatically on first `docker compose up` via the `docker-entrypoint-initdb.d` mount.
+
+**Existing database:** Run migrations manually:
+
+```bash
+# Run all migrations in order
+for f in migrations-chirho/*.sql; do
+  echo "Running $f..."
+  cat "$f" | docker exec -i sveltekit2-platform-chirho-db-chirho-1 psql -U postgres
+done
+
+# Or run individual migration
+cat migrations-chirho/0001_add_reference_versions_chirho.sql | \
+  docker exec -i sveltekit2-platform-chirho-db-chirho-1 psql -U postgres
+```
+
+**Via Drizzle (schema sync):**
 
 ```bash
 # Via Docker
@@ -155,6 +175,64 @@ docker compose exec db-chirho psql -U postgres
 -- Add a new language
 INSERT INTO language (code, name) VALUES ('spa', 'Spanish');
 ```
+
+## Translation Tools
+
+Tools are located in the parent directory (`../tools-chirho/`). Run from the project root.
+
+### Import Translations
+
+Import all translation SQL files from `translations-chirho/`:
+
+```bash
+# From project root (platform-chirho/)
+bun run tools-chirho/import-translations-chirho.ts
+
+# Dry run first
+bun run tools-chirho/import-translations-chirho.ts --dry-run
+```
+
+### Import Reference Bibles
+
+Import SWORD reference versions (KJV, WEB, RV1909, etc.):
+
+```bash
+# Install SWORD tools (macOS)
+brew install sword
+
+# List available SWORD modules
+diatheke -b system -k modulelist
+
+# Import a reference version
+bun run tools-chirho/import-reference-chirho.ts kjv ./data-chirho/kjv.txt
+```
+
+### Generate PDFs
+
+Generate interlinear PDFs with Greek/Hebrew text, Strong's numbers, and translations:
+
+```bash
+# Generate PDF for a book
+bun run tools-chirho/generate-pdf-chirho.ts spa jude
+
+# Specify chapter range
+bun run tools-chirho/generate-pdf-chirho.ts hin genesis --chapter 1-10
+
+# Custom page size (a4, a5, letter)
+bun run tools-chirho/generate-pdf-chirho.ts spa psalms --size a5
+```
+
+Output: `output-chirho/pdfs-chirho/<book>-<lang>-chirho.pdf`
+
+### MCP Server
+
+The Bible translation MCP server provides tools for Claude Code:
+
+```bash
+bun run mcp-chirho
+```
+
+Tools: `list_books_chirho`, `get_verse_chirho`, `get_chapter_chirho`, `query_lemma_chirho`, `expand_glosses_chirho`
 
 ## Project Structure
 
