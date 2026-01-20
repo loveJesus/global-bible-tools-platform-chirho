@@ -12,11 +12,12 @@
 	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('hidden');
 
 	// Get CSS class for gloss based on state - improved styling
+	// Source values: USER (manually entered), IMPORT (machine/bulk imported), null
 	function getGlossClassChirho(stateChirho: string | null, sourceChirho: string | null): string {
 		if (!stateChirho) return 'text-slate-400 italic'; // No translation
 		if (stateChirho === 'APPROVED') return 'text-emerald-700 font-medium'; // Approved
-		if (sourceChirho === 'MACHINE') return 'text-purple-600 underline decoration-purple-400 decoration-2'; // Machine - purple underline
-		return 'text-amber-700 bg-amber-50 rounded px-0.5'; // Pending - amber background always visible
+		if (sourceChirho === 'IMPORT') return 'text-purple-600 underline decoration-purple-400 decoration-2'; // Machine/imported - purple underline
+		return 'text-amber-700 bg-amber-50 rounded px-0.5'; // Pending (USER source) - amber background
 	}
 
 	// Navigate to selected book/chapter
@@ -165,7 +166,7 @@
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-purple-600 underline decoration-purple-400 decoration-2">text</span>
-				<span class="text-slate-600">Machine</span>
+				<span class="text-slate-600">Imported</span>
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-slate-400 italic">—</span>
