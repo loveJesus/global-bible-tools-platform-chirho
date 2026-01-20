@@ -35,6 +35,25 @@ const HEADER_CHIRHO = `-- For God so loved the world, that He gave His only bego
 
 `;
 
+/**
+ * Normalize book name to canonical full form for consistent directory naming
+ */
+const BOOK_NAME_MAP_CHIRHO: Record<string, string> = {
+  gen: 'genesis', exo: 'exodus', exod: 'exodus', mat: 'matthew', matt: 'matthew',
+  mrk: 'mark', mar: 'mark', luk: 'luke', joh: 'john', jhn: 'john',
+  act: 'acts', rom: 'romans', '1co': '1corinthians', '2co': '2corinthians',
+  gal: 'galatians', eph: 'ephesians', php: 'philippians', col: 'colossians',
+  '1th': '1thessalonians', '2th': '2thessalonians', '1ti': '1timothy', '2ti': '2timothy',
+  tit: 'titus', phm: 'philemon', heb: 'hebrews', jam: 'james', jas: 'james',
+  '1pe': '1peter', '2pe': '2peter', '1jn': '1john', '2jn': '2john', '3jn': '3john',
+  jud: 'jude', rev: 'revelation', psa: 'psalms', psalm: 'psalms', pro: 'proverbs',
+};
+
+function normalizeBookNameChirho(inputChirho: string): string {
+  const lowerChirho = inputChirho.toLowerCase().replace(/\s+/g, '');
+  return BOOK_NAME_MAP_CHIRHO[lowerChirho] ?? lowerChirho;
+}
+
 interface WordInfoChirho {
   wordIdChirho: string;
   textChirho: string;
@@ -123,7 +142,8 @@ async function mainChirho() {
   }
 
   const langCodeChirho = argsChirho[0];
-  const bookNameChirho = argsChirho[1];
+  const bookNameRawChirho = argsChirho[1];
+  const bookNameChirho = normalizeBookNameChirho(bookNameRawChirho);
   const jsonFileChirho = argsChirho[2];
   const sourceChirho = argsChirho[3] ?? 'opus-4.5-chirho';
 

@@ -45,6 +45,51 @@
 		gotoChirho(`/read-chirho/${langCodeChirho}/${chapterIdChirho}`);
 	}
 
+	function onRefVersionChangeChirho(eventChirho: Event): void {
+		const selectChirho = eventChirho.target as HTMLSelectElement;
+		const versionIdChirho = selectChirho.value;
+		const urlChirho = new URL(window.location.href);
+		urlChirho.searchParams.set('ref', versionIdChirho);
+		gotoChirho(urlChirho.pathname + urlChirho.search);
+	}
+
+	// Group reference versions by language, with current language first
+	function getGroupedVersionsChirho() {
+		const versionsChirho = dataChirho.referenceVersionsChirho ?? [];
+		const currentLangChirho = dataChirho.codeChirho;
+		const langNamesChirho: Record<string, string> = {
+			eng: 'English',
+			spa: 'Spanish',
+			hin: 'Hindi',
+			tur: 'Turkish',
+			ben: 'Bengali'
+		};
+
+		// Group by language
+		const groupedChirho = versionsChirho.reduce(
+			(accChirho, vChirho) => {
+				const langChirho = vChirho.languageCodeChirho;
+				if (!accChirho[langChirho]) accChirho[langChirho] = [];
+				accChirho[langChirho].push(vChirho);
+				return accChirho;
+			},
+			{} as Record<string, typeof versionsChirho>
+		);
+
+		// Sort: current language first, then alphabetically
+		const sortedKeysChirho = Object.keys(groupedChirho).sort((aChirho, bChirho) => {
+			if (aChirho === currentLangChirho) return -1;
+			if (bChirho === currentLangChirho) return 1;
+			return (langNamesChirho[aChirho] ?? aChirho).localeCompare(langNamesChirho[bChirho] ?? bChirho);
+		});
+
+		return sortedKeysChirho.map((langChirho) => ({
+			langCodeChirho: langChirho,
+			langNameChirho: langNamesChirho[langChirho] ?? langChirho.toUpperCase(),
+			versionsChirho: groupedChirho[langChirho]
+		}));
+	}
+
 	// Get reference text for a verse and render OSIS markup as HTML
 	function getReferenceTextChirho(verseIdChirho: string): string {
 		const rawChirho = dataChirho.referenceVersesMapChirho?.[verseIdChirho] ?? '';
@@ -159,9 +204,21 @@
 				</button>
 			</div>
 			{#if dataChirho.referenceVersionsChirho?.length}
-				<select class="border border-slate-300 rounded px-2 py-1 bg-white text-sm">
-					{#each dataChirho.referenceVersionsChirho as versionChirho}
-						<option value={versionChirho.codeChirho}>{versionChirho.nameChirho}</option>
+				<select
+					class="border border-slate-300 rounded px-2 py-1 bg-white text-sm"
+					onchange={onRefVersionChangeChirho}
+				>
+					{#each getGroupedVersionsChirho() as groupChirho}
+						<optgroup label={groupChirho.langNameChirho}>
+							{#each groupChirho.versionsChirho as versionChirho}
+								<option
+									value={versionChirho.idChirho}
+									selected={versionChirho.idChirho === dataChirho.selectedRefVersionIdChirho}
+								>
+									{versionChirho.nameChirho}
+								</option>
+							{/each}
+						</optgroup>
 					{/each}
 				</select>
 			{/if}
@@ -240,7 +297,7 @@
 		{#if referenceDisplayModeChirho === 'side'}
 			<aside class="fixed right-0 top-0 w-80 h-full bg-white shadow-lg border-l border-slate-200 overflow-y-auto z-40">
 				<div class="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center">
-					<h3 class="font-semibold text-slate-800">Reference (KJV)</h3>
+					<h3 class="font-semibold text-slate-800">{dataChirho.selectedRefVersionNameChirho}</h3>
 					<button
 						type="button"
 						class="text-slate-500 hover:text-slate-700"

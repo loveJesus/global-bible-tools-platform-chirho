@@ -60,6 +60,62 @@ async function queryPgChirho<T = Record<string, unknown>>(queryStrChirho: string
   }
 }
 
+/**
+ * Normalize book name to canonical full form for consistent directory naming
+ * Maps abbreviations to full names (e.g., "gen" → "genesis", "mat" → "matthew")
+ */
+const BOOK_NAME_MAP_CHIRHO: Record<string, string> = {
+  // Abbreviations → Full names
+  gen: 'genesis', exo: 'exodus', exod: 'exodus', lev: 'leviticus',
+  num: 'numbers', deu: 'deuteronomy', deut: 'deuteronomy',
+  jos: 'joshua', josh: 'joshua', jdg: 'judges', judg: 'judges',
+  rut: 'ruth', '1sa': '1samuel', '2sa': '2samuel',
+  '1ki': '1kings', '2ki': '2kings', '1ch': '1chronicles', '2ch': '2chronicles',
+  ezr: 'ezra', neh: 'nehemiah', est: 'esther',
+  job: 'job', psa: 'psalms', psalm: 'psalms', pro: 'proverbs', prov: 'proverbs',
+  ecc: 'ecclesiastes', eccl: 'ecclesiastes', sng: 'songofsolomon', song: 'songofsolomon',
+  isa: 'isaiah', jer: 'jeremiah', lam: 'lamentations',
+  ezk: 'ezekiel', eze: 'ezekiel', dan: 'daniel',
+  hos: 'hosea', joe: 'joel', amo: 'amos', oba: 'obadiah', obd: 'obadiah',
+  jon: 'jonah', mic: 'micah', nah: 'nahum', hab: 'habakkuk',
+  zep: 'zephaniah', hag: 'haggai', zec: 'zechariah', zech: 'zechariah',
+  mal: 'malachi',
+  // NT
+  mat: 'matthew', matt: 'matthew', mrk: 'mark', mar: 'mark',
+  luk: 'luke', joh: 'john', jhn: 'john',
+  act: 'acts', rom: 'romans',
+  '1co': '1corinthians', '2co': '2corinthians',
+  gal: 'galatians', eph: 'ephesians', php: 'philippians', phil: 'philippians',
+  col: 'colossians', '1th': '1thessalonians', '2th': '2thessalonians',
+  '1ti': '1timothy', '2ti': '2timothy', tit: 'titus', phm: 'philemon',
+  heb: 'hebrews', jam: 'james', jas: 'james',
+  '1pe': '1peter', '2pe': '2peter', '1jn': '1john', '2jn': '2john', '3jn': '3john',
+  jud: 'jude', jude: 'jude', rev: 'revelation',
+  // Full names (pass through)
+  genesis: 'genesis', exodus: 'exodus', leviticus: 'leviticus', numbers: 'numbers',
+  deuteronomy: 'deuteronomy', joshua: 'joshua', judges: 'judges', ruth: 'ruth',
+  '1samuel': '1samuel', '2samuel': '2samuel', '1kings': '1kings', '2kings': '2kings',
+  '1chronicles': '1chronicles', '2chronicles': '2chronicles', ezra: 'ezra',
+  nehemiah: 'nehemiah', esther: 'esther', job: 'job', psalms: 'psalms',
+  proverbs: 'proverbs', ecclesiastes: 'ecclesiastes', songofsolomon: 'songofsolomon',
+  isaiah: 'isaiah', jeremiah: 'jeremiah', lamentations: 'lamentations',
+  ezekiel: 'ezekiel', daniel: 'daniel', hosea: 'hosea', joel: 'joel', amos: 'amos',
+  obadiah: 'obadiah', jonah: 'jonah', micah: 'micah', nahum: 'nahum',
+  habakkuk: 'habakkuk', zephaniah: 'zephaniah', haggai: 'haggai', zechariah: 'zechariah',
+  malachi: 'malachi', matthew: 'matthew', mark: 'mark', luke: 'luke', john: 'john',
+  acts: 'acts', romans: 'romans', '1corinthians': '1corinthians', '2corinthians': '2corinthians',
+  galatians: 'galatians', ephesians: 'ephesians', philippians: 'philippians',
+  colossians: 'colossians', '1thessalonians': '1thessalonians', '2thessalonians': '2thessalonians',
+  '1timothy': '1timothy', '2timothy': '2timothy', titus: 'titus', philemon: 'philemon',
+  hebrews: 'hebrews', james: 'james', '1peter': '1peter', '2peter': '2peter',
+  '1john': '1john', '2john': '2john', '3john': '3john', revelation: 'revelation',
+};
+
+function normalizeBookNameChirho(inputChirho: string): string {
+  const lowerChirho = inputChirho.toLowerCase().replace(/\s+/g, '');
+  return BOOK_NAME_MAP_CHIRHO[lowerChirho] ?? lowerChirho;
+}
+
 const serverChirho = new Server(
   {
     name: "bible-translation-tools-chirho",
@@ -538,7 +594,8 @@ ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLU
         const { join: joinChirho } = await import('path');
 
         const langCodeChirho = argsChirho?.language_code_chirho as string;
-        const bookNameChirho = argsChirho?.book_name_chirho as string;
+        const bookNameRawChirho = argsChirho?.book_name_chirho as string;
+        const bookNameChirho = normalizeBookNameChirho(bookNameRawChirho);
         const glossesChirho = argsChirho?.glosses_chirho as Record<string, string>;
         // Note: source column is enum {USER, IMPORT} - use IMPORT for AI translations
         // Model identifier passed via source_chirho is stored in SQL comments for tracking

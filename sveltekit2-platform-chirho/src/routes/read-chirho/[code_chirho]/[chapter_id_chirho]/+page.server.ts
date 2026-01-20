@@ -39,13 +39,14 @@ interface LanguageWithTranslationsRowChirho {
 }
 
 interface ReferenceVerseRowChirho {
-	verseId: string;
-	text: string;
+	verseIdChirho: string;
+	textChirho: string;
 }
 
-export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
+export const load: PageServerLoadChirho = async ({ params: paramsChirho, url: urlChirho }) => {
 	const codeChirho = paramsChirho.code_chirho;
 	const chapterIdChirho = paramsChirho.chapter_id_chirho;
+	const refVersionParamChirho = urlChirho.searchParams.get('ref');
 
 	// Parse chapter ID
 	const { bookIdChirho, chapterChirho } = parseChapterIdChirho(chapterIdChirho);
@@ -189,7 +190,7 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		[bookIdChirho]
 	);
 
-	// Get all reference versions (for English by default, expandable later)
+	// Get all reference versions
 	const referenceVersionsChirho = await dbChirho
 		.select({
 			idChirho: referenceVersionTableChirho.idChirho,
@@ -200,22 +201,38 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		.from(referenceVersionTableChirho)
 		.orderBy(referenceVersionTableChirho.nameChirho);
 
-	// Get reference verses for the chapter (using KJV as default, id=1)
+	// Find the best reference version: URL param > language default > KJV
+	const langToVersionMapChirho: Record<string, number> = {
+		eng: 1, // KJV
+		spa: 3, // RV1909
+		hin: 4, // HinERV
+		tur: 5 // TurHADI
+	};
+	const preferredVersionIdChirho = refVersionParamChirho
+		? parseInt(refVersionParamChirho, 10)
+		: (langToVersionMapChirho[codeChirho] ?? 1);
+
+	// Get reference verses for the chapter using the preferred version
 	// Chapter verses match pattern: bookId (2 digits) + chapter (3 digits) + verse (3 digits)
 	const chapterPrefixChirho = `${bookIdChirho.toString().padStart(2, '0')}${chapterChirho.toString().padStart(3, '0')}`;
 	const referenceVersesChirho = await queryRawChirho<ReferenceVerseRowChirho>(
-		`SELECT verse_id_chirho AS "verseId", text_chirho AS "text"
+		`SELECT verse_id_chirho AS "verseIdChirho", text_chirho AS "textChirho"
 		 FROM reference_verse_chirho
-		 WHERE version_id_chirho = 1 AND verse_id_chirho LIKE $1
+		 WHERE version_id_chirho = $1 AND verse_id_chirho LIKE $2
 		 ORDER BY verse_id_chirho`,
-		[`${chapterPrefixChirho}%`]
+		[preferredVersionIdChirho, `${chapterPrefixChirho}%`]
 	);
 
 	// Convert reference verses to a map for easy lookup
 	const referenceVersesMapChirho: Record<string, string> = {};
 	for (const rvChirho of referenceVersesChirho) {
-		referenceVersesMapChirho[rvChirho.verseId] = rvChirho.text;
+		referenceVersesMapChirho[rvChirho.verseIdChirho] = rvChirho.textChirho;
 	}
+
+	// Get the selected reference version name
+	const selectedRefVersionChirho = referenceVersionsChirho.find(
+		(vChirho) => vChirho.idChirho === preferredVersionIdChirho
+	);
 
 	return {
 		codeChirho,
@@ -229,6 +246,8 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		chaptersInBookChirho,
 		languagesWithTranslationsChirho,
 		referenceVersionsChirho,
-		referenceVersesMapChirho
+		referenceVersesMapChirho,
+		selectedRefVersionIdChirho: preferredVersionIdChirho,
+		selectedRefVersionNameChirho: selectedRefVersionChirho?.nameChirho ?? 'Reference'
 	};
 };
