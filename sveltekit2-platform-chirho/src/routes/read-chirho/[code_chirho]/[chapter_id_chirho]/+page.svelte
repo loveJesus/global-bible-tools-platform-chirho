@@ -12,11 +12,11 @@
 	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('hidden');
 
 	// Get CSS class for gloss based on state - improved styling
-	// Source values: USER (manually entered), IMPORT (machine/bulk imported), null
+	// Source values: USER (manually entered), MACHINE (AI-generated imports), IMPORT (legacy), null
 	function getGlossClassChirho(stateChirho: string | null, sourceChirho: string | null): string {
 		if (!stateChirho) return 'text-slate-400 italic'; // No translation
 		if (stateChirho === 'APPROVED') return 'text-emerald-700 font-medium'; // Approved
-		if (sourceChirho === 'IMPORT') return 'text-purple-600 underline decoration-purple-400 decoration-2'; // Machine/imported - purple underline
+		if (sourceChirho === 'MACHINE' || sourceChirho === 'IMPORT') return 'text-purple-600 underline decoration-purple-400 decoration-2'; // Machine/imported - purple underline
 		return 'text-amber-700 bg-amber-50 rounded px-0.5'; // Pending (USER source) - amber background
 	}
 
@@ -45,9 +45,22 @@
 		gotoChirho(`/read-chirho/${langCodeChirho}/${chapterIdChirho}`);
 	}
 
-	// Get reference text for a verse
+	// Get reference text for a verse and render OSIS markup as HTML
 	function getReferenceTextChirho(verseIdChirho: string): string {
-		return dataChirho.referenceVersesMapChirho?.[verseIdChirho] ?? '';
+		const rawChirho = dataChirho.referenceVersesMapChirho?.[verseIdChirho] ?? '';
+		// Convert OSIS markup to HTML
+		// <transChange type="added">text</transChange> -> <em>text</em> (italics for supplied words)
+		// <w>text</w> -> text (strip word tags)
+		return rawChirho
+			.replace(/<transChange[^>]*>([^<]*)<\/transChange>/g, '<em>$1</em>')
+			.replace(/<w[^>]*>([^<]*)<\/w>/g, '$1')
+			.replace(/<[^>]+>/g, ''); // Strip any remaining tags
+	}
+
+	// Get PDF download URL for current chapter
+	function getPdfUrlChirho(): string {
+		const bookNameChirho = dataChirho.bookChirho?.nameChirho?.toLowerCase() ?? 'unknown';
+		return `/api-chirho/pdf-chirho/${dataChirho.codeChirho}/${bookNameChirho}?chapter=${dataChirho.chapterChirho}`;
 	}
 </script>
 
@@ -84,9 +97,9 @@
 					onchange={onLanguageChangeChirho}
 				>
 					{#each dataChirho.languagesWithTranslationsChirho ?? [] as langChirho}
-						<option value={langChirho.code}>{langChirho.name}</option>
+						<option value={langChirho.codeChirho}>{langChirho.nameChirho}</option>
 					{/each}
-					{#if !dataChirho.languagesWithTranslationsChirho?.some((lChirho) => lChirho.code === dataChirho.codeChirho)}
+					{#if !dataChirho.languagesWithTranslationsChirho?.some((lChirho) => lChirho.codeChirho === dataChirho.codeChirho)}
 						<option value={dataChirho.codeChirho}>{dataChirho.languageChirho?.nameChirho}</option>
 					{/if}
 				</select>
@@ -100,7 +113,7 @@
 					onchange={onBookChangeChirho}
 				>
 					{#each dataChirho.allBooksChirho ?? [] as bookOptionChirho}
-						<option value={String(bookOptionChirho.id)}>{bookOptionChirho.name}</option>
+						<option value={String(bookOptionChirho.idChirho)}>{bookOptionChirho.nameChirho}</option>
 					{/each}
 				</select>
 			</label>
@@ -152,6 +165,16 @@
 					{/each}
 				</select>
 			{/if}
+			<a
+				href={getPdfUrlChirho()}
+				class="ml-auto px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center gap-1"
+				download
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+				</svg>
+				PDF
+			</a>
 		</div>
 
 		<!-- Legend for gloss styling -->
@@ -204,8 +227,8 @@
 					{#if referenceDisplayModeChirho === 'below'}
 						{@const refTextChirho = getReferenceTextChirho(verseChirho.verseIdChirho)}
 						{#if refTextChirho}
-							<div class="ml-8 mt-2 text-sm text-slate-600 italic border-l-2 border-slate-200 pl-3">
-								{refTextChirho}
+							<div class="ml-8 mt-2 text-sm text-slate-600 border-l-2 border-slate-200 pl-3">
+								{@html refTextChirho}
 							</div>
 						{/if}
 					{/if}
@@ -234,7 +257,7 @@
 						{#if refTextChirho}
 							<p class="text-sm">
 								<strong class="text-slate-500">{verseChirho.verseNumberChirho}</strong>
-								<span class="text-slate-700">{refTextChirho}</span>
+								<span class="text-slate-700">{@html refTextChirho}</span>
 							</p>
 						{/if}
 					{/each}

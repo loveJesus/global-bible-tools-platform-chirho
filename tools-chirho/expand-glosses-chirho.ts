@@ -81,7 +81,7 @@ function generateWordSqlChirho(
 ): string {
   const escapedGlossChirho = glossChirho.replace(/'/g, "''");
 
-  // Note: source column is enum {USER, IMPORT} - use IMPORT for AI translations
+  // Note: source column is enum {USER, IMPORT, MACHINE} - use MACHINE for AI translations
   // Model identifier is stored in SQL comments for tracking
   // Fixed: Two separate statements to handle both new and existing phrases
   // Statement 1: Creates phrase + phrase_word if they don't exist
@@ -98,7 +98,7 @@ WITH np AS (
 )
 INSERT INTO phrase_word (phrase_id, word_id) SELECT id, '${wordIdChirho}' FROM np ON CONFLICT DO NOTHING;
 INSERT INTO gloss (phrase_id, gloss, state, updated_at, source)
-SELECT p.id, '${escapedGlossChirho}', 'UNAPPROVED', NOW(), 'IMPORT'
+SELECT p.id, '${escapedGlossChirho}', 'UNAPPROVED', NOW(), 'MACHINE'
 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
 WHERE pw.word_id = '${wordIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL
 ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLUDED.updated_at, source = EXCLUDED.source;

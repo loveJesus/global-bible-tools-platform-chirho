@@ -28,14 +28,14 @@ interface WordWithGlossRowChirho {
 }
 
 interface BookWithChaptersRowChirho {
-	id: number;
-	name: string;
-	maxChapter: number;
+	idChirho: number;
+	nameChirho: string;
+	maxChapterChirho: number;
 }
 
 interface LanguageWithTranslationsRowChirho {
-	code: string;
-	name: string;
+	codeChirho: string;
+	nameChirho: string;
 }
 
 interface ReferenceVerseRowChirho {
@@ -161,7 +161,7 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 
 	// Get all books with their chapter counts for navigation
 	const allBooksChirho = await queryRawChirho<BookWithChaptersRowChirho>(
-		`SELECT b.id, b.name, MAX(v.chapter) as "maxChapter"
+		`SELECT b.id AS "idChirho", b.name AS "nameChirho", MAX(v.chapter) as "maxChapterChirho"
 		 FROM book b
 		 JOIN verse v ON v.book_id = b.id
 		 GROUP BY b.id, b.name
@@ -169,8 +169,8 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 	);
 
 	// Generate chapter list for current book using maxChapter from query
-	const currentBookInfoChirho = allBooksChirho.find((bChirho) => bChirho.id === bookIdChirho);
-	const maxChapterChirho = currentBookInfoChirho?.maxChapter ?? 1;
+	const currentBookInfoChirho = allBooksChirho.find((bChirho) => bChirho.idChirho === bookIdChirho);
+	const maxChapterChirho = currentBookInfoChirho?.maxChapterChirho ?? 1;
 	const chaptersInBookChirho = Array.from(
 		{ length: maxChapterChirho },
 		(_, iChirho) => iChirho + 1
@@ -178,7 +178,7 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 
 	// Get languages that have translations for current book
 	const languagesWithTranslationsChirho = await queryRawChirho<LanguageWithTranslationsRowChirho>(
-		`SELECT DISTINCT l.code, l.name
+		`SELECT DISTINCT l.code AS "codeChirho", l.name AS "nameChirho"
 		 FROM language l
 		 JOIN phrase p ON p.language_id = l.id
 		 JOIN phrase_word pw ON pw.phrase_id = p.id
