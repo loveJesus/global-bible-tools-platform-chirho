@@ -100,16 +100,22 @@
 			</section>
 		{/if}
 
-		<h2 class="mt-8 text-xl font-semibold text-slate-800">Books</h2>
-		<div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-			{#each dataChirho.booksChirho as bookChirho}
-				<a
-					href="/read-chirho/{dataChirho.codeChirho}/{bookChirho.idChirho.toString().padStart(2, '0')}001"
-					class="rounded border border-slate-200 bg-white px-4 py-2 text-sm hover:bg-slate-50"
-				>
-					{bookChirho.nameChirho}
-				</a>
-			{/each}
-		</div>
+		<h2 class="mt-8 text-xl font-semibold text-slate-800">Books with Translations</h2>
+		{#if dataChirho.booksChirho.length > 0}
+			<div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+				{#each dataChirho.booksChirho as bookChirho}
+					<a
+						href="/read-chirho/{dataChirho.codeChirho}/{bookChirho.idChirho.toString().padStart(2, '0')}001"
+						class="rounded border border-slate-200 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+					>
+						{bookChirho.nameChirho}
+					</a>
+				{/each}
+			</div>
+		{:else}
+			<p class="mt-4 text-slate-500 italic">
+				No translations available yet for {dataChirho.languageChirho?.nameChirho ?? 'this language'}.
+			</p>
+		{/if}
 	</div>
 </main>

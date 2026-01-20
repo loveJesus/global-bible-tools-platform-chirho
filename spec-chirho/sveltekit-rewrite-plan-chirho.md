@@ -281,7 +281,7 @@ export const load: PageServerLoad = async ({ params }) => {
 - [x] Implement session management in `hooks.server.ts`
 - [x] Create base layouts and navigation
 - [x] Configure Tailwind CSS
-- [ ] Set up i18n
+- [x] Set up i18n (sveltekit-i18n)
 
 ### Phase 2: Authentication (Week 2-3)
 - [x] Login page with form actions
@@ -294,7 +294,7 @@ export const load: PageServerLoad = async ({ params }) => {
 - [x] Book/Verse/Word read models
 - [x] Lemma/LemmaForm queries
 - [x] Read view (`/read-chirho/[code]/[chapter]`)
-- [ ] Audio playback
+- [x] Audio playback (AudioDialogChirho component)
 
 ### Phase 4: Translation Module (Week 4-6) - CRITICAL
 - [x] Phrase/Gloss repositories
@@ -307,13 +307,13 @@ export const load: PageServerLoad = async ({ params }) => {
 ### Phase 5: Languages Module (Week 6-7)
 - [x] Language CRUD
 - [x] Member management
-- [ ] Settings page
+- [x] Settings page (`/admin-chirho/languages-chirho/[code_chirho]/settings-chirho`)
 - [x] Import functionality
 
 ### Phase 6: Admin & Remaining (Week 7-8)
 - [x] User administration
-- [ ] Snapshots module
-- [ ] Reporting/analytics
+- [x] Snapshots module (`/admin-chirho/languages-chirho/[code_chirho]/snapshots-chirho`)
+- [x] Reporting/analytics (`/admin-chirho/analytics-chirho`)
 - [x] Dashboard (admin panel)
 - [x] Job worker integration (import jobs page)
 
@@ -357,11 +357,11 @@ The core rewrite from Next.js 14 to SvelteKit 2 is complete with:
 - Chirho naming convention applied throughout
 
 ### 📋 Do now Features
-- [ ] i18n - Internationalization (app works now in English)
-- [ ] Audio playback - Study view audio sync
-- [ ] Language settings page - Advanced per-language configuration
-- [ ] Snapshots module - Language backup/restore (GitHub #128)
-- [ ] Reporting/analytics - Statistics dashboard
+- [x] i18n - Internationalization (sveltekit-i18n added)
+- [x] Audio playback - AudioDialogChirho component with speaker selection
+- [x] Language settings page - `/admin-chirho/languages-chirho/[code_chirho]/settings-chirho`
+- [x] Snapshots module - Schema, service, and UI at `/admin-chirho/languages-chirho/[code_chirho]/snapshots-chirho`
+- [x] Reporting/analytics - Analytics dashboard at `/admin-chirho/analytics-chirho`
 
 ### (Future Enhancements)
 - [ ] Machine translation - Google Translate integration
