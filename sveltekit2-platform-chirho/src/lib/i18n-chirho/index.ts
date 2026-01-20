@@ -12,6 +12,11 @@ const configChirho: ConfigChirho = {
 			locale: 'en',
 			key: 'common',
 			loader: async () => (await import('./messages-chirho/en-chirho/common-chirho.json')).default
+		},
+		{
+			locale: 'en',
+			key: 'landing',
+			loader: async () => (await import('./messages-chirho/en-chirho/landing-chirho.json')).default
 		}
 	]
 };
@@ -27,7 +32,21 @@ export const {
 // Default locale
 export const defaultLocaleChirho = 'en';
 
-// Available locales
-export const availableLocalesChirho = [
-	{ codeChirho: 'en', nameChirho: 'English' }
+// Available UI locales (for the language switcher)
+export interface UiLocaleChirho {
+	codeChirho: string;
+	nameChirho: string;
+	nativeNameChirho: string;
+	dirChirho: 'ltr' | 'rtl';
+}
+
+export const availableLocalesChirho: UiLocaleChirho[] = [
+	{ codeChirho: 'en', nameChirho: 'English', nativeNameChirho: 'English', dirChirho: 'ltr' },
+	{ codeChirho: 'es', nameChirho: 'Spanish', nativeNameChirho: 'Español', dirChirho: 'ltr' },
+	{ codeChirho: 'ar', nameChirho: 'Arabic', nativeNameChirho: 'اَلْعَرَبِيَّةُ', dirChirho: 'rtl' },
+	{ codeChirho: 'hi', nameChirho: 'Hindi', nativeNameChirho: 'हिन्दी', dirChirho: 'ltr' },
+	{ codeChirho: 'zh', nameChirho: 'Chinese', nativeNameChirho: '中文', dirChirho: 'ltr' },
+	{ codeChirho: 'fr', nameChirho: 'French', nativeNameChirho: 'Français', dirChirho: 'ltr' },
+	{ codeChirho: 'de', nameChirho: 'German', nativeNameChirho: 'Deutsch', dirChirho: 'ltr' },
+	{ codeChirho: 'pt', nameChirho: 'Portuguese', nativeNameChirho: 'Português', dirChirho: 'ltr' }
 ];

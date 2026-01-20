@@ -18,10 +18,18 @@
 	<header class="bg-white border-b border-slate-200">
 		<div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
 			<div class="flex items-center gap-6">
-				<a href="/" class="text-xl font-bold text-slate-900">Global Bible Tools</a>
+				<a href="/" class="flex items-center gap-2">
+					<img
+						src="https://assets.globalbibletools.com/landing/logo.png"
+						alt="Global Bible Tools"
+						class="h-8 w-8"
+					/>
+					<span class="text-xl font-bold text-slate-900">Global Bible Tools</span>
+				</a>
 				<nav class="hidden sm:flex gap-4">
 					<a href="/read-chirho" class="text-slate-600 hover:text-slate-900">Read</a>
 					<a href="/translate-chirho" class="text-slate-600 hover:text-slate-900">Translate</a>
+					<a href="/downloads-chirho" class="text-slate-600 hover:text-slate-900">Downloads</a>
 				</nav>
 			</div>
 			<div class="flex items-center gap-4">

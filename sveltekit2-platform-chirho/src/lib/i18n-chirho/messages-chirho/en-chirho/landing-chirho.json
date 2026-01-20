@@ -1,0 +1,108 @@
+{
+	"heroChirho": {
+		"missionChirho": "The global Church needs access to serious biblical language study tools without cost or hindrance.",
+		"learnMoreChirho": "Learn More"
+	},
+	"navChirho": {
+		"visionChirho": "Vision",
+		"contributeChirho": "Contribute",
+		"progressChirho": "Progress",
+		"aboutChirho": "About",
+		"readersBibleChirho": "Reader's Bible",
+		"dashboardChirho": "Dashboard"
+	},
+	"visionChirho": {
+		"titleChirho": "Vision",
+		"preferToReadChirho": "Prefer to Read?",
+		"languageLearningChirho": "Language Learning",
+		"biblicalStudyChirho": "Biblical Study",
+		"languageLessonsChirho": {
+			"titleChirho": "Language Lessons",
+			"descriptionChirho": "YouTube courses provide free Greek and Hebrew training to everyone."
+		},
+		"readersBibleChirho": {
+			"titleChirho": "Reader's Bible",
+			"descriptionChirho": "A digital reader's Bible helps language learners accelerate their comprehension by reading the biblical text with assistance."
+		},
+		"lexiconsChirho": {
+			"titleChirho": "Lexicons",
+			"descriptionChirho": "Lexicons are needed in biblical study to explore the range of meaning for Greek and Hebrew words."
+		},
+		"grammarsChirho": {
+			"titleChirho": "Grammars",
+			"descriptionChirho": "Grammars are used in biblical study to learn the structure of the biblical languages."
+		},
+		"textCriticalChirho": {
+			"titleChirho": "Text Critical Notes",
+			"descriptionChirho": "Text critical notes contribute to biblical study by explaining the differences in the manuscript witness to the biblical text."
+		}
+	},
+	"contributeChirho": {
+		"titleChirho": "Contribute",
+		"giveChirho": {
+			"titleChirho": "Give",
+			"descriptionChirho": "Please give through Betheden Ministries to fund this work."
+		},
+		"softwareChirho": {
+			"titleChirho": "Software Development",
+			"descriptionChirho": "If you can help with software development or UI design, check out our GitHub repository."
+		},
+		"translateChirho": {
+			"titleChirho": "Reader's Bible",
+			"descriptionChirho": "If you can help translate glosses for the Reader's Hebrew or Greek Bible, please fill out this form."
+		},
+		"resourcesChirho": {
+			"titleChirho": "Resources",
+			"descriptionChirho": "If you have original language study resources you would like to contribute or help digitize, please contact us."
+		}
+	},
+	"progressChirho": {
+		"titleChirho": "Progress",
+		"translationProgressChirho": "Reader's Bible Translation"
+	},
+	"aboutChirho": {
+		"titleChirho": "About",
+		"descriptionChirho": "Andrew and Bethany Case are the founders of Betheden Ministries, which is the non-profit behind Global Bible Tools. Our purpose is to help see the whole Bible in every language, and the global Church equipped for growth and maturity. In the western world we have an \"embarrassment of riches.\" We have thousands of biblical resources one click away, and in the language we understand best. Meanwhile, there are millions of people in other countries who don't even have a Bible in their mother tongue. We believe that knowledge of the biblical languages is one of the most fundamental needs of every church around the world. It is the foundation of theology, sound interpretation, and healthy churches. So our goal is to empower the global Church with the biblical languages, as well as train and serve the Bible translation effort.",
+		"statementOfFaithChirho": "Statement of Faith",
+		"constitutionChirho": "Constitution",
+		"coreValuesChirho": "Core Values",
+		"pursuitOfJoyChirho": {
+			"titleChirho": "Pursuit of Joy",
+			"descriptionChirho": "All of life should be lived, not out of fear, but as a pursuit of joy in God."
+		},
+		"partnershipChirho": {
+			"titleChirho": "Partnership",
+			"descriptionChirho": "Because Scripture teaches that we are part of a larger Body, we seek to work with others through strategic, genuine relationships."
+		},
+		"eagernessToLearnChirho": {
+			"titleChirho": "Eagerness to Learn",
+			"descriptionChirho": "We want to innovate with excellence, which requires continuous curiosity and study."
+		},
+		"humilityChirho": {
+			"titleChirho": "Humility",
+			"descriptionChirho": "Our hope is to serve the global Church, which requires the humility to put them first, listen to their needs, understand them well, and provide them with the best we can offer by God's grace."
+		},
+		"freelyGivingChirho": {
+			"titleChirho": "Freely Giving",
+			"descriptionChirho": "Because we have received everything from God as a gift, we are committed to making all of our content free and open-access to everyone, and encouraging others to do the same."
+		},
+		"empoweringChirho": {
+			"titleChirho": "Empowering the Under-Resourced",
+			"descriptionChirho": "Because many non-Western Christians still suffer the lack of quality biblical resources, we endeavor to prioritize giving them access to these resources."
+		}
+	},
+	"quickAccessChirho": {
+		"readChirho": {
+			"titleChirho": "Read",
+			"descriptionChirho": "Interlinear translations"
+		},
+		"translateChirho": {
+			"titleChirho": "Translate",
+			"descriptionChirho": "Contribute translations"
+		},
+		"downloadsChirho": {
+			"titleChirho": "Downloads",
+			"descriptionChirho": "PDF Bibles (KJV, WEB)"
+		}
+	}
+}
