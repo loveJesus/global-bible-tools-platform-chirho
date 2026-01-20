@@ -7,7 +7,7 @@
  * Usage: bun run tools-chirho/import-kjv-chirho.ts [--book <name>]
  */
 
-import { spawn as spawnChirho } from 'child_process';
+import { execSync as execSyncChirho } from 'child_process';
 import { initPgConnectionChirho, queryPgChirho, closePgChirho } from './db-chirho';
 
 const BOOKS_CHIRHO = [
@@ -20,105 +20,89 @@ const BOOKS_CHIRHO = [
   { idChirho: 66, nameChirho: 'Revelation', chaptersChirho: 22 },
 ];
 
-interface VerseDataChirho {
+interface ParsedVerseChirho {
+  verseIdChirho: string;
   osisChirho: string;
   plainChirho: string;
 }
 
-async function getVerseDataChirho(refChirho: string): Promise<VerseDataChirho | null> {
-  return new Promise((resolveChirho) => {
-    // Get OSIS format (includes Strong's numbers in savlm attribute)
-    const procChirho = spawnChirho('diatheke', ['-b', 'KJV', '-f', 'OSIS', '-k', refChirho]);
-    let outputChirho = '';
+function getChapterVersesChirho(bookChirho: typeof BOOKS_CHIRHO[0], chapterChirho: number): ParsedVerseChirho[] {
+  const versesChirho: ParsedVerseChirho[] = [];
+  const refChirho = `${bookChirho.nameChirho} ${chapterChirho}`;
 
-    procChirho.stdout.on('data', (dataChirho: Buffer) => {
-      outputChirho += dataChirho.toString();
+  try {
+    // Get entire chapter at once - MUCH faster than verse-by-verse
+    const outputChirho = execSyncChirho(`diatheke -b KJV -f OSIS -k "${refChirho}"`, {
+      encoding: 'utf-8',
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
     });
 
-    procChirho.on('close', () => {
-      // diatheke returns: "Reference: <w>...</w>...\n(KJV)"
-      // Verify the reference matches what we requested (diatheke may return next book's content)
-      const refMatchChirho = outputChirho.match(/^([^:]+):/);
-      if (!refMatchChirho) {
-        resolveChirho(null);
-        return;
+    // Each verse is on a separate line: "Genesis 1:1: <w>In the beginning</w>..."
+    const linesChirho = outputChirho.split('\n');
+
+    for (const lineChirho of linesChirho) {
+      // Parse reference and content: "Book Chapter:Verse: content"
+      const matchChirho = lineChirho.match(/^([^:]+)\s+(\d+):(\d+):\s*(.+)$/);
+      if (!matchChirho) continue;
+
+      const [, returnedBookChirho, returnedChapChirho, verseNumChirho, contentChirho] = matchChirho;
+
+      // Verify this is still from the requested book (diatheke continues into next book)
+      const requestedBookLowerChirho = bookChirho.nameChirho.toLowerCase();
+      const returnedBookLowerChirho = returnedBookChirho.trim().toLowerCase();
+
+      if (!returnedBookLowerChirho.startsWith(requestedBookLowerChirho.slice(0, 3))) {
+        // We've crossed into a different book, stop processing
+        break;
       }
 
-      // Normalize references for comparison
-      const returnedRefChirho = refMatchChirho[1].trim().toLowerCase();
-      const requestedRefChirho = refChirho.trim().toLowerCase();
-
-      // Extract book name from both (e.g., "jude" from "Jude 1:1")
-      const returnedBookChirho = returnedRefChirho.split(/\s+\d/)[0].trim();
-      const requestedBookChirho = requestedRefChirho.split(/\s+\d/)[0].trim();
-
-      // Check if books match (diatheke returns next book when verse doesn't exist)
-      if (returnedBookChirho !== requestedBookChirho) {
-        resolveChirho(null);
-        return;
+      // Verify chapter matches
+      if (parseInt(returnedChapChirho) !== chapterChirho) {
+        break;
       }
 
-      // Strip the reference prefix and trailing (KJV)
-      const osisChirho = outputChirho
-        .replace(/^[^:]+:\s*/, '')  // Remove "Jude 1:1: " prefix
-        .replace(/\(KJV\)[\s\S]*$/, '')  // Remove "(KJV)" and anything after
-        .replace(/<milestone[^>]*>/g, '')  // Remove milestone tags
+      // Clean OSIS content
+      const osisChirho = contentChirho
+        .replace(/<milestone[^>]*>/g, '')
         .trim();
 
-      if (!osisChirho || osisChirho.length < 2) {
-        resolveChirho(null);
-        return;
-      }
+      if (!osisChirho || osisChirho.length < 2) continue;
 
-      // Create plain text by stripping all XML tags
+      // Create plain text by stripping XML tags
       const plainChirho = osisChirho
         .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
         .trim();
 
-      if (!plainChirho || plainChirho.length < 2) {
-        resolveChirho(null);
-      } else {
-        resolveChirho({ osisChirho, plainChirho });
-      }
-    });
+      if (!plainChirho || plainChirho.length < 2) continue;
 
-    procChirho.on('error', () => {
-      resolveChirho(null);
-    });
-  });
+      // Create verse ID: BBCCCVVV
+      const verseIdChirho = `${bookChirho.idChirho.toString().padStart(2, '0')}${chapterChirho.toString().padStart(3, '0')}${verseNumChirho.padStart(3, '0')}`;
+
+      versesChirho.push({ verseIdChirho, osisChirho, plainChirho });
+    }
+  } catch (errChirho) {
+    console.error(`Error getting ${refChirho}:`, errChirho);
+  }
+
+  return versesChirho;
 }
 
 async function importBookChirho(bookChirho: typeof BOOKS_CHIRHO[0]): Promise<number> {
   let countChirho = 0;
 
   for (let chapChirho = 1; chapChirho <= bookChirho.chaptersChirho; chapChirho++) {
-    let verseNumChirho = 1;
-    let emptyCountChirho = 0;
+    const versesChirho = getChapterVersesChirho(bookChirho, chapChirho);
 
-    while (emptyCountChirho < 3) {
-      const refChirho = `${bookChirho.nameChirho} ${chapChirho}:${verseNumChirho}`;
-      const dataChirho = await getVerseDataChirho(refChirho);
-
-      if (!dataChirho) {
-        emptyCountChirho++;
-        verseNumChirho++;
-        continue;
-      }
-
-      emptyCountChirho = 0;
-      const verseIdChirho = `${bookChirho.idChirho.toString().padStart(2, '0')}${chapChirho.toString().padStart(3, '0')}${verseNumChirho.toString().padStart(3, '0')}`;
-
-      // Store both OSIS and plain text - OSIS in osis_chirho column, plain in text_chirho
+    // Batch insert all verses for this chapter
+    for (const verseChirho of versesChirho) {
       await queryPgChirho(
         `INSERT INTO reference_verse_chirho (version_id_chirho, verse_id_chirho, text_chirho, osis_chirho)
          VALUES (1, $1, $2, $3)
          ON CONFLICT (version_id_chirho, verse_id_chirho) DO UPDATE SET text_chirho = EXCLUDED.text_chirho, osis_chirho = EXCLUDED.osis_chirho`,
-        [verseIdChirho, dataChirho.plainChirho, dataChirho.osisChirho]
+        [verseChirho.verseIdChirho, verseChirho.plainChirho, verseChirho.osisChirho]
       );
-
       countChirho++;
-      verseNumChirho++;
     }
 
     process.stdout.write(`\r  ${bookChirho.nameChirho} ${chapChirho}/${bookChirho.chaptersChirho} - ${countChirho} verses`);
