@@ -219,8 +219,8 @@
 	bind:this={rootRefChirho}
 	dir={isHebrewChirho ? 'rtl' : 'ltr'}
 	class="group/word relative rounded p-2 {phraseFocusedChirho && !wordSelectedChirho
-		? 'bg-amber-50 dark:bg-gray-800'
-		: ''} {wordSelectedChirho ? 'bg-amber-100 shadow-inner dark:bg-gray-700 dark:shadow-none' : ''}"
+		? 'bg-amber-50'
+		: ''} {wordSelectedChirho ? 'bg-amber-100 shadow-inner' : ''}"
 	onclick={handleWordClickChirho}
 	onkeydown={(eventChirho) => eventChirho.altKey && eventChirho.key === 'Enter' && onSelectChirho?.()}
 >
@@ -238,7 +238,7 @@
 				onFocusChirho?.();
 				onShowDetailChirho?.();
 			}}
-			onkeydown={(e) => e.key === 'Enter' && onShowDetailChirho?.()}
+			onkeydown={(eChirho) => eChirho.key === 'Enter' && onShowDetailChirho?.()}
 			role="button"
 		>
 			{wordChirho.textChirho}
@@ -250,8 +250,8 @@
 				class="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
 				title="Open notes"
 				tabindex="-1"
-				onclick={(e) => {
-					if (e.altKey) return;
+				onclick={(eChirho) => {
+					if (eChirho.altKey) return;
 					onFocusChirho?.();
 					onShowDetailChirho?.();
 					onOpenNotesChirho?.();
@@ -269,7 +269,7 @@
 
 		{#if isMultiWordChirho}
 			<svg
-				class="h-4 w-4 text-gray-600 dark:text-gray-400"
+				class="h-4 w-4 text-gray-600"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -326,8 +326,8 @@
 						title="Approve (Enter)"
 						tabindex="-1"
 						disabled={savingChirho}
-						onclick={(e) => {
-							e.stopPropagation();
+						onclick={(eChirho) => {
+							eChirho.stopPropagation();
 							saveGlossChirho('APPROVED');
 							inputRefChirho?.focus();
 						}}
@@ -348,8 +348,8 @@
 						title="Revoke approval"
 						tabindex="-1"
 						disabled={savingChirho}
-						onclick={(e) => {
-							e.stopPropagation();
+						onclick={(eChirho) => {
+							eChirho.stopPropagation();
 							saveGlossChirho('UNAPPROVED');
 							inputRefChirho?.focus();
 						}}

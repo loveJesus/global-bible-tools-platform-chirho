@@ -116,7 +116,7 @@
 		type="button"
 		class="fixed inset-0 z-40 cursor-default"
 		onclick={() => (isOpenChirho = false)}
-		onkeydown={(e) => e.key === 'Escape' && (isOpenChirho = false)}
+		onkeydown={(eChirho) => eChirho.key === 'Escape' && (isOpenChirho = false)}
 		aria-label="Close menu"
 		tabindex="-1"
 	></button>
