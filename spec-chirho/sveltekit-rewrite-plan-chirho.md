@@ -339,6 +339,37 @@ export const load: PageServerLoad = async ({ params }) => {
 
 ---
 
+## Completion Status
+
+### ✅ SvelteKit 2 Rewrite: COMPLETE
+
+The core rewrite from Next.js 14 to SvelteKit 2 is complete with:
+- All critical modules ported (translation, bible-core, languages, users, admin)
+- Drizzle ORM with full schema definitions
+- Session management and authentication flows
+- Admin panel with users, languages, and jobs management
+- PDF export functionality (GitHub #109)
+- Word detail panel with lemma glosses (GitHub #129)
+- API validation with Zod
+- Authorization checks on all protected routes
+- Chirho naming convention applied throughout
+
+### 📋 Deferred Features (Future Enhancements)
+
+These features are not part of the core rewrite but can be added later:
+- [ ] i18n - Internationalization (app works in English)
+- [ ] Audio playback - Study view audio sync
+- [ ] Machine translation - Google Translate integration
+- [ ] Language settings page - Advanced per-language configuration
+- [ ] Snapshots module - Language backup/restore (GitHub #128)
+- [ ] Reporting/analytics - Statistics dashboard
+
+### 🔗 Related GitHub Issues Addressed
+- #109 PDF interlinear export ✅
+- #129 List glosses for a given lemma ✅
+
+---
+
 ## Upstream Sync Strategy
 
 Use `/sync-upstream-chirho` command (see `.claude/commands/sync-upstream-chirho.md`):
