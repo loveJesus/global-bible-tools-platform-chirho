@@ -165,6 +165,12 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, locals:
 
 export const actions: ActionsChirho = {
 	updateGlossChirho: async ({ request: requestChirho, params: paramsChirho, locals: localsChirho }) => {
+		// Check authentication
+		const sessionChirho = localsChirho.sessionChirho;
+		if (!sessionChirho?.userIdChirho) {
+			return failChirho(401, { errorChirho: 'Unauthorized. Please log in to update translations.' });
+		}
+
 		const formDataChirho = await requestChirho.formData();
 		const wordIdChirho = formDataChirho.get('wordIdChirho') as string;
 		const glossChirho = formDataChirho.get('glossChirho') as string;
@@ -212,7 +218,7 @@ export const actions: ActionsChirho = {
 				.values({
 					languageIdChirho: languageChirho.idChirho,
 					createdAtChirho: new Date(),
-					createdByChirho: localsChirho.userChirho?.idChirho ?? null
+					createdByChirho: sessionChirho.userIdChirho
 				})
 				.returning({ idChirho: phraseTableChirho.idChirho });
 
@@ -236,7 +242,7 @@ export const actions: ActionsChirho = {
 				stateChirho: stateChirho,
 				sourceChirho: 'USER' as const,
 				updatedAtChirho: new Date(),
-				updatedByChirho: localsChirho.userChirho?.idChirho ?? null
+				updatedByChirho: sessionChirho.userIdChirho
 			})
 			.onConflictDoUpdate({
 				target: glossTableChirho.phraseIdChirho,
@@ -245,7 +251,7 @@ export const actions: ActionsChirho = {
 					stateChirho: stateChirho,
 					sourceChirho: 'USER' as const,
 					updatedAtChirho: new Date(),
-					updatedByChirho: localsChirho.userChirho?.idChirho ?? null
+					updatedByChirho: sessionChirho.userIdChirho
 				}
 			});
 
@@ -253,7 +259,7 @@ export const actions: ActionsChirho = {
 		await dbChirho.insert(glossHistoryTableChirho).values({
 			phraseIdChirho: phraseIdChirho,
 			updatedAtChirho: new Date(),
-			updatedByChirho: localsChirho.userChirho?.idChirho ?? null,
+			updatedByChirho: sessionChirho.userIdChirho,
 			glossChirho: glossChirho || null,
 			stateChirho: stateChirho,
 			sourceChirho: 'USER'

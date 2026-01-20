@@ -16,7 +16,6 @@ export class SystemRoleChirho {
 	static fromRawChirho(valueChirho: string): SystemRoleChirho {
 		switch (valueChirho) {
 			case 'ADMIN':
-			case SystemRoleRawChirho.AdminChirho:
 				return SystemRoleChirho.AdminChirho;
 			default:
 				throw new Error(`Unknown system role: ${valueChirho}`);

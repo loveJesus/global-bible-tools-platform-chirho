@@ -52,15 +52,29 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		ORDER BY rv.name_chirho
 	`, [codeChirho]);
 
-	// Check if interlinear PDF exists for this language
+	// Check if interlinear PDF exists for this language (our translation)
 	const interlinearPdfPathChirho = joinChirho(process.cwd(), `static/bibles-chirho/interlinear-${codeChirho}.pdf`);
 	const hasInterlinearPdfChirho = existsSyncChirho(interlinearPdfPathChirho);
+
+	// Check which reference version interlinear PDFs exist
+	const interlinearVersionsChirho = referenceVersionsChirho
+		.map((vChirho) => {
+			const pdfPathChirho = joinChirho(process.cwd(), `static/bibles-chirho/interlinear-${vChirho.codeChirho.toLowerCase()}-chirho.pdf`);
+			return {
+				codeChirho: vChirho.codeChirho,
+				nameChirho: vChirho.nameChirho,
+				hasPdfChirho: existsSyncChirho(pdfPathChirho),
+				pdfPathChirho: `/bibles-chirho/interlinear-${vChirho.codeChirho.toLowerCase()}-chirho.pdf`
+			};
+		})
+		.filter((vChirho) => vChirho.hasPdfChirho);
 
 	return {
 		codeChirho,
 		languageChirho,
 		booksChirho,
 		referenceVersionsChirho,
-		hasInterlinearPdfChirho
+		hasInterlinearPdfChirho,
+		interlinearVersionsChirho
 	};
 };

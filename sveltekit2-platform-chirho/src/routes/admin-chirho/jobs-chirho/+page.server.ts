@@ -4,7 +4,8 @@
 
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
 import { queryRawChirho } from '$lib/server/db-chirho';
-import { redirect as redirectChirho } from '@sveltejs/kit';
+import { error as errorChirho, redirect as redirectChirho } from '@sveltejs/kit';
+import { isUserAdminChirho } from '$lib/server/auth-helpers-chirho';
 
 interface ImportJobRowChirho {
 	languageIdChirho: string;
@@ -23,6 +24,12 @@ export const load: PageServerLoadChirho = async ({ locals: localsChirho }) => {
 	const sessionChirho = localsChirho.sessionChirho;
 	if (!sessionChirho?.userIdChirho) {
 		throw redirectChirho(302, '/login-chirho');
+	}
+
+	// Check admin role
+	const isAdminChirho = await isUserAdminChirho(sessionChirho.userIdChirho);
+	if (!isAdminChirho) {
+		throw errorChirho(403, 'Access denied. Admin privileges required.');
 	}
 
 	// Get all import jobs with language and user info

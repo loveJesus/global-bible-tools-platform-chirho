@@ -28,6 +28,12 @@
 			descriptionChirho: 'View background job status and history',
 			hrefChirho: '/admin-chirho/jobs-chirho',
 			iconChirho: '⚙️'
+		},
+		{
+			titleChirho: 'Analytics',
+			descriptionChirho: 'View translation progress and activity statistics',
+			hrefChirho: '/admin-chirho/analytics-chirho',
+			iconChirho: '📊'
 		}
 	];
 </script>

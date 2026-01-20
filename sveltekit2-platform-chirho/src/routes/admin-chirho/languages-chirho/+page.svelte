@@ -187,6 +187,18 @@
 									>
 										View
 									</a>
+									<a
+										href="/admin-chirho/languages-chirho/{langChirho.codeChirho}/settings-chirho"
+										class="text-emerald-600 hover:text-emerald-800 text-sm"
+									>
+										Settings
+									</a>
+									<a
+										href="/admin-chirho/languages-chirho/{langChirho.codeChirho}/snapshots-chirho"
+										class="text-purple-600 hover:text-purple-800 text-sm"
+									>
+										Snapshots
+									</a>
 									<button
 										type="button"
 										onclick={() => (editingLanguageChirho = langChirho)}
@@ -315,9 +327,10 @@
 				<input type="hidden" name="id" value={editingLanguageChirho.idChirho} />
 
 				<div>
-					<label class="block text-sm font-medium text-slate-700">Language Code</label>
+					<label for="edit-code" class="block text-sm font-medium text-slate-700">Language Code</label>
 					<input
 						type="text"
+						id="edit-code"
 						disabled
 						value={editingLanguageChirho.codeChirho}
 						class="mt-1 w-full px-3 py-2 bg-slate-100 border border-slate-300 rounded-lg text-slate-500"

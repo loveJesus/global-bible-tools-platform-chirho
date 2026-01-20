@@ -111,7 +111,7 @@
 	></button>
 
 	<!-- Panel -->
-	<aside
+	<div
 		class="fixed right-0 top-0 z-50 h-full w-96 max-w-full overflow-y-auto bg-white shadow-xl"
 		role="dialog"
 		aria-modal="true"
@@ -285,5 +285,5 @@
 				<p class="text-center text-slate-500">Select a word to view details</p>
 			{/if}
 		</div>
-	</aside>
+	</div>
 {/if}

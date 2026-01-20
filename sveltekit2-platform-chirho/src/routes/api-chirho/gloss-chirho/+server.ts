@@ -6,7 +6,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { dbChirho } from '$lib/server/db-chirho';
 import { glossTableChirho } from '$lib/server/schema-chirho/translation-chirho';
-import { eq } from 'drizzle-orm';
+import { glossUpdateSchemaChirho, validateFormDataChirho } from '$lib/server/validation-chirho';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	// Check authentication
@@ -18,17 +18,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const formDataChirho = await request.formData();
 
-		const verseIdChirho = formDataChirho.get('verseId') as string;
-		const languageCodeChirho = formDataChirho.get('languageCode') as string;
-		const phraseIdChirho = parseInt(formDataChirho.get('phraseId') as string, 10);
-		const stateChirho = formDataChirho.get('state') as 'APPROVED' | 'UNAPPROVED';
-		const glossChirho = formDataChirho.get('gloss') as string;
-		const methodRawChirho = formDataChirho.get('method') as string;
-		const methodChirho: 'USER' | 'IMPORT' = methodRawChirho === 'IMPORT' ? 'IMPORT' : 'USER';
-
-		if (!verseIdChirho || !languageCodeChirho || isNaN(phraseIdChirho)) {
-			return json({ errorChirho: 'Missing required fields' }, { status: 400 });
+		// Validate input with Zod
+		const validationChirho = validateFormDataChirho(glossUpdateSchemaChirho, formDataChirho);
+		if (!validationChirho.successChirho) {
+			return json({ errorChirho: validationChirho.errorChirho }, { status: 400 });
 		}
+
+		const { verseIdChirho, languageCodeChirho, phraseIdChirho, stateChirho, glossChirho, methodChirho } = validationChirho.dataChirho;
 
 		// Update or insert gloss
 		const resultChirho = await dbChirho

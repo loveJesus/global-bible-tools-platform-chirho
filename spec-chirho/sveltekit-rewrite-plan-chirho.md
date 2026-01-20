@@ -4,6 +4,8 @@ spec-chirho/sveltekit-rewrite-plan-chirho.md# For God so loved the world, that H
 
 # SvelteKit 2 Rewrite Plan for Global Bible Tools Platform
 
+For reference online nextjs site is at https://globalbibletools.com/
+
 ## Executive Summary
 
 This plan outlines the rewrite of the Global Bible Tools Platform from Next.js 14 to SvelteKit 2 with Drizzle ORM. The key challenges are:
@@ -354,15 +356,16 @@ The core rewrite from Next.js 14 to SvelteKit 2 is complete with:
 - Authorization checks on all protected routes
 - Chirho naming convention applied throughout
 
-### 📋 Deferred Features (Future Enhancements)
-
-These features are not part of the core rewrite but can be added later:
-- [ ] i18n - Internationalization (app works in English)
+### 📋 Do now Features
+- [ ] i18n - Internationalization (app works now in English)
 - [ ] Audio playback - Study view audio sync
-- [ ] Machine translation - Google Translate integration
 - [ ] Language settings page - Advanced per-language configuration
 - [ ] Snapshots module - Language backup/restore (GitHub #128)
 - [ ] Reporting/analytics - Statistics dashboard
+
+### (Future Enhancements)
+- [ ] Machine translation - Google Translate integration
+
 
 ### 🔗 Related GitHub Issues Addressed
 - #109 PDF interlinear export ✅

@@ -12,6 +12,20 @@ import {
 	phraseWordTableChirho
 } from '$lib/server/schema-chirho/translation-chirho';
 import { languageTableChirho } from '$lib/server/schema-chirho/languages-chirho';
+import { z as zChirho } from 'zod';
+
+// Validation schemas
+const notesQuerySchemaChirho = zChirho.object({
+	wordIdChirho: zChirho.string().min(1, 'Word ID is required'),
+	languageCodeChirho: zChirho.string().min(2).max(10, 'Invalid language code')
+});
+
+const noteCreateSchemaChirho = zChirho.object({
+	wordIdChirho: zChirho.string().min(1, 'Word ID is required'),
+	languageCodeChirho: zChirho.string().min(2).max(10, 'Invalid language code'),
+	contentChirho: zChirho.string().min(1, 'Note content is required').max(5000, 'Note too long'),
+	typeChirho: zChirho.enum(['footnote', 'translator_note'], { message: 'Type must be footnote or translator_note' })
+});
 
 interface NoteRowChirho {
 	phraseId: number;
@@ -28,15 +42,22 @@ export const GET: RequestHandler = async ({ url: urlChirho }) => {
 		const wordIdChirho = urlChirho.searchParams.get('wordId');
 		const languageCodeChirho = urlChirho.searchParams.get('languageCode');
 
-		if (!wordIdChirho || !languageCodeChirho) {
-			return json({ errorChirho: 'Missing wordId or languageCode parameter' }, { status: 400 });
+		// Validate query params with Zod
+		const validationChirho = notesQuerySchemaChirho.safeParse({
+			wordIdChirho,
+			languageCodeChirho
+		});
+
+		if (!validationChirho.success) {
+			const errorsChirho = validationChirho.error.issues.map((eChirho: { message: string }) => eChirho.message).join(', ');
+			return json({ errorChirho: errorsChirho }, { status: 400 });
 		}
 
 		// Get language ID
 		const languageChirho = await dbChirho
 			.select({ idChirho: languageTableChirho.idChirho })
 			.from(languageTableChirho)
-			.where(eqChirho(languageTableChirho.codeChirho, languageCodeChirho))
+			.where(eqChirho(languageTableChirho.codeChirho, validationChirho.data.languageCodeChirho))
 			.limit(1);
 
 		if (languageChirho.length === 0) {
@@ -82,7 +103,7 @@ export const GET: RequestHandler = async ({ url: urlChirho }) => {
 
 			ORDER BY timestamp DESC
 			`,
-			[wordIdChirho, languageIdChirho]
+			[validationChirho.data.wordIdChirho, languageIdChirho]
 		);
 
 		return json({
@@ -111,14 +132,21 @@ export const POST: RequestHandler = async ({ request: requestChirho, locals: loc
 
 	try {
 		const formDataChirho = await requestChirho.formData();
-		const wordIdChirho = formDataChirho.get('wordId') as string;
-		const languageCodeChirho = formDataChirho.get('languageCode') as string;
-		const contentChirho = formDataChirho.get('content') as string;
-		const typeChirho = formDataChirho.get('type') as 'footnote' | 'translator_note';
 
-		if (!wordIdChirho || !languageCodeChirho || !contentChirho || !typeChirho) {
-			return json({ errorChirho: 'Missing required fields' }, { status: 400 });
+		// Validate with Zod
+		const validationChirho = noteCreateSchemaChirho.safeParse({
+			wordIdChirho: formDataChirho.get('wordId'),
+			languageCodeChirho: formDataChirho.get('languageCode'),
+			contentChirho: formDataChirho.get('content'),
+			typeChirho: formDataChirho.get('type')
+		});
+
+		if (!validationChirho.success) {
+			const errorsChirho = validationChirho.error.issues.map((eChirho: { message: string }) => eChirho.message).join(', ');
+			return json({ errorChirho: errorsChirho }, { status: 400 });
 		}
+
+		const { wordIdChirho, languageCodeChirho, contentChirho, typeChirho } = validationChirho.data;
 
 		// Get language
 		const languageChirho = await dbChirho

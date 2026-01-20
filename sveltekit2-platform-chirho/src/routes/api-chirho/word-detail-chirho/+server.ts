@@ -5,6 +5,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { queryRawChirho } from '$lib/server/db-chirho';
+import { z as zChirho } from 'zod';
+
+// Validation schema
+const wordDetailQuerySchemaChirho = zChirho.object({
+	wordIdChirho: zChirho.string().min(1, 'Word ID is required'),
+	languageCodeChirho: zChirho.string().optional()
+});
 
 interface WordDetailRowChirho {
 	wordId: string;
@@ -29,12 +36,18 @@ interface LemmaTranslationChirho {
 
 export const GET: RequestHandler = async ({ url: urlChirho }) => {
 	try {
-		const wordIdChirho = urlChirho.searchParams.get('wordId');
-		const languageCodeChirho = urlChirho.searchParams.get('languageCode');
+		// Validate query params with Zod
+		const validationChirho = wordDetailQuerySchemaChirho.safeParse({
+			wordIdChirho: urlChirho.searchParams.get('wordId'),
+			languageCodeChirho: urlChirho.searchParams.get('languageCode')
+		});
 
-		if (!wordIdChirho) {
-			return json({ errorChirho: 'Missing wordId parameter' }, { status: 400 });
+		if (!validationChirho.success) {
+			const errorsChirho = validationChirho.error.issues.map((eChirho: { message: string }) => eChirho.message).join(', ');
+			return json({ errorChirho: errorsChirho }, { status: 400 });
 		}
+
+		const wordIdChirho = validationChirho.data.wordIdChirho;
 
 		// Get word with form and lemma info
 		const wordDetailChirho = await queryRawChirho<WordDetailRowChirho>(

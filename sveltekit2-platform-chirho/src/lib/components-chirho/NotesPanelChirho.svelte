@@ -135,7 +135,7 @@
 	></button>
 
 	<!-- Panel -->
-	<aside
+	<div
 		class="fixed right-0 top-0 z-50 flex h-full w-96 max-w-full flex-col bg-white shadow-xl"
 		role="dialog"
 		aria-modal="true"
@@ -279,5 +279,5 @@
 				{/if}
 			</p>
 		</form>
-	</aside>
+	</div>
 {/if}

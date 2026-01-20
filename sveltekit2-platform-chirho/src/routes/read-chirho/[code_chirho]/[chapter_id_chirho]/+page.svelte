@@ -11,6 +11,11 @@
 	// Reference display mode state
 	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('hidden');
 
+	// RTL state - auto-detect for Hebrew (OT books 1-39)
+	const isHebrewBookChirho = $derived((dataChirho.bookChirho?.idChirho ?? 40) <= 39);
+	let forceRtlChirho = $state<boolean | null>(null); // null = auto, true = force RTL, false = force LTR
+	const isRtlChirho = $derived(forceRtlChirho === null ? isHebrewBookChirho : forceRtlChirho);
+
 	// Get CSS class for gloss based on state - improved styling
 	// Source values: USER (manually entered), MACHINE (AI-generated imports), IMPORT (legacy), null
 	function getGlossClassChirho(stateChirho: string | null, sourceChirho: string | null): string {
@@ -177,8 +182,36 @@
 			</label>
 		</div>
 
-		<!-- Reference Version Controls -->
+		<!-- Display Controls: RTL toggle + Reference -->
 		<div class="mt-3 flex flex-wrap gap-3 items-center text-sm">
+			<!-- RTL Toggle -->
+			<span class="text-slate-600">Direction:</span>
+			<div class="flex rounded border border-slate-300 overflow-hidden">
+				<button
+					type="button"
+					class="px-2 py-1 {!isRtlChirho ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (forceRtlChirho = false)}
+				>
+					LTR →
+				</button>
+				<button
+					type="button"
+					class="px-2 py-1 border-x border-slate-300 {forceRtlChirho === null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (forceRtlChirho = null)}
+				>
+					Auto
+				</button>
+				<button
+					type="button"
+					class="px-2 py-1 {isRtlChirho && forceRtlChirho !== null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					onclick={() => (forceRtlChirho = true)}
+				>
+					← RTL
+				</button>
+			</div>
+
+			<span class="text-slate-300">|</span>
+
 			<span class="text-slate-600">Reference:</span>
 			<div class="flex rounded border border-slate-300 overflow-hidden">
 				<button
@@ -259,7 +292,7 @@
 			{#each dataChirho.versesChirho as verseChirho}
 				<div class="verse-container-chirho">
 					<!-- Word-by-word gloss view -->
-					<div class="flex gap-3">
+					<div class="flex gap-3" dir={isRtlChirho ? 'rtl' : 'ltr'}>
 						<span class="text-sm font-semibold text-slate-400 w-8 pt-1 flex-shrink-0">
 							{verseChirho.verseNumberChirho}
 						</span>
@@ -267,6 +300,7 @@
 							{#each verseChirho.wordsChirho as wordChirho}
 								<span
 									class="inline-flex flex-col items-center hover:bg-yellow-50 cursor-pointer rounded px-1 py-0.5 transition-colors"
+									dir="ltr"
 									title="{wordChirho.lemmaIdChirho ?? ''} | {wordChirho.grammarChirho ?? ''}"
 								>
 									<span class="text-slate-800 text-sm">{wordChirho.textChirho}</span>

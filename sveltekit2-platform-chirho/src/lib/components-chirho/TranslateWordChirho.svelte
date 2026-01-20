@@ -66,8 +66,9 @@
 	// State
 	let savingChirho = $state(false);
 	let inputValueChirho = $state('');
-	let inputRefChirho: HTMLInputElement;
-	let rootRefChirho: HTMLLIElement;
+	// Element refs don't need to be reactive - Svelte handles bind:this specially
+	let inputRefChirho: HTMLInputElement = $state(null!);
+	let rootRefChirho: HTMLLIElement = $state(null!);
 	let autosaveQueuedChirho = $state(false);
 
 	// Computed values
@@ -213,6 +214,7 @@
 	);
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <li
 	bind:this={rootRefChirho}
 	dir={isHebrewChirho ? 'rtl' : 'ltr'}
@@ -220,6 +222,7 @@
 		? 'bg-amber-50 dark:bg-gray-800'
 		: ''} {wordSelectedChirho ? 'bg-amber-100 shadow-inner dark:bg-gray-700 dark:shadow-none' : ''}"
 	onclick={handleWordClickChirho}
+	onkeydown={(eventChirho) => eventChirho.altKey && eventChirho.key === 'Enter' && onSelectChirho?.()}
 >
 	<!-- Ancient word row -->
 	<div

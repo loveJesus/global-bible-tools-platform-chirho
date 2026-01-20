@@ -6,6 +6,7 @@ import type { PageServerLoad as PageServerLoadChirho, Actions as ActionsChirho }
 import { dbChirho, eqChirho, queryRawChirho } from '$lib/server/db-chirho';
 import { userTableChirho, userSystemRoleTableChirho } from '$lib/server/schema-chirho/users-chirho';
 import { error as errorChirho, fail as failChirho, redirect as redirectChirho } from '@sveltejs/kit';
+import { isUserAdminChirho } from '$lib/server/auth-helpers-chirho';
 
 interface UserWithRolesRowChirho {
 	idChirho: string;
@@ -22,6 +23,12 @@ export const load: PageServerLoadChirho = async ({ locals: localsChirho }) => {
 	const sessionChirho = localsChirho.sessionChirho;
 	if (!sessionChirho?.userIdChirho) {
 		throw redirectChirho(302, '/login-chirho');
+	}
+
+	// Check admin role
+	const isAdminChirho = await isUserAdminChirho(sessionChirho.userIdChirho);
+	if (!isAdminChirho) {
+		throw errorChirho(403, 'Access denied. Admin privileges required.');
 	}
 
 	// Get all users with their roles and language memberships
@@ -62,6 +69,12 @@ export const actions: ActionsChirho = {
 		const sessionChirho = localsChirho.sessionChirho;
 		if (!sessionChirho?.userIdChirho) {
 			return failChirho(401, { errorChirho: 'Unauthorized' });
+		}
+
+		// Verify admin role
+		const isAdminChirho = await isUserAdminChirho(sessionChirho.userIdChirho);
+		if (!isAdminChirho) {
+			return failChirho(403, { errorChirho: 'Admin privileges required' });
 		}
 
 		const formDataChirho = await requestChirho.formData();
@@ -106,6 +119,12 @@ export const actions: ActionsChirho = {
 		const sessionChirho = localsChirho.sessionChirho;
 		if (!sessionChirho?.userIdChirho) {
 			return failChirho(401, { errorChirho: 'Unauthorized' });
+		}
+
+		// Verify admin role
+		const isAdminChirho = await isUserAdminChirho(sessionChirho.userIdChirho);
+		if (!isAdminChirho) {
+			return failChirho(403, { errorChirho: 'Admin privileges required' });
 		}
 
 		const formDataChirho = await requestChirho.formData();

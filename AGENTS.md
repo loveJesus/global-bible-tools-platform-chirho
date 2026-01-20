@@ -100,6 +100,23 @@ docker compose up -d        # Start all services
 docker compose logs -f      # View logs
 ```
 
+### Troubleshooting Docker
+
+**"Cannot find module" errors after adding dependencies:**
+
+The SvelteKit Docker setup uses a named volume (`sveltekit-node-modules-chirho`) to persist
+`node_modules` for faster rebuilds. If you add new dependencies to `package.json`, the stale
+volume will override the newly built image's `node_modules`. To fix:
+
+```bash
+cd sveltekit2-platform-chirho
+docker compose down server-chirho
+docker volume rm sveltekit2-platform-chirho_sveltekit-node-modules-chirho
+docker compose up -d server-chirho
+```
+
+This removes the cached volume so it gets populated fresh from the rebuilt image.
+
 ### Services (Local Development)
 | Service | Port | URL |
 |---------|------|-----|

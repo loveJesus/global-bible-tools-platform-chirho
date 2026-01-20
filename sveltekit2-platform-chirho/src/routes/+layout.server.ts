@@ -3,8 +3,14 @@
 // — John 3:16
 
 import type { LayoutServerLoad as LayoutServerLoadChirho } from './$types';
+import { loadTranslationsChirho, defaultLocaleChirho } from '$lib/i18n-chirho';
 
-export const load: LayoutServerLoadChirho = async ({ locals: localsChirho }) => {
+export const load: LayoutServerLoadChirho = async ({ locals: localsChirho, url: urlChirho }) => {
+	const { pathname: pathnameChirho } = urlChirho;
+
+	// Load translations for the current route
+	await loadTranslationsChirho(defaultLocaleChirho, pathnameChirho);
+
 	return {
 		userChirho: localsChirho.userChirho
 			? {
@@ -12,6 +18,7 @@ export const load: LayoutServerLoadChirho = async ({ locals: localsChirho }) => 
 					nameChirho: localsChirho.userChirho.nameChirho,
 					emailChirho: localsChirho.userChirho.emailChirho
 				}
-			: null
+			: null,
+		localeChirho: defaultLocaleChirho
 	};
 };

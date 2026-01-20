@@ -1,0 +1,38 @@
+{
+	"appNameChirho": "Global Bible Tools",
+	"navChirho": {
+		"homeChirho": "Home",
+		"readChirho": "Read",
+		"translateChirho": "Translate",
+		"downloadsChirho": "Downloads",
+		"adminChirho": "Admin",
+		"profileChirho": "Profile",
+		"loginChirho": "Sign In",
+		"logoutChirho": "Sign Out"
+	},
+	"actionsChirho": {
+		"saveChirho": "Save",
+		"cancelChirho": "Cancel",
+		"deleteChirho": "Delete",
+		"editChirho": "Edit",
+		"addChirho": "Add",
+		"searchChirho": "Search",
+		"loadingChirho": "Loading...",
+		"submitChirho": "Submit"
+	},
+	"messagesChirho": {
+		"successChirho": "Success",
+		"errorChirho": "Error",
+		"unauthorizedChirho": "Unauthorized. Please sign in.",
+		"notFoundChirho": "Not found",
+		"confirmDeleteChirho": "Are you sure you want to delete this?"
+	},
+	"bibleChirho": {
+		"oldTestamentChirho": "Old Testament",
+		"newTestamentChirho": "New Testament",
+		"chapterChirho": "Chapter",
+		"verseChirho": "Verse",
+		"wordChirho": "Word",
+		"glossChirho": "Gloss"
+	}
+}

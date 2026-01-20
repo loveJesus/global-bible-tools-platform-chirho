@@ -75,7 +75,7 @@
 			<div class="mt-4 space-y-4">
 				<!-- Email (read-only) -->
 				<div>
-					<label class="block text-sm font-medium text-slate-700">Email</label>
+					<span class="block text-sm font-medium text-slate-700">Email</span>
 					<div class="mt-1 flex items-center gap-3">
 						<span class="text-slate-900">{dataChirho.userChirho.emailChirho}</span>
 						<span

@@ -31,7 +31,7 @@
 		<p class="mt-2 text-slate-600">Select a book to read</p>
 
 		<!-- PDF Downloads Section -->
-		{#if dataChirho.hasInterlinearPdfChirho || dataChirho.referenceVersionsChirho.length > 0}
+		{#if dataChirho.hasInterlinearPdfChirho || dataChirho.interlinearVersionsChirho?.length > 0 || dataChirho.referenceVersionsChirho.length > 0}
 			<section class="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-4">
 				<h2 class="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-900">
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,37 +40,63 @@
 					Download Bible PDFs
 				</h2>
 
-				<div class="flex flex-wrap gap-2">
-					<!-- Interlinear Bible (our translation) -->
-					{#if dataChirho.hasInterlinearPdfChirho}
-						<a
-							href="/bibles-chirho/interlinear-{dataChirho.codeChirho}.pdf"
-							class="inline-flex items-center gap-1 rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
-							download
-						>
-							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-							</svg>
-							Interlinear Bible
-							<span class="text-xs text-emerald-200">(Greek/Hebrew + {dataChirho.languageChirho?.nameChirho})</span>
-						</a>
-					{/if}
+				<!-- Interlinear Bibles (GREEN buttons) -->
+				{#if dataChirho.hasInterlinearPdfChirho || dataChirho.interlinearVersionsChirho?.length > 0}
+					<div class="mb-3">
+						<span class="text-xs font-medium text-emerald-800 uppercase tracking-wide">Interlinear (Greek/Hebrew + Translation)</span>
+						<div class="mt-1 flex flex-wrap gap-2">
+							<!-- Our translation interlinear -->
+							{#if dataChirho.hasInterlinearPdfChirho}
+								<a
+									href="/bibles-chirho/interlinear-{dataChirho.codeChirho}.pdf"
+									class="inline-flex items-center gap-1 rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+									download
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+									</svg>
+									{dataChirho.languageChirho?.nameChirho} Interlinear
+								</a>
+							{/if}
 
-					<!-- Reference Bibles for this language -->
-					{#each dataChirho.referenceVersionsChirho as versionChirho}
-						<a
-							href="/api-chirho/pdf-chirho/full-bible-chirho/{versionChirho.codeChirho}"
-							class="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
-							download
-						>
-							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-							</svg>
-							{versionChirho.nameChirho}
-							<span class="text-xs text-blue-200">({formatVerseCountChirho(versionChirho.verseCountChirho)})</span>
-						</a>
-					{/each}
-				</div>
+							<!-- Reference version interlinear PDFs -->
+							{#each dataChirho.interlinearVersionsChirho ?? [] as versionChirho}
+								<a
+									href={versionChirho.pdfPathChirho}
+									class="inline-flex items-center gap-1 rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+									download
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+									</svg>
+									{versionChirho.nameChirho} Interlinear
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Reference Bibles (BLUE buttons) -->
+				{#if dataChirho.referenceVersionsChirho.length > 0}
+					<div>
+						<span class="text-xs font-medium text-blue-800 uppercase tracking-wide">Reference Text Only</span>
+						<div class="mt-1 flex flex-wrap gap-2">
+							{#each dataChirho.referenceVersionsChirho as versionChirho}
+								<a
+									href="/api-chirho/pdf-chirho/full-bible-chirho/{versionChirho.codeChirho}"
+									class="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+									download
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+									</svg>
+									{versionChirho.nameChirho}
+									<span class="text-xs text-blue-200">({formatVerseCountChirho(versionChirho.verseCountChirho)})</span>
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</section>
 		{/if}
 
