@@ -37,6 +37,24 @@ async function getVerseDataChirho(refChirho: string): Promise<VerseDataChirho | 
 
     procChirho.on('close', () => {
       // diatheke returns: "Reference: <w>...</w>...\n(KJV)"
+      // Verify the reference matches what we requested (diatheke may return next book's content)
+      const refMatchChirho = outputChirho.match(/^([^:]+):/);
+      if (!refMatchChirho) {
+        resolveChirho(null);
+        return;
+      }
+
+      // Normalize references for comparison (e.g., "Jude 1:1" vs "Jude 1:1")
+      const returnedRefChirho = refMatchChirho[1].trim();
+      const requestedRefChirho = refChirho.trim();
+
+      // Check if the returned reference starts with what we asked for
+      // Handle variations like "Jude 1:1" matching "Jude 1:1"
+      if (!returnedRefChirho.toLowerCase().startsWith(requestedRefChirho.toLowerCase().split(':')[0].split(' ')[0])) {
+        resolveChirho(null);
+        return;
+      }
+
       // Strip the reference prefix and trailing (KJV)
       const osisChirho = outputChirho
         .replace(/^[^:]+:\s*/, '')  // Remove "Jude 1:1: " prefix
