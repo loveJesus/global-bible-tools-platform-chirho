@@ -79,6 +79,20 @@ platform-chirho/
 The `sveltekit2-platform-chirho/` directory is our primary development environment.
 **Production:** https://global-tools.bible.systems
 
+### Production VPS (Hetzner)
+- **IP:** 46.224.100.134
+- **SSH:** `ssh root@46.224.100.134`
+- **App Directory:** `/opt/app-chirho`
+- **Deployment Repo:** Uses `global-bible-tools-sveltekit-chirho` (separate from platform repo)
+
+**To deploy updates:**
+```bash
+ssh root@46.224.100.134
+cd /opt/app-chirho
+git pull origin main_chirho
+docker compose down && docker compose up -d --build
+```
+
 ### Running Locally
 ```bash
 cd sveltekit2-platform-chirho
