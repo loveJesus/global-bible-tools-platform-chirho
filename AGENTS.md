@@ -2,7 +2,11 @@
 
 # Global Bible Tools Platform - Agent Instructions
 
-This is a Bun-based tooling project that supports the Next.js application running in Docker. This project provides:
+This is a Bun-based tooling project with two platforms:
+- **SvelteKit 2** (`sveltekit2-platform-chirho/`) - Our primary dev environment (Chirho naming)
+- **Next.js** (`nextjs-platform-chirho/`) - Upstream reference (no Chirho naming)
+
+This project provides:
 - Translation generation and management tools
 - Build scripts and utilities
 - Database tooling and queries
@@ -52,22 +56,65 @@ platform-chirho/
 ├── .env                          # Environment variables
 ├── erd-bible-chirho.txt          # Bible data ERD diagram
 ├── erd-translation-chirho.txt    # Translation workflow ERD
-├── nextjs-platform-chirho/       # [SUBMODULE] Next.js app (upstream code)
+├── sveltekit2-platform-chirho/   # PRIMARY: SvelteKit 2 app (Chirho naming)
+│   ├── src/lib/server/           # Server code, Drizzle schema
+│   ├── src/routes/               # SvelteKit routes
+│   ├── compose.yaml              # Docker: PostgreSQL, MinIO, Caddy
+│   └── Caddyfile                 # Reverse proxy config
+├── nextjs-platform-chirho/       # [SUBMODULE] Next.js app (upstream reference)
 │   ├── src/modules/              # Feature modules
 │   ├── db/migrations/            # SQL migrations
 │   └── compose.yaml              # Docker services
-├── tools-chirho/                 # Bun tooling scripts
+├── translations-chirho/          # [SUBMODULE] Translation SQL files
+├── tools-chirho/                 # Bun tooling scripts (MCP server)
 ├── scripts-chirho/               # Build and utility scripts
-├── translations-chirho/          # Translation files and generators
 └── spec-chirho/                  # Specifications and AI notes
     ├── platform-overview-chirho.md
-    └── database-architecture-chirho.md
+    ├── database-architecture-chirho.md
+    └── sveltekit-rewrite-plan-chirho.md
 ```
 
-## Next.js Platform (Submodule)
+## SvelteKit Platform (Primary)
+
+The `sveltekit2-platform-chirho/` directory is our primary development environment.
+**Production:** https://global-tools.bible.systems
+
+### Running Locally
+```bash
+cd sveltekit2-platform-chirho
+docker compose up -d        # Start all services
+docker compose logs -f      # View logs
+```
+
+### Services (Local Development)
+| Service | Port | URL |
+|---------|------|-----|
+| SvelteKit Server | 5173 | http://localhost:5173 |
+| PostgreSQL | 5435 | postgresql://postgres:asdfasdf@localhost:5435/postgres |
+| Test DB | 5433 | postgresql://postgres:asdfasdf@localhost:5433/postgres |
+| MinIO (S3) | 9000 | http://localhost:9000 |
+| MinIO Console | 9001 | http://localhost:9001 |
+
+### Key Paths
+- `src/lib/server/db-chirho.ts` - Database connection (Drizzle + pg)
+- `src/lib/server/schema-chirho/` - Drizzle schema definitions
+- `src/lib/modules-chirho/` - Feature modules
+- `src/routes/` - SvelteKit routes
+- `compose.yaml` - Docker services
+
+### Routes
+- `/read-chirho/[code]/[chapter]` - Reader view
+- `/translate-chirho/[code]/[verse]` - Translation view
+- `/login-chirho` - Authentication
+
+---
+
+## Next.js Platform (Upstream Reference)
 
 The `nextjs-platform-chirho/` directory is a git submodule pointing to:
 `https://github.com/globalbibletools/platform.git`
+
+**Note:** This is used as a reference for upstream features. Use SvelteKit for development.
 
 ### Key Paths in Submodule
 - `src/db.ts` - Database connection (Kysely + pg)
@@ -75,22 +122,20 @@ The `nextjs-platform-chirho/` directory is a git submodule pointing to:
 - `db/migrations/` - SQL migrations
 - `compose.yaml` - Docker services
 
-### Running the Platform
+### Running (if needed for reference)
 ```bash
 cd nextjs-platform-chirho
 docker compose up -d        # Start all services
 docker compose logs -f      # View logs
 ```
 
-### Services (when Docker is up)
+### Services
 | Service | Port | URL |
 |---------|------|-----|
 | Next.js Server | 3000 | http://localhost:3000 |
 | PostgreSQL | 5432 | postgresql://postgres:asdfasdf@localhost:5432/postgres |
 | Test DB | 5433 | postgresql://postgres:asdfasdf@localhost:5433/postgres |
 | LocalStack S3 | 4566 | http://localhost:4566 |
-| Job Worker | 9000 | http://localhost:9000 |
-| Docs | 4000 | http://localhost:4000 |
 
 ## Database Quick Reference
 
@@ -126,6 +171,10 @@ const booksChirho = await queryPgChirho(`SELECT * FROM book ORDER BY id`);
 
 **Direct Query via Docker (for debugging):**
 ```bash
+# SvelteKit database (primary)
+docker exec sveltekit2-platform-chirho-db-chirho-1 psql -U postgres -c "SELECT * FROM book LIMIT 5"
+
+# Next.js database (if running)
 docker exec nextjs-platform-chirho-db-1 psql -U postgres -c "SELECT * FROM book LIMIT 5"
 ```
 
@@ -239,14 +288,35 @@ Use `/translate-chirho <language> <scope>` to create translations:
 
 ### Query the database directly
 ```bash
-docker compose -f nextjs-platform-chirho/compose.yaml exec db psql -U postgres
+# SvelteKit database (primary)
+cd sveltekit2-platform-chirho && docker compose exec db-chirho psql -U postgres
+
+# Or directly:
+docker exec -it sveltekit2-platform-chirho-db-chirho-1 psql -U postgres
 ```
 
-### Update submodule to latest
+### Start local development
+```bash
+cd sveltekit2-platform-chirho
+docker compose up -d        # Start PostgreSQL, MinIO
+bun install                 # Install dependencies
+bun run dev                 # Start dev server at http://localhost:5173
+```
+
+### Update nextjs submodule (for upstream changes)
 ```bash
 cd nextjs-platform-chirho
 git pull origin main
 cd ..
 git add nextjs-platform-chirho
 git commit -m "Update platform submodule"
+```
+
+### Sync data from nextjs to sveltekit DB
+```bash
+# Export from nextjs
+docker exec nextjs-platform-chirho-db-1 pg_dump -U postgres --data-only > /tmp/data.sql
+
+# Import to sveltekit
+docker exec -i sveltekit2-platform-chirho-db-chirho-1 psql -U postgres < /tmp/data.sql
 ```

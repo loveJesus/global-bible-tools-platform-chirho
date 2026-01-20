@@ -21,12 +21,13 @@ import { $ } from "bun";
 // PostgreSQL Connection (Bible Database via Docker)
 // =============================================================================
 
+// SvelteKit platform is now the primary dev environment
 const DOCKER_CONTAINER_CHIRHO =
-  process.env.DOCKER_CONTAINER_CHIRHO ?? "nextjs-platform-chirho-db-1";
+  process.env.DOCKER_CONTAINER_CHIRHO ?? "sveltekit2-platform-chirho-db-chirho-1";
 
 const DATABASE_URL_CHIRHO =
   process.env.DATABASE_URL_CHIRHO ??
-  "postgresql://postgres:asdfasdf@localhost:5432/postgres";
+  "postgresql://postgres:asdfasdf@localhost:5435/postgres";
 
 let pgClientChirho: ReturnType<typeof postgres> | null = null;
 let useDockerExecChirho = false;
