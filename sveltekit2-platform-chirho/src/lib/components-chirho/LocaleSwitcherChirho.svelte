@@ -4,7 +4,8 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { availableLocalesChirho, localeChirho } from '$lib/i18n-chirho';
+	import { page as pageChirho } from '$app/state';
+	import { availableLocalesChirho, localeChirho, loadTranslationsChirho } from '$lib/i18n-chirho';
 
 	interface PropsChirho {
 		variantChirho?: 'light' | 'dark';
@@ -14,6 +15,14 @@
 
 	let isOpenChirho = $state(false);
 	let currentCodeChirho = $state('en');
+
+	// Only show locales that have UI translations
+	const supportedLocaleCodesChirho = ['en', 'es', 'hi'];
+	const supportedLocalesChirho = $derived(
+		availableLocalesChirho.filter((localeItemChirho) =>
+			supportedLocaleCodesChirho.includes(localeItemChirho.codeChirho)
+		)
+	);
 
 	// Subscribe to locale store
 	$effect(() => {
@@ -25,28 +34,36 @@
 		return unsubscribeChirho;
 	});
 
-	// Initialize from localStorage on mount
-	onMount(() => {
-		const savedChirho = localStorage.getItem('locale-chirho');
-		if (savedChirho && availableLocalesChirho.some((localeItemChirho) => localeItemChirho.codeChirho === savedChirho)) {
+	// Initialize from cookie/localStorage on mount
+	onMount(async () => {
+		// Check cookie first
+		const cookieMatchChirho = document.cookie.match(/locale=([^;]+)/);
+		const savedChirho = cookieMatchChirho?.[1] || localStorage.getItem('locale-chirho');
+
+		if (savedChirho && supportedLocaleCodesChirho.includes(savedChirho)) {
+			await loadTranslationsChirho(savedChirho, pageChirho.url.pathname);
 			localeChirho.set(savedChirho);
 			currentCodeChirho = savedChirho;
 		}
 	});
 
-	function selectLocaleChirho(codeChirho: string) {
+	async function selectLocaleChirho(codeChirho: string) {
+		// Load translations for new locale
+		await loadTranslationsChirho(codeChirho, pageChirho.url.pathname);
 		localeChirho.set(codeChirho);
 		currentCodeChirho = codeChirho;
 		isOpenChirho = false;
-		// Store preference
+
+		// Store preference in cookie (accessible by server) and localStorage
+		document.cookie = `locale=${codeChirho};path=/;max-age=31536000;SameSite=Lax`;
 		if (typeof localStorage !== 'undefined') {
 			localStorage.setItem('locale-chirho', codeChirho);
 		}
 	}
 
 	const currentLocaleChirho = $derived(
-		availableLocalesChirho.find((localeItemChirho) => localeItemChirho.codeChirho === currentCodeChirho) ||
-			availableLocalesChirho[0]
+		supportedLocalesChirho.find((localeItemChirho) => localeItemChirho.codeChirho === currentCodeChirho) ||
+			supportedLocalesChirho[0]
 	);
 
 	const buttonClassChirho = $derived(
@@ -83,7 +100,7 @@
 			class="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5"
 			role="listbox"
 		>
-			{#each availableLocalesChirho as localeItemChirho}
+			{#each supportedLocalesChirho as localeItemChirho}
 				<button
 					type="button"
 					role="option"

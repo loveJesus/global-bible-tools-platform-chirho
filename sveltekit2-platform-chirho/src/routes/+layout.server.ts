@@ -6,11 +6,18 @@ import type { LayoutServerLoad as LayoutServerLoadChirho } from './$types';
 import { loadTranslationsChirho, defaultLocaleChirho } from '$lib/i18n-chirho';
 import { isUserAdminChirho } from '$lib/server/auth-helpers-chirho';
 
-export const load: LayoutServerLoadChirho = async ({ locals: localsChirho, url: urlChirho }) => {
+export const load: LayoutServerLoadChirho = async ({ locals: localsChirho, url: urlChirho, cookies: cookiesChirho }) => {
 	const { pathname: pathnameChirho } = urlChirho;
 
+	// Get locale from cookie or use default
+	const savedLocaleChirho = cookiesChirho.get('locale');
+	const supportedLocalesChirho = ['en', 'es', 'hi'];
+	const currentLocaleChirho = savedLocaleChirho && supportedLocalesChirho.includes(savedLocaleChirho)
+		? savedLocaleChirho
+		: defaultLocaleChirho;
+
 	// Load translations for the current route
-	await loadTranslationsChirho(defaultLocaleChirho, pathnameChirho);
+	await loadTranslationsChirho(currentLocaleChirho, pathnameChirho);
 
 	let isAdminChirho = false;
 	if (localsChirho.userChirho) {
@@ -26,6 +33,6 @@ export const load: LayoutServerLoadChirho = async ({ locals: localsChirho, url: 
 					isAdminChirho
 				}
 			: null,
-		localeChirho: defaultLocaleChirho
+		localeChirho: currentLocaleChirho
 	};
 };

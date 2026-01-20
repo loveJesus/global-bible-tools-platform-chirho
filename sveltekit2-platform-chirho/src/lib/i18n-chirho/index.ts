@@ -8,6 +8,7 @@ import type { Config as ConfigChirho } from 'sveltekit-i18n';
 const configChirho: ConfigChirho = {
 	fallbackLocale: 'en',
 	loaders: [
+		// English
 		{
 			locale: 'en',
 			key: 'common',
@@ -17,6 +18,94 @@ const configChirho: ConfigChirho = {
 			locale: 'en',
 			key: 'landing',
 			loader: async () => (await import('./messages-chirho/en-chirho/landing-chirho.json')).default
+		},
+		// Spanish
+		{
+			locale: 'es',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/es-chirho/common-chirho.json')).default
+		},
+		{
+			locale: 'es',
+			key: 'landing',
+			loader: async () => (await import('./messages-chirho/es-chirho/landing-chirho.json')).default
+		},
+		// Hindi
+		{
+			locale: 'hi',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/hi-chirho/common-chirho.json')).default
+		},
+		{
+			locale: 'hi',
+			key: 'landing',
+			loader: async () => (await import('./messages-chirho/hi-chirho/landing-chirho.json')).default
+		},
+		// French
+		{
+			locale: 'fr',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/fr-chirho/common-chirho.json')).default
+		},
+		// German
+		{
+			locale: 'de',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/de-chirho/common-chirho.json')).default
+		},
+		// Portuguese
+		{
+			locale: 'pt',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/pt-chirho/common-chirho.json')).default
+		},
+		// Russian
+		{
+			locale: 'ru',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/ru-chirho/common-chirho.json')).default
+		},
+		// Chinese
+		{
+			locale: 'zh',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/zh-chirho/common-chirho.json')).default
+		},
+		// Arabic
+		{
+			locale: 'ar',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/ar-chirho/common-chirho.json')).default
+		},
+		// Japanese
+		{
+			locale: 'ja',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/ja-chirho/common-chirho.json')).default
+		},
+		// Korean
+		{
+			locale: 'ko',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/ko-chirho/common-chirho.json')).default
+		},
+		// Indonesian
+		{
+			locale: 'id',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/id-chirho/common-chirho.json')).default
+		},
+		// Italian
+		{
+			locale: 'it',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/it-chirho/common-chirho.json')).default
+		},
+		// Dutch
+		{
+			locale: 'nl',
+			key: 'common',
+			loader: async () => (await import('./messages-chirho/nl-chirho/common-chirho.json')).default
 		}
 	]
 };
@@ -43,10 +132,16 @@ export interface UiLocaleChirho {
 export const availableLocalesChirho: UiLocaleChirho[] = [
 	{ codeChirho: 'en', nameChirho: 'English', nativeNameChirho: 'English', dirChirho: 'ltr' },
 	{ codeChirho: 'es', nameChirho: 'Spanish', nativeNameChirho: 'Español', dirChirho: 'ltr' },
-	{ codeChirho: 'ar', nameChirho: 'Arabic', nativeNameChirho: 'اَلْعَرَبِيَّةُ', dirChirho: 'rtl' },
 	{ codeChirho: 'hi', nameChirho: 'Hindi', nativeNameChirho: 'हिन्दी', dirChirho: 'ltr' },
-	{ codeChirho: 'zh', nameChirho: 'Chinese', nativeNameChirho: '中文', dirChirho: 'ltr' },
 	{ codeChirho: 'fr', nameChirho: 'French', nativeNameChirho: 'Français', dirChirho: 'ltr' },
 	{ codeChirho: 'de', nameChirho: 'German', nativeNameChirho: 'Deutsch', dirChirho: 'ltr' },
-	{ codeChirho: 'pt', nameChirho: 'Portuguese', nativeNameChirho: 'Português', dirChirho: 'ltr' }
+	{ codeChirho: 'pt', nameChirho: 'Portuguese', nativeNameChirho: 'Português', dirChirho: 'ltr' },
+	{ codeChirho: 'ru', nameChirho: 'Russian', nativeNameChirho: 'Русский', dirChirho: 'ltr' },
+	{ codeChirho: 'zh', nameChirho: 'Chinese', nativeNameChirho: '中文', dirChirho: 'ltr' },
+	{ codeChirho: 'ar', nameChirho: 'Arabic', nativeNameChirho: 'العربية', dirChirho: 'rtl' },
+	{ codeChirho: 'ja', nameChirho: 'Japanese', nativeNameChirho: '日本語', dirChirho: 'ltr' },
+	{ codeChirho: 'ko', nameChirho: 'Korean', nativeNameChirho: '한국어', dirChirho: 'ltr' },
+	{ codeChirho: 'id', nameChirho: 'Indonesian', nativeNameChirho: 'Bahasa Indonesia', dirChirho: 'ltr' },
+	{ codeChirho: 'it', nameChirho: 'Italian', nativeNameChirho: 'Italiano', dirChirho: 'ltr' },
+	{ codeChirho: 'nl', nameChirho: 'Dutch', nativeNameChirho: 'Nederlands', dirChirho: 'ltr' }
 ];

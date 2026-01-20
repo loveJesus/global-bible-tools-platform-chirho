@@ -6,6 +6,7 @@
 	import type { PageData as PageDataChirho } from './$types';
 	import { goto as gotoChirho } from '$app/navigation';
 	import AudioDialogChirho from '$lib/components-chirho/AudioDialogChirho.svelte';
+	import { tChirho } from '$lib/i18n-chirho';
 
 	let { data: dataChirho }: { data: PageDataChirho } = $props();
 
@@ -140,7 +141,7 @@
 <main class="min-h-screen bg-slate-50">
 	<div class="mx-auto max-w-4xl px-4 py-8">
 		<nav class="mb-4 flex gap-2 text-sm">
-			<a href="/read-chirho" class="text-blue-600 hover:underline">Languages</a>
+			<a href="/read-chirho" class="text-blue-600 hover:underline">{$tChirho('common.readChirho.languagesChirho')}</a>
 			<span class="text-slate-400">/</span>
 			<a href="/read-chirho/{dataChirho.codeChirho}" class="text-blue-600 hover:underline">
 				{dataChirho.languageChirho?.nameChirho}
@@ -157,7 +158,7 @@
 		<div class="mt-4 flex flex-wrap gap-4 items-center">
 			<!-- Language Switcher -->
 			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">Language:</span>
+				<span class="text-sm text-slate-600">{$tChirho('common.readChirho.languageChirho')}:</span>
 				<select
 					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
 					value={dataChirho.codeChirho}
@@ -179,11 +180,11 @@
 					bind:checked={hideNdashChirho}
 					class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
 				/>
-				<span class="text-slate-600">Hide dashes</span>
+				<span class="text-slate-600">{$tChirho('common.readChirho.hideDashesChirho')}</span>
 			</label>
 
 			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">Book:</span>
+				<span class="text-sm text-slate-600">{$tChirho('common.bibleChirho.bookChirho')}:</span>
 				<select
 					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
 					value={String(dataChirho.bookChirho?.idChirho ?? '')}
@@ -196,7 +197,7 @@
 			</label>
 
 			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">Chapter:</span>
+				<span class="text-sm text-slate-600">{$tChirho('common.bibleChirho.chapterChirho')}:</span>
 				<select
 					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
 					value={String(dataChirho.chapterChirho ?? '')}
@@ -215,12 +216,12 @@
 				type="button"
 				onclick={() => (showAudioChirho = true)}
 				class="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-300 text-sm text-slate-600 bg-white hover:bg-slate-50 transition-colors"
-				title="Listen to Audio"
+				title={$tChirho('common.readChirho.listenAudioChirho')}
 			>
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
 				</svg>
-				Audio
+				{$tChirho('common.readChirho.audioChirho')}
 			</button>
 
 			<!-- Biblical Hebrew GPT Link -->
@@ -241,7 +242,7 @@
 		<!-- Display Controls: RTL toggle + Reference -->
 		<div class="mt-3 flex flex-wrap gap-3 items-center text-sm">
 			<!-- RTL Toggle -->
-			<span class="text-slate-600">Direction:</span>
+			<span class="text-slate-600">{$tChirho('common.readChirho.directionChirho')}:</span>
 			<div class="flex rounded border border-slate-300 overflow-hidden">
 				<button
 					type="button"
@@ -268,29 +269,29 @@
 
 			<span class="text-slate-300">|</span>
 
-			<span class="text-slate-600">Reference:</span>
+			<span class="text-slate-600">{$tChirho('common.readChirho.referenceChirho')}:</span>
 			<div class="flex rounded border border-slate-300 overflow-hidden">
 				<button
 					type="button"
 					class="px-2 py-1 {referenceDisplayModeChirho === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'hidden')}
-					aria-label="Close reference panel"
+					aria-label={$tChirho('common.readChirho.closeReferencePanelChirho')}
 				>
-					Hidden
+					{$tChirho('common.readChirho.hiddenChirho')}
 				</button>
 				<button
 					type="button"
 					class="px-2 py-1 border-x border-slate-300 {referenceDisplayModeChirho === 'below' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'below')}
 				>
-					Below
+					{$tChirho('common.readChirho.belowChirho')}
 				</button>
 				<button
 					type="button"
 					class="px-2 py-1 {referenceDisplayModeChirho === 'side' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'side')}
 				>
-					Side
+					{$tChirho('common.readChirho.sideChirho')}
 				</button>
 			</div>
 			{#if dataChirho.referenceVersionsChirho?.length}
@@ -328,19 +329,19 @@
 		<div class="mt-4 flex flex-wrap gap-4 text-xs">
 			<span class="flex items-center gap-1">
 				<span class="text-emerald-700 font-medium">text</span>
-				<span class="text-slate-600">Approved</span>
+				<span class="text-slate-600">{$tChirho('common.translateChirho.approvedChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-amber-700 bg-amber-50 rounded px-1">text</span>
-				<span class="text-slate-600">Pending review</span>
+				<span class="text-slate-600">{$tChirho('common.translateChirho.pendingReviewChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-purple-600 underline decoration-purple-400 decoration-2">text</span>
-				<span class="text-slate-600">Imported</span>
+				<span class="text-slate-600">{$tChirho('common.translateChirho.importedChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-slate-400 italic">—</span>
-				<span class="text-slate-600">No translation</span>
+				<span class="text-slate-600">{$tChirho('common.translateChirho.noTranslationChirho')}</span>
 			</span>
 		</div>
 
@@ -421,7 +422,7 @@
 					href="/read-chirho/{dataChirho.codeChirho}/{dataChirho.prevChapterIdChirho}"
 					class="text-blue-600 hover:underline"
 				>
-					← Previous Chapter
+					← {$tChirho('common.readChirho.previousChapterChirho')}
 				</a>
 			{:else}
 				<span></span>
@@ -432,7 +433,7 @@
 					href="/read-chirho/{dataChirho.codeChirho}/{dataChirho.nextChapterIdChirho}"
 					class="text-blue-600 hover:underline"
 				>
-					Next Chapter →
+					{$tChirho('common.readChirho.nextChapterChirho')} →
 				</a>
 			{/if}
 		</div>

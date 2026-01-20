@@ -56,6 +56,36 @@ export class UserChirho {
 		return { userChirho, tokenChirho: inviteChirho.tokenChirho };
 	}
 
+	/**
+	 * Register a new user with email and password (self-registration).
+	 * Creates user with pending email verification.
+	 */
+	static async registerChirho(optionsChirho: {
+		nameChirho: string;
+		emailChirho: string;
+		passwordChirho: string;
+	}): Promise<{ userChirho: UserChirho; verificationTokenChirho: string }> {
+		const passwordHashChirho = await PasswordChirho.createChirho(optionsChirho.passwordChirho);
+		const verificationChirho = EmailVerificationChirho.createForEmailChirho(optionsChirho.emailChirho);
+
+		const userChirho = new UserChirho({
+			idChirho: ulidChirho(),
+			nameChirho: optionsChirho.nameChirho,
+			emailChirho: new UserEmailChirho({
+				addressChirho: optionsChirho.emailChirho.toLowerCase(),
+				statusChirho: EmailStatusChirho.UnverifiedChirho
+			}),
+			passwordChirho: passwordHashChirho,
+			emailVerificationChirho: verificationChirho,
+			invitationsChirho: [],
+			passwordResetsChirho: [],
+			statusChirho: UserStatusChirho.ActiveChirho,
+			systemRolesChirho: []
+		});
+
+		return { userChirho, verificationTokenChirho: verificationChirho.tokenChirho };
+	}
+
 	get idChirho(): string {
 		return this.propsChirho.idChirho;
 	}

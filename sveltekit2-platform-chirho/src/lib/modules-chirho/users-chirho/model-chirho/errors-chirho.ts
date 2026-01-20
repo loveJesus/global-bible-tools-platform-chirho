@@ -64,3 +64,10 @@ export class EmailAlreadyExistsErrorChirho extends Error {
 		this.name = 'EmailAlreadyExistsErrorChirho';
 	}
 }
+
+export class UserAlreadyExistsErrorChirho extends Error {
+	constructor() {
+		super('User already exists');
+		this.name = 'UserAlreadyExistsErrorChirho';
+	}
+}

@@ -5,6 +5,7 @@
 <script lang="ts">
 	import type { PageData as PageDataChirho } from './$types';
 	import LocaleSwitcherChirho from '$lib/components-chirho/LocaleSwitcherChirho.svelte';
+	import { tChirho } from '$lib/i18n-chirho';
 
 	let { data: dataChirho }: { data: PageDataChirho } = $props();
 
@@ -38,10 +39,10 @@
 			<h1 class="ml-2 text-base font-bold sm:text-lg lg:text-2xl">Global Bible Tools</h1>
 		</a>
 		<div class="flex-grow md:flex-grow-0"></div>
-		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#vision-chirho">Vision</a>
-		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#contribute-chirho">Contribute</a>
-		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#progress-chirho">Progress</a>
-		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#about-chirho">About</a>
+		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#vision-chirho">{$tChirho('landing.navChirho.visionChirho')}</a>
+		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#contribute-chirho">{$tChirho('landing.navChirho.contributeChirho')}</a>
+		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#progress-chirho">{$tChirho('landing.navChirho.progressChirho')}</a>
+		<a class="mx-3 hidden pt-1 font-bold min-[800px]:block" href="#about-chirho">{$tChirho('landing.navChirho.aboutChirho')}</a>
 		<div class="md:flex-grow"></div>
 		<div class="mr-2 hidden sm:block">
 			<LocaleSwitcherChirho />
@@ -50,7 +51,7 @@
 			href="/read-chirho"
 			class="ml-2 flex h-8 items-center justify-center rounded-lg bg-blue-800 px-4 font-bold text-white shadow-md hover:bg-blue-700 transition-colors"
 		>
-			Reader's Bible
+			{$tChirho('landing.navChirho.readersBibleChirho')}
 		</a>
 	</nav>
 
@@ -68,14 +69,13 @@
 				<p
 					class="mb-6 max-w-[600px] text-center text-base font-bold text-white sm:mb-16 sm:text-lg md:text-xl lg:text-2xl"
 				>
-					The global Church needs access to serious biblical language study tools without cost or
-					hindrance.
+					{$tChirho('landing.heroChirho.missionChirho')}
 				</p>
 				<a
 					href="#vision-chirho"
 					class="flex h-8 items-center justify-center rounded-lg bg-blue-800 px-4 font-bold text-white shadow-xl hover:bg-blue-700 transition-colors md:h-10 md:px-6 md:text-lg lg:h-12 lg:px-8 lg:text-xl"
 				>
-					Learn More
+					{$tChirho('landing.heroChirho.learnMoreChirho')}
 				</a>
 			</div>
 		</section>
@@ -100,8 +100,8 @@
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-lg font-semibold text-slate-900">Read</h2>
-								<p class="text-sm text-slate-600">Interlinear translations</p>
+								<h2 class="text-lg font-semibold text-slate-900">{$tChirho('landing.quickAccessChirho.readChirho.titleChirho')}</h2>
+								<p class="text-sm text-slate-600">{$tChirho('landing.quickAccessChirho.readChirho.descriptionChirho')}</p>
 							</div>
 						</div>
 					</a>
@@ -122,8 +122,8 @@
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-lg font-semibold text-slate-900">Translate</h2>
-								<p class="text-sm text-slate-600">Contribute translations</p>
+								<h2 class="text-lg font-semibold text-slate-900">{$tChirho('landing.quickAccessChirho.translateChirho.titleChirho')}</h2>
+								<p class="text-sm text-slate-600">{$tChirho('landing.quickAccessChirho.translateChirho.descriptionChirho')}</p>
 							</div>
 						</div>
 					</a>
@@ -144,8 +144,8 @@
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-lg font-semibold text-slate-900">Downloads</h2>
-								<p class="text-sm text-slate-600">PDF Bibles (KJV, WEB)</p>
+								<h2 class="text-lg font-semibold text-slate-900">{$tChirho('landing.quickAccessChirho.downloadsChirho.titleChirho')}</h2>
+								<p class="text-sm text-slate-600">{$tChirho('landing.quickAccessChirho.downloadsChirho.descriptionChirho')}</p>
 							</div>
 						</div>
 					</a>
@@ -156,7 +156,7 @@
 		<!-- Vision Section -->
 		<section id="vision-chirho" class="bg-amber-50 px-6 pb-32 pt-12 md:px-8 md:pt-16 lg:pt-24">
 			<div class="mx-auto w-full max-w-[1000px]">
-				<h2 class="mb-8 text-3xl font-bold md:text-5xl">Vision</h2>
+				<h2 class="mb-8 text-3xl font-bold md:text-5xl">{$tChirho('landing.visionChirho.titleChirho')}</h2>
 				<div class="relative mb-8 w-full shadow-lg">
 					<div class="pb-[56.25%]"></div>
 					<video
@@ -175,7 +175,7 @@
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Prefer to Read?
+						{$tChirho('landing.visionChirho.preferToReadChirho')}
 						<svg class="ml-1 inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
@@ -191,10 +191,10 @@
 					class="grid grid-flow-col grid-cols-1 grid-rows-[auto_1fr_1fr_auto_1fr_1fr_1fr] gap-8 md:grid-cols-2 md:grid-rows-[auto_1fr_1fr_1fr] lg:gap-x-16"
 				>
 					<h3 class="mx-4 border-b-4 border-black pb-2 text-center text-xl font-bold">
-						Language Learning
+						{$tChirho('landing.visionChirho.languageLearningChirho')}
 					</h3>
 					<div class="rounded-2xl bg-white p-6 shadow">
-						<h4 class="mb-3 text-lg font-bold">Language Lessons</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.visionChirho.languageLessonsChirho.titleChirho')}</h4>
 						<p>
 							YouTube courses
 							<a
@@ -218,36 +218,33 @@
 						</p>
 					</div>
 					<div class="rounded-2xl bg-white p-6 shadow">
-						<h4 class="mb-3 text-lg font-bold">Reader's Bible</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.visionChirho.readersBibleChirho.titleChirho')}</h4>
 						<p>
-							A digital reader's Bible helps language learners accelerate their comprehension by
-							reading the biblical text with assistance.
+							{$tChirho('landing.visionChirho.readersBibleChirho.descriptionChirho')}
 						</p>
 					</div>
 
 					<h3
 						class="mx-4 border-b-4 border-black pb-2 text-center text-xl font-bold md:col-start-2"
 					>
-						Biblical Study
+						{$tChirho('landing.visionChirho.biblicalStudyChirho')}
 					</h3>
 					<div class="rounded-2xl bg-white p-6 shadow md:col-start-2">
-						<h4 class="mb-3 text-lg font-bold">Lexicons</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.visionChirho.lexiconsChirho.titleChirho')}</h4>
 						<p>
-							Lexicons are needed in biblical study to explore the range of meaning for Greek and
-							Hebrew words.
+							{$tChirho('landing.visionChirho.lexiconsChirho.descriptionChirho')}
 						</p>
 					</div>
 					<div class="rounded-2xl bg-white p-6 shadow md:col-start-2">
-						<h4 class="mb-3 text-lg font-bold">Grammars</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.visionChirho.grammarsChirho.titleChirho')}</h4>
 						<p>
-							Grammars are used in biblical study to learn the structure of the biblical languages.
+							{$tChirho('landing.visionChirho.grammarsChirho.descriptionChirho')}
 						</p>
 					</div>
 					<div class="rounded-2xl bg-white p-6 shadow md:col-start-2">
-						<h4 class="mb-3 text-lg font-bold">Text Critical Notes</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.visionChirho.textCriticalChirho.titleChirho')}</h4>
 						<p>
-							Text critical notes contribute to biblical study by explaining the differences in the
-							manuscript witness to the biblical text.
+							{$tChirho('landing.visionChirho.textCriticalChirho.descriptionChirho')}
 						</p>
 					</div>
 				</div>
@@ -261,12 +258,12 @@
 			style="clip-path: polygon(0 0, 100% 40px, 100% 100%, 0 100%)"
 		>
 			<div class="mx-auto w-full max-w-[1000px]">
-				<h2 class="mb-8 text-3xl font-bold text-white md:text-5xl">Contribute</h2>
+				<h2 class="mb-8 text-3xl font-bold text-white md:text-5xl">{$tChirho('landing.contributeChirho.titleChirho')}</h2>
 				<ul
 					class="mb-16 flex flex-col gap-8 md:grid md:grid-cols-2 lg:flex lg:flex-row"
 				>
 					<li class="w-full rounded-2xl bg-white p-6 shadow md:text-center">
-						<h4 class="mb-3 text-lg font-bold">Give</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.contributeChirho.giveChirho.titleChirho')}</h4>
 						<p>
 							Please give through
 							<a
@@ -285,7 +282,7 @@
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow md:text-center">
-						<h4 class="mb-3 text-lg font-bold">Software Development</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.contributeChirho.softwareChirho.titleChirho')}</h4>
 						<p>
 							If you can help with software development or UI design, check out our
 							<a
@@ -299,7 +296,7 @@
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow md:text-center">
-						<h4 class="mb-3 text-lg font-bold">Reader's Bible</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.contributeChirho.translateChirho.titleChirho')}</h4>
 						<p>
 							If you can help translate glosses for the Reader's Hebrew or Greek Bible, please
 							<a
@@ -313,7 +310,7 @@
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow md:text-center">
-						<h4 class="mb-3 text-lg font-bold">Resources</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.contributeChirho.resourcesChirho.titleChirho')}</h4>
 						<p>
 							If you have original language study resources you would like to contribute or help
 							digitize, contact
@@ -347,9 +344,9 @@
 			style="clip-path: polygon(0 40px, 100% 0, 100% 100%, 0 100%)"
 		>
 			<div class="mx-auto w-full max-w-[1000px]">
-				<h2 class="mb-8 text-3xl font-bold md:text-5xl">Progress</h2>
+				<h2 class="mb-8 text-3xl font-bold md:text-5xl">{$tChirho('landing.progressChirho.titleChirho')}</h2>
 				<div class="max-h-[80vh] overflow-y-auto rounded-2xl bg-white p-6 shadow">
-					<h3 class="mb-4 text-center text-lg font-bold">Reader's Bible Translation</h3>
+					<h3 class="mb-4 text-center text-lg font-bold">{$tChirho('landing.progressChirho.translationProgressChirho')}</h3>
 
 					{#if dataChirho.progressChirho && dataChirho.progressChirho.length > 0}
 						<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -395,18 +392,9 @@
 			style="clip-path: polygon(0 0, 100% 40px, 100% 100%, 0 100%)"
 		>
 			<div class="mx-auto w-full max-w-[1000px]">
-				<h2 class="mb-8 text-3xl font-bold text-white md:text-5xl">About</h2>
+				<h2 class="mb-8 text-3xl font-bold text-white md:text-5xl">{$tChirho('landing.aboutChirho.titleChirho')}</h2>
 				<p class="mb-4 text-white">
-					Andrew and Bethany Case are the founders of Betheden Ministries, which is the non-profit
-					behind Global Bible Tools. Our purpose is to help see the whole Bible in every language,
-					and the global Church equipped for growth and maturity. In the western world we have an
-					"embarrassment of riches." We have thousands of biblical resources one click away, and in
-					the language we understand best. Meanwhile, there are millions of people in other
-					countries who don't even have a Bible in their mother tongue. We believe that knowledge of
-					the biblical languages is one of the most fundamental needs of every church around the
-					world. It is the foundation of theology, sound interpretation, and healthy churches. So
-					our goal is to empower the global Church with the biblical languages, as well as train and
-					serve the Bible translation effort.
+					{$tChirho('landing.aboutChirho.descriptionChirho')}
 				</p>
 				<div class="mb-8 flex flex-wrap justify-center gap-8 text-white">
 					<a
@@ -415,7 +403,7 @@
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Statement of Faith
+						{$tChirho('landing.aboutChirho.statementOfFaithChirho')}
 						<svg class="ml-1 inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
@@ -431,7 +419,7 @@
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Constitution
+						{$tChirho('landing.aboutChirho.constitutionChirho')}
 						<svg class="ml-1 inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
@@ -444,47 +432,41 @@
 				</div>
 
 				<h3 class="mx-4 mb-8 border-b-4 border-white pb-2 text-center text-xl font-bold text-white">
-					Core Values
+					{$tChirho('landing.aboutChirho.coreValuesChirho')}
 				</h3>
 				<ul class="mb-16 flex flex-col gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3">
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Pursuit of Joy</h4>
-						<p>All of life should be lived, not out of fear, but as a pursuit of joy in God.</p>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.pursuitOfJoyChirho.titleChirho')}</h4>
+						<p>{$tChirho('landing.aboutChirho.pursuitOfJoyChirho.descriptionChirho')}</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Partnership</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.partnershipChirho.titleChirho')}</h4>
 						<p>
-							Because Scripture teaches that we are part of a larger Body, we seek to work with
-							others through strategic, genuine relationships.
+							{$tChirho('landing.aboutChirho.partnershipChirho.descriptionChirho')}
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Eagerness to Learn</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.eagernessToLearnChirho.titleChirho')}</h4>
 						<p>
-							We want to innovate with excellence, which requires continuous curiosity and study.
+							{$tChirho('landing.aboutChirho.eagernessToLearnChirho.descriptionChirho')}
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Humility</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.humilityChirho.titleChirho')}</h4>
 						<p>
-							Our hope is to serve the global Church, which requires the humility to put them first,
-							listen to their needs, understand them well, and provide them with the best we can
-							offer by God's grace.
+							{$tChirho('landing.aboutChirho.humilityChirho.descriptionChirho')}
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Freely Giving</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.freelyGivingChirho.titleChirho')}</h4>
 						<p>
-							Because we have received everything from God as a gift, we are committed to making all
-							of our content free and open-access to everyone, and encouraging others to do the
-							same.
+							{$tChirho('landing.aboutChirho.freelyGivingChirho.descriptionChirho')}
 						</p>
 					</li>
 					<li class="w-full rounded-2xl bg-white p-6 shadow sm:text-center">
-						<h4 class="mb-3 text-lg font-bold">Empowering the Under-Resourced</h4>
+						<h4 class="mb-3 text-lg font-bold">{$tChirho('landing.aboutChirho.empoweringChirho.titleChirho')}</h4>
 						<p>
-							Because many non-Western Christians still suffer the lack of quality biblical
-							resources, we endeavor to prioritize giving them access to these resources.
+							{$tChirho('landing.aboutChirho.empoweringChirho.descriptionChirho')}
 						</p>
 					</li>
 				</ul>

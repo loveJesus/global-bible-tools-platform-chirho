@@ -1,0 +1,108 @@
+{
+	"heroChirho": {
+		"missionChirho": "वैश्विक चर्च को बिना किसी लागत या बाधा के गंभीर बाइबिल भाषा अध्ययन उपकरणों तक पहुंच की आवश्यकता है।",
+		"learnMoreChirho": "और जानें"
+	},
+	"navChirho": {
+		"visionChirho": "दृष्टि",
+		"contributeChirho": "योगदान करें",
+		"progressChirho": "प्रगति",
+		"aboutChirho": "हमारे बारे में",
+		"readersBibleChirho": "पाठक की बाइबल",
+		"dashboardChirho": "डैशबोर्ड"
+	},
+	"visionChirho": {
+		"titleChirho": "दृष्टि",
+		"preferToReadChirho": "पढ़ना पसंद करते हैं?",
+		"languageLearningChirho": "भाषा सीखना",
+		"biblicalStudyChirho": "बाइबिल अध्ययन",
+		"languageLessonsChirho": {
+			"titleChirho": "भाषा पाठ",
+			"descriptionChirho": "YouTube पाठ्यक्रम सभी को मुफ्त ग्रीक और हिब्रू प्रशिक्षण प्रदान करते हैं।"
+		},
+		"readersBibleChirho": {
+			"titleChirho": "पाठक की बाइबल",
+			"descriptionChirho": "एक डिजिटल पाठक की बाइबल भाषा सीखने वालों को सहायता के साथ बाइबिल पाठ पढ़कर उनकी समझ को तेज करने में मदद करती है।"
+		},
+		"lexiconsChirho": {
+			"titleChirho": "शब्दकोश",
+			"descriptionChirho": "ग्रीक और हिब्रू शब्दों के अर्थ की सीमा का पता लगाने के लिए बाइबिल अध्ययन में शब्दकोशों की आवश्यकता होती है।"
+		},
+		"grammarsChirho": {
+			"titleChirho": "व्याकरण",
+			"descriptionChirho": "बाइबिल भाषाओं की संरचना सीखने के लिए बाइबिल अध्ययन में व्याकरण का उपयोग किया जाता है।"
+		},
+		"textCriticalChirho": {
+			"titleChirho": "पाठ आलोचनात्मक नोट्स",
+			"descriptionChirho": "पाठ आलोचनात्मक नोट्स बाइबिल पाठ के पांडुलिपि साक्ष्य में अंतरों की व्याख्या करके बाइबिल अध्ययन में योगदान करते हैं।"
+		}
+	},
+	"contributeChirho": {
+		"titleChirho": "योगदान करें",
+		"giveChirho": {
+			"titleChirho": "दान करें",
+			"descriptionChirho": "इस कार्य को वित्त पोषित करने के लिए कृपया Betheden Ministries के माध्यम से दान करें।"
+		},
+		"softwareChirho": {
+			"titleChirho": "सॉफ्टवेयर विकास",
+			"descriptionChirho": "यदि आप सॉफ्टवेयर विकास या UI डिज़ाइन में मदद कर सकते हैं, तो हमारे GitHub रिपॉजिटरी देखें।"
+		},
+		"translateChirho": {
+			"titleChirho": "पाठक की बाइबल",
+			"descriptionChirho": "यदि आप पाठक की हिब्रू या ग्रीक बाइबल के लिए ग्लॉस अनुवाद करने में मदद कर सकते हैं, तो कृपया यह फॉर्म भरें।"
+		},
+		"resourcesChirho": {
+			"titleChirho": "संसाधन",
+			"descriptionChirho": "यदि आपके पास मूल भाषा अध्ययन संसाधन हैं जिन्हें आप योगदान करना या डिजिटाइज़ करने में मदद करना चाहते हैं, तो कृपया हमसे संपर्क करें।"
+		}
+	},
+	"progressChirho": {
+		"titleChirho": "प्रगति",
+		"translationProgressChirho": "पाठक की बाइबल अनुवाद"
+	},
+	"aboutChirho": {
+		"titleChirho": "हमारे बारे में",
+		"descriptionChirho": "Andrew और Bethany Case Betheden Ministries के संस्थापक हैं, जो Global Bible Tools के पीछे की गैर-लाभकारी संस्था है। हमारा उद्देश्य हर भाषा में पूरी बाइबल देखने में मदद करना और वैश्विक चर्च को विकास और परिपक्वता के लिए सुसज्जित करना है।",
+		"statementOfFaithChirho": "विश्वास का वक्तव्य",
+		"constitutionChirho": "संविधान",
+		"coreValuesChirho": "मूल मूल्य",
+		"pursuitOfJoyChirho": {
+			"titleChirho": "आनंद की खोज",
+			"descriptionChirho": "सारा जीवन डर से नहीं, बल्कि परमेश्वर में आनंद की खोज के रूप में जीना चाहिए।"
+		},
+		"partnershipChirho": {
+			"titleChirho": "साझेदारी",
+			"descriptionChirho": "क्योंकि पवित्रशास्त्र सिखाता है कि हम एक बड़े शरीर का हिस्सा हैं, हम रणनीतिक, वास्तविक संबंधों के माध्यम से दूसरों के साथ काम करना चाहते हैं।"
+		},
+		"eagernessToLearnChirho": {
+			"titleChirho": "सीखने की उत्सुकता",
+			"descriptionChirho": "हम उत्कृष्टता के साथ नवाचार करना चाहते हैं, जिसके लिए निरंतर जिज्ञासा और अध्ययन की आवश्यकता होती है।"
+		},
+		"humilityChirho": {
+			"titleChirho": "विनम्रता",
+			"descriptionChirho": "हमारी आशा वैश्विक चर्च की सेवा करना है, जिसके लिए उन्हें पहले रखने, उनकी जरूरतों को सुनने, उन्हें अच्छी तरह समझने और परमेश्वर की कृपा से सर्वश्रेष्ठ प्रदान करने की विनम्रता की आवश्यकता है।"
+		},
+		"freelyGivingChirho": {
+			"titleChirho": "मुक्त रूप से देना",
+			"descriptionChirho": "क्योंकि हमने परमेश्वर से सब कुछ उपहार के रूप में प्राप्त किया है, हम अपनी सभी सामग्री को सभी के लिए मुफ्त और खुली पहुंच बनाने के लिए प्रतिबद्ध हैं।"
+		},
+		"empoweringChirho": {
+			"titleChirho": "वंचितों को सशक्त बनाना",
+			"descriptionChirho": "क्योंकि कई गैर-पश्चिमी ईसाई अभी भी गुणवत्तापूर्ण बाइबिल संसाधनों की कमी से पीड़ित हैं, हम उन्हें इन संसाधनों तक पहुंच देने को प्राथमिकता देने का प्रयास करते हैं।"
+		}
+	},
+	"quickAccessChirho": {
+		"readChirho": {
+			"titleChirho": "पढ़ें",
+			"descriptionChirho": "इंटरलीनियर अनुवाद"
+		},
+		"translateChirho": {
+			"titleChirho": "अनुवाद करें",
+			"descriptionChirho": "अनुवाद में योगदान करें"
+		},
+		"downloadsChirho": {
+			"titleChirho": "डाउनलोड",
+			"descriptionChirho": "पीडीएफ बाइबल (KJV, WEB)"
+		}
+	}
+}

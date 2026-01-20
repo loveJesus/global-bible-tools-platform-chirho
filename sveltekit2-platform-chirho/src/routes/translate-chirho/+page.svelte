@@ -4,23 +4,24 @@
 
 <script lang="ts">
 	import type { PageData as PageDataChirho } from './$types';
+	import { tChirho } from '$lib/i18n-chirho';
 
 	let { data: dataChirho }: { data: PageDataChirho } = $props();
 </script>
 
 <svelte:head>
-	<title>Translate - Global Bible Tools</title>
+	<title>{$tChirho('common.translateChirho.titleChirho')} - {$tChirho('common.appNameChirho')}</title>
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50 p-8">
 	<div class="mx-auto max-w-4xl">
-		<h1 class="text-3xl font-bold text-slate-900">Translate</h1>
-		<p class="mt-2 text-slate-600">Select a language to contribute translations</p>
+		<h1 class="text-3xl font-bold text-slate-900">{$tChirho('common.translateChirho.titleChirho')}</h1>
+		<p class="mt-2 text-slate-600">{$tChirho('common.translateChirho.selectLanguageChirho')}</p>
 
 		{#if !dataChirho.userChirho}
 			<div class="mt-8 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
 				<p class="text-yellow-800">
-					<a href="/login-chirho" class="font-semibold underline">Sign in</a> to contribute translations.
+					<a href="/login-chirho" class="font-semibold underline">{$tChirho('common.authChirho.signInChirho')}</a> {$tChirho('common.translateChirho.toContributeChirho')}
 				</p>
 			</div>
 		{/if}
@@ -38,7 +39,7 @@
 		</div>
 
 		{#if dataChirho.languagesChirho.length === 0}
-			<p class="mt-8 text-slate-500">No languages available yet.</p>
+			<p class="mt-8 text-slate-500">{$tChirho('common.translateChirho.noLanguagesChirho')}</p>
 		{/if}
 	</div>
 </main>

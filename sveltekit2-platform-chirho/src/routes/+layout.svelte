@@ -6,6 +6,15 @@
 	import '../app.css';
 	import { page as pageChirho } from '$app/state';
 	import type { LayoutData as LayoutDataChirho } from './$types';
+	import LocaleSwitcherChirho from '$lib/components-chirho/LocaleSwitcherChirho.svelte';
+	import { tChirho, localeChirho } from '$lib/i18n-chirho';
+
+	// Initialize locale from server data
+	$effect(() => {
+		if (data.localeChirho) {
+			localeChirho.set(data.localeChirho);
+		}
+	});
 
 	let { children, data }: { children: any; data: LayoutDataChirho } = $props();
 
@@ -46,12 +55,13 @@
 					<span class="text-xl font-bold text-slate-900">Global Bible Tools</span>
 				</a>
 				<nav class="hidden sm:flex gap-4">
-					<a href="/read-chirho" class="text-slate-600 hover:text-slate-900">Read</a>
-					<a href="/translate-chirho" class="text-slate-600 hover:text-slate-900">Translate</a>
-					<a href="/downloads-chirho" class="text-slate-600 hover:text-slate-900">Downloads</a>
+					<a href="/read-chirho" class="text-slate-600 hover:text-slate-900">{$tChirho('common.navChirho.readChirho')}</a>
+					<a href="/translate-chirho" class="text-slate-600 hover:text-slate-900">{$tChirho('common.navChirho.translateChirho')}</a>
+					<a href="/downloads-chirho" class="text-slate-600 hover:text-slate-900">{$tChirho('common.navChirho.downloadsChirho')}</a>
 				</nav>
 			</div>
-			<div class="flex items-center gap-4">
+			<div class="flex items-center gap-3">
+				<LocaleSwitcherChirho />
 				{#if data.userChirho}
 					<div class="relative">
 						<button
@@ -81,7 +91,7 @@
 									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 									</svg>
-									Profile
+									{$tChirho('common.navChirho.profileChirho')}
 								</a>
 
 								{#if data.userChirho.isAdminChirho}
@@ -89,7 +99,7 @@
 										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 										</svg>
-										Admin
+										{$tChirho('common.navChirho.adminChirho')}
 									</a>
 								{/if}
 
@@ -98,7 +108,7 @@
 										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
 										</svg>
-										Logout
+										{$tChirho('common.navChirho.logoutChirho')}
 									</a>
 								</div>
 							</div>
@@ -114,7 +124,7 @@
 						{/if}
 					</div>
 				{:else}
-					<a href="/login-chirho" class="text-sm text-blue-600 hover:text-blue-700">Login</a>
+					<a href="/login-chirho" class="text-sm text-blue-600 hover:text-blue-700">{$tChirho('common.navChirho.loginChirho')}</a>
 				{/if}
 			</div>
 		</div>

@@ -3,6 +3,8 @@
      — John 3:16 -->
 
 <script lang="ts">
+	import { tChirho } from '$lib/i18n-chirho';
+
 	interface PdfDownloadChirho {
 		nameChirho: string;
 		descriptionChirho: string;
@@ -30,16 +32,16 @@
 </script>
 
 <svelte:head>
-	<title>Downloads | Global Bible Tools</title>
-	<meta name="description" content="Download interlinear Bible PDFs with Hebrew & Greek text and word-by-word translations" />
+	<title>{$tChirho('common.downloadsChirho.titleChirho')} | {$tChirho('common.appNameChirho')}</title>
+	<meta name="description" content={$tChirho('common.downloadsChirho.metaDescriptionChirho')} />
 </svelte:head>
 
 <div class="min-h-screen bg-slate-50 py-12 px-4">
 	<div class="max-w-4xl mx-auto">
 		<header class="text-center mb-12">
-			<h1 class="text-3xl font-bold text-slate-800">Interlinear Bible Downloads</h1>
+			<h1 class="text-3xl font-bold text-slate-800">{$tChirho('common.downloadsChirho.interlinearDownloadsChirho')}</h1>
 			<p class="mt-2 text-slate-600">
-				Free PDF downloads with Hebrew & Greek text, Strong's numbers, and word-by-word translations
+				{$tChirho('common.downloadsChirho.freePdfDownloadsChirho')}
 			</p>
 		</header>
 
@@ -79,7 +81,7 @@
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 							</svg>
-							Download
+							{$tChirho('common.actionsChirho.downloadChirho')}
 						</a>
 					</div>
 				</div>
@@ -87,20 +89,17 @@
 		</div>
 
 		<div class="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-100">
-			<h3 class="font-semibold text-blue-800">About These Downloads</h3>
+			<h3 class="font-semibold text-blue-800">{$tChirho('common.downloadsChirho.aboutDownloadsChirho')}</h3>
 			<p class="mt-2 text-blue-700 text-sm">
-				Each PDF contains the complete Bible with original Hebrew (Old Testament) and Greek (New Testament) text,
-				Strong's numbers with links to BibleHub, and word-by-word interlinear translation.
-				The reference translation text appears below each verse for easy reading.
+				{$tChirho('common.downloadsChirho.aboutDescription1Chirho')}
 			</p>
 			<p class="mt-2 text-blue-700 text-sm">
-				These PDFs are provided free of charge for personal study and ministry use.
-				All reference Bible texts used are in the public domain.
+				{$tChirho('common.downloadsChirho.aboutDescription2Chirho')}
 			</p>
 		</div>
 
 		<footer class="mt-8 text-center text-sm text-slate-500">
-			<a href="/" class="text-blue-600 hover:underline">← Back to Home</a>
+			<a href="/" class="text-blue-600 hover:underline">← {$tChirho('common.navChirho.homeChirho')}</a>
 		</footer>
 	</div>
 </div>
