@@ -32,9 +32,10 @@ interface WordWithGlossRowChirho {
 	state: string | null;
 }
 
-export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
+export const load: PageServerLoadChirho = async ({ params: paramsChirho, locals: localsChirho }) => {
 	const codeChirho = paramsChirho.code_chirho;
 	const verseIdChirho = paramsChirho.verse_id_chirho;
+	const userChirho = localsChirho.userChirho;
 
 	// Parse verse ID
 	const { bookIdChirho, chapterChirho, verseNumberChirho } = parseVerseIdChirho(verseIdChirho);
@@ -145,11 +146,17 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		.limit(1);
 
 	return {
+		userChirho: userChirho ? {
+			idChirho: userChirho.idChirho,
+			nameChirho: userChirho.nameChirho,
+			emailChirho: userChirho.emailChirho
+		} : null,
 		codeChirho,
 		languageChirho,
 		bookChirho,
 		chapterChirho,
 		verseNumberChirho,
+		verseIdChirho,
 		wordsChirho,
 		prevVerseIdChirho: prevVerseChirho[0]?.idChirho ?? null,
 		nextVerseIdChirho: nextVerseChirho[0]?.idChirho ?? null
@@ -227,7 +234,7 @@ export const actions: ActionsChirho = {
 				phraseIdChirho: phraseIdChirho,
 				glossChirho: glossChirho || null,
 				stateChirho: stateChirho,
-				sourceChirho: 'USER',
+				sourceChirho: 'USER' as const,
 				updatedAtChirho: new Date(),
 				updatedByChirho: localsChirho.userChirho?.idChirho ?? null
 			})
@@ -236,7 +243,7 @@ export const actions: ActionsChirho = {
 				set: {
 					glossChirho: glossChirho || null,
 					stateChirho: stateChirho,
-					sourceChirho: 'USER',
+					sourceChirho: 'USER' as const,
 					updatedAtChirho: new Date(),
 					updatedByChirho: localsChirho.userChirho?.idChirho ?? null
 				}

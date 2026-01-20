@@ -13,7 +13,7 @@ WORKDIR /app
 # ============================================================================
 FROM base AS dev
 # Install dependencies only (for caching)
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile || bun install
 
 # Copy source
@@ -26,7 +26,7 @@ CMD ["bun", "run", "dev-chirho", "--host"]
 # Build stage
 # ============================================================================
 FROM base AS build
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile || bun install
 
 COPY . .

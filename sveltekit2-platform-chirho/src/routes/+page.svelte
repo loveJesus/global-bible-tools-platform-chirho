@@ -15,7 +15,7 @@
 			Collaborative platform for Bible translation
 		</p>
 
-		<div class="mt-8 grid gap-4 sm:grid-cols-2">
+		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			<a
 				href="/read-chirho"
 				class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
@@ -30,6 +30,14 @@
 			>
 				<h2 class="text-xl font-semibold text-slate-900">Translate</h2>
 				<p class="mt-2 text-slate-600">Contribute to Bible translations</p>
+			</a>
+
+			<a
+				href="/downloads-chirho"
+				class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+			>
+				<h2 class="text-xl font-semibold text-slate-900">Downloads</h2>
+				<p class="mt-2 text-slate-600">Interlinear Bible PDFs (KJV, WEB)</p>
 			</a>
 		</div>
 

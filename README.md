@@ -134,6 +134,72 @@ platform-chirho/
 └── AGENTS.md                     # Full AI agent instructions
 ```
 
+## Reference Bible Sources
+
+The following reference Bible versions are available in the platform. All are public domain or permissively licensed.
+
+### English
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| King James Version | KJV | 29,208 | [CrossWire SWORD](https://crosswire.org) | Public Domain |
+| American Standard Version | ASV | 29,368 | [CrossWire SWORD](https://crosswire.org) | Public Domain |
+| World English Bible | WEB | ~31,000 | [CrossWire SWORD](https://crosswire.org) | Public Domain |
+
+### Spanish
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Reina-Valera 1909 | SpaRV1909 | 31,084 | [CrossWire SWORD](https://crosswire.org) | Public Domain |
+
+### Bengali
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Bengali Bible 2006 | ben2006eb | 29,396 | [eBible.org](https://ebible.org) | CC BY-SA 4.0 |
+
+### Hindi
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Hindi Easy-to-Read Version | HinERV | 29,258 | [eBible.org](https://ebible.org) | CC BY-SA 4.0 |
+
+### Russian
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Russian Synodal Bible | RusSynodal | 30,811 | [CrossWire SWORD](https://crosswire.org) | Public Domain |
+
+### Swahili
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Swahili Union Version | swhonen | 27,691 | [eBible.org](https://ebible.org/Scriptures/swhonen_vpl.zip) | CC BY-SA 4.0 |
+
+### Turkish
+
+| Version | Code | Verses | Source | License |
+|---------|------|--------|--------|---------|
+| Turkish Bible | TurHADI | 30,683 | NT: [eBible.org](https://ebible.org), OT: [Sacred Texts](https://sacred-texts.com/bib/wb/trk/) | Public Domain |
+
+### Import Tools
+
+```bash
+# Import from SWORD module (requires `brew install sword` on macOS)
+bun run tools-chirho/import-sword-chirho.ts <module_name>
+
+# Import from eBible.org VPL format
+bun run tools-chirho/import-ebible-vpl-chirho.ts <zip_url> <version_code> [version_name] [language_code]
+
+# Example: Import Swahili Bible
+bun run tools-chirho/import-ebible-vpl-chirho.ts \
+  https://ebible.org/Scriptures/swhonen_vpl.zip \
+  swhonen "Swahili Union Version" swa
+
+# Import Turkish OT from sacred-texts.com
+bun run tools-chirho/import-turkish-ot-chirho.ts
+```
+
 ## Documentation
 
 - [AGENTS.md](./AGENTS.md) - Full agent instructions and naming conventions

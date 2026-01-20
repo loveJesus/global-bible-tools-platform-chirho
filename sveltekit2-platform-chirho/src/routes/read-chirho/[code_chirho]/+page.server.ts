@@ -3,9 +3,11 @@
 // — John 3:16
 
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
-import { dbChirho, eqChirho } from '$lib/server/db-chirho';
-import { languageTableChirho, bookTableChirho } from '$lib/server/schema-chirho';
+import { dbChirho, eqChirho, queryRawChirho } from '$lib/server/db-chirho';
+import { languageTableChirho, bookTableChirho, referenceVersionTableChirho } from '$lib/server/schema-chirho';
 import { error as errorChirho } from '@sveltejs/kit';
+import { existsSync as existsSyncChirho } from 'fs';
+import { join as joinChirho } from 'path';
 
 export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 	const codeChirho = paramsChirho.code_chirho;
@@ -28,9 +30,37 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho }) => {
 		.from(bookTableChirho)
 		.orderBy(bookTableChirho.idChirho);
 
+	// Get reference versions for THIS language only (with verse counts)
+	const referenceVersionsChirho = await queryRawChirho<{
+		idChirho: number;
+		codeChirho: string;
+		nameChirho: string;
+		languageCodeChirho: string;
+		verseCountChirho: number;
+	}>(`
+		SELECT
+			rv.id_chirho AS "idChirho",
+			rv.code_chirho AS "codeChirho",
+			rv.name_chirho AS "nameChirho",
+			rv.language_code_chirho AS "languageCodeChirho",
+			COUNT(rvs.verse_id_chirho)::int AS "verseCountChirho"
+		FROM reference_version_chirho rv
+		LEFT JOIN reference_verse_chirho rvs ON rvs.version_id_chirho = rv.id_chirho
+		WHERE rv.language_code_chirho = $1
+		GROUP BY rv.id_chirho, rv.code_chirho, rv.name_chirho, rv.language_code_chirho
+		HAVING COUNT(rvs.verse_id_chirho) > 0
+		ORDER BY rv.name_chirho
+	`, [codeChirho]);
+
+	// Check if interlinear PDF exists for this language
+	const interlinearPdfPathChirho = joinChirho(process.cwd(), `static/bibles-chirho/interlinear-${codeChirho}.pdf`);
+	const hasInterlinearPdfChirho = existsSyncChirho(interlinearPdfPathChirho);
+
 	return {
 		codeChirho,
 		languageChirho,
-		booksChirho
+		booksChirho,
+		referenceVersionsChirho,
+		hasInterlinearPdfChirho
 	};
 };

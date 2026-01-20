@@ -185,6 +185,7 @@
 					type="button"
 					class="px-2 py-1 {referenceDisplayModeChirho === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'hidden')}
+					aria-label="Close reference panel"
 				>
 					Hidden
 				</button>
@@ -302,8 +303,9 @@
 						type="button"
 						class="text-slate-500 hover:text-slate-700"
 						onclick={() => (referenceDisplayModeChirho = 'hidden')}
+						aria-label="Close reference panel"
 					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 						</svg>
 					</button>

@@ -4,29 +4,77 @@
 
 <script lang="ts">
 	import type { PageData as PageDataChirho } from './$types';
-	import { enhance as enhanceChirho } from '$app/forms';
+	import TranslateWordChirho from '$lib/components-chirho/TranslateWordChirho.svelte';
+	import WordDetailPanelChirho from '$lib/components-chirho/WordDetailPanelChirho.svelte';
+	import NotesPanelChirho from '$lib/components-chirho/NotesPanelChirho.svelte';
 
 	let { data: dataChirho }: { data: PageDataChirho } = $props();
 
-	let selectedWordIdChirho = $state<string | null>(null);
-	let glossInputChirho = $state('');
+	// Selected words for multi-word linking
+	let selectedWordIdsChirho = $state<Set<string>>(new Set());
+	let focusedPhraseIdChirho = $state<number | null>(null);
 
-	function selectWordChirho(wordIdChirho: string, currentGlossChirho: string | null) {
-		selectedWordIdChirho = wordIdChirho;
-		glossInputChirho = currentGlossChirho ?? '';
+	// Word detail panel state
+	let detailPanelOpenChirho = $state(false);
+	let detailWordIdChirho = $state<string | null>(null);
+
+	// Notes panel state
+	let notesPanelOpenChirho = $state(false);
+	let notesWordIdChirho = $state<string | null>(null);
+
+	// Determine if the verse contains Hebrew (OT) or Greek (NT)
+	const isHebrewChirho = $derived(
+		dataChirho.bookChirho?.idChirho ? dataChirho.bookChirho.idChirho <= 39 : false
+	);
+
+	// Toggle word selection for multi-word phrases
+	function toggleWordSelectionChirho(wordIdChirho: string) {
+		const newSetChirho = new Set(selectedWordIdsChirho);
+		if (newSetChirho.has(wordIdChirho)) {
+			newSetChirho.delete(wordIdChirho);
+		} else {
+			newSetChirho.add(wordIdChirho);
+		}
+		selectedWordIdsChirho = newSetChirho;
+	}
+
+	// Create phrase from selected words
+	async function linkSelectedWordsChirho() {
+		if (selectedWordIdsChirho.size < 2) return;
+
+		const formDataChirho = new FormData();
+		formDataChirho.set('wordIds', JSON.stringify([...selectedWordIdsChirho]));
+		formDataChirho.set('languageCode', dataChirho.codeChirho);
+
+		try {
+			const responseChirho = await fetch('/api-chirho/phrase-chirho', {
+				method: 'POST',
+				body: formDataChirho
+			});
+
+			if (responseChirho.ok) {
+				selectedWordIdsChirho = new Set();
+				// Reload page to get updated phrases
+				window.location.reload();
+			}
+		} catch (errorChirho) {
+			console.error('Error linking words:', errorChirho);
+		}
 	}
 </script>
 
 <svelte:head>
 	<title>
-		Translate {dataChirho.bookChirho?.nameChirho} {dataChirho.chapterChirho}:{dataChirho.verseNumberChirho} - {dataChirho.languageChirho?.nameChirho}
+		Translate {dataChirho.bookChirho?.nameChirho}
+		{dataChirho.chapterChirho}:{dataChirho.verseNumberChirho} - {dataChirho.languageChirho
+			?.nameChirho}
 	</title>
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50">
 	<div class="mx-auto max-w-6xl px-4 py-8">
 		<!-- Navigation -->
-		<nav class="mb-4 flex gap-2 text-sm">
+		<nav class="mb-4 flex items-center gap-2 text-sm">
 			<a href="/translate-chirho" class="text-blue-600 hover:underline">Languages</a>
 			<span class="text-slate-400">/</span>
 			<a href="/translate-chirho/{dataChirho.codeChirho}" class="text-blue-600 hover:underline">
@@ -34,106 +82,108 @@
 			</a>
 			<span class="text-slate-400">/</span>
 			<span class="text-slate-600">
-				{dataChirho.bookChirho?.nameChirho} {dataChirho.chapterChirho}:{dataChirho.verseNumberChirho}
+				{dataChirho.bookChirho?.nameChirho}
+				{dataChirho.chapterChirho}:{dataChirho.verseNumberChirho}
 			</span>
+
+			<!-- Link words button -->
+			{#if selectedWordIdsChirho.size >= 2}
+				<button
+					type="button"
+					onclick={linkSelectedWordsChirho}
+					class="ml-auto rounded bg-purple-600 px-3 py-1 text-sm text-white hover:bg-purple-700"
+				>
+					Link {selectedWordIdsChirho.size} Words
+				</button>
+			{/if}
 		</nav>
 
-		<div class="grid gap-8 lg:grid-cols-2">
-			<!-- Source Text Column -->
-			<div class="rounded-lg border border-slate-200 bg-white p-6">
-				<h2 class="text-lg font-semibold text-slate-900 mb-4">Source Text</h2>
-				<div class="flex flex-wrap gap-1">
-					{#each dataChirho.wordsChirho as wordChirho}
-						<button
-							type="button"
-							onclick={() => selectWordChirho(wordChirho.wordIdChirho, wordChirho.glossChirho)}
-							class="px-2 py-1 rounded text-lg {selectedWordIdChirho === wordChirho.wordIdChirho
-								? 'bg-blue-100 ring-2 ring-blue-500'
-								: wordChirho.glossChirho
-									? 'bg-green-50 hover:bg-green-100'
-									: 'bg-slate-100 hover:bg-slate-200'}"
-						>
-							{wordChirho.textChirho}
-						</button>
-					{/each}
-				</div>
-			</div>
+		<!-- Interlinear Translation View -->
+		<div class="rounded-lg border border-slate-200 bg-white p-6">
+			<h2 class="mb-4 text-lg font-semibold text-slate-900">
+				{dataChirho.bookChirho?.nameChirho}
+				{dataChirho.chapterChirho}:{dataChirho.verseNumberChirho}
+			</h2>
 
-			<!-- Translation Column -->
-			<div class="rounded-lg border border-slate-200 bg-white p-6">
-				<h2 class="text-lg font-semibold text-slate-900 mb-4">Translation</h2>
-
-				{#if selectedWordIdChirho}
-					{@const selectedWordChirho = dataChirho.wordsChirho.find((wordItemChirho) => wordItemChirho.wordIdChirho === selectedWordIdChirho)}
-					{#if selectedWordChirho}
-						<div class="space-y-4">
-							<div>
-								<p class="text-2xl font-bold">{selectedWordChirho.textChirho}</p>
-								{#if selectedWordChirho.lemmaIdChirho}
-									<p class="text-sm text-slate-500">Lemma: {selectedWordChirho.lemmaIdChirho}</p>
-								{/if}
-								{#if selectedWordChirho.grammarChirho}
-									<p class="text-sm text-slate-500">Grammar: {selectedWordChirho.grammarChirho}</p>
-								{/if}
-							</div>
-
-							<form
-								method="POST"
-								action="?/updateGlossChirho"
-								use:enhanceChirho={() => {
-									return async ({ update: updateChirho }) => {
-										await updateChirho();
-									};
-								}}
-							>
-								<input type="hidden" name="wordIdChirho" value={selectedWordIdChirho} />
-								<div class="space-y-2">
-									<label for="gloss-input" class="block text-sm font-medium text-slate-700">
-										Translation
-									</label>
-									<input
-										id="gloss-input"
-										type="text"
-										name="glossChirho"
-										bind:value={glossInputChirho}
-										class="w-full rounded border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-										placeholder="Enter translation..."
-									/>
-									<div class="flex gap-2">
-										<button
-											type="submit"
-											class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-										>
-											Save
-										</button>
-										<button
-											type="submit"
-											name="approveChirho"
-											value="true"
-											class="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-										>
-											Save & Approve
-										</button>
-									</div>
-								</div>
-							</form>
-						</div>
-					{/if}
-				{:else}
-					<p class="text-slate-500">Select a word to translate</p>
-				{/if}
-			</div>
+			<ul
+				class="flex flex-wrap gap-1"
+				dir={isHebrewChirho ? 'rtl' : 'ltr'}
+				role="list"
+				aria-label="Words to translate"
+			>
+				{#each dataChirho.wordsChirho as wordChirho (wordChirho.wordIdChirho)}
+					<TranslateWordChirho
+						verseIdChirho={dataChirho.verseIdChirho}
+						wordChirho={{
+							idChirho: wordChirho.wordIdChirho,
+							textChirho: wordChirho.textChirho,
+							referenceGlossChirho: undefined,
+							suggestionsChirho: [],
+							machineSuggestionChirho: undefined
+						}}
+						phraseChirho={{
+							idChirho: wordChirho.phraseIdChirho ?? 0,
+							wordIdsChirho: [wordChirho.wordIdChirho],
+							glossChirho: wordChirho.glossChirho
+								? {
+										textChirho: wordChirho.glossChirho,
+										stateChirho: wordChirho.stateChirho ?? 'UNAPPROVED'
+									}
+								: undefined
+						}}
+						languageChirho={{
+							codeChirho: dataChirho.codeChirho,
+							fontChirho: dataChirho.languageChirho?.fontChirho ?? 'Noto Sans',
+							textDirectionChirho: dataChirho.languageChirho?.textDirectionChirho ?? 'ltr',
+							isMemberChirho: true
+						}}
+						isHebrewChirho={isHebrewChirho}
+						wordSelectedChirho={selectedWordIdsChirho.has(wordChirho.wordIdChirho)}
+						phraseFocusedChirho={focusedPhraseIdChirho === wordChirho.phraseIdChirho}
+						onSelectChirho={() => toggleWordSelectionChirho(wordChirho.wordIdChirho)}
+						onFocusChirho={() => {
+							focusedPhraseIdChirho = wordChirho.phraseIdChirho ?? null;
+						}}
+						onShowDetailChirho={() => {
+							detailWordIdChirho = wordChirho.wordIdChirho;
+							detailPanelOpenChirho = true;
+						}}
+						onOpenNotesChirho={() => {
+							notesWordIdChirho = wordChirho.wordIdChirho;
+							notesPanelOpenChirho = true;
+						}}
+					/>
+				{/each}
+			</ul>
 		</div>
 
 		<!-- Preview -->
 		<div class="mt-8 rounded-lg border border-slate-200 bg-white p-6">
-			<h2 class="text-lg font-semibold text-slate-900 mb-4">Preview</h2>
-			<p class="text-lg leading-relaxed" style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}">
+			<h2 class="mb-4 text-lg font-semibold text-slate-900">Preview</h2>
+			<p
+				class="text-lg leading-relaxed"
+				style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}"
+				dir={dataChirho.languageChirho?.textDirectionChirho ?? 'ltr'}
+			>
 				{#each dataChirho.wordsChirho as wordChirho, indexChirho}
-					<span class="{wordChirho.glossChirho ? '' : 'text-slate-400'}">
-						{wordChirho.glossChirho ?? `[${wordChirho.textChirho}]`}{indexChirho < dataChirho.wordsChirho.length - 1 ? ' ' : ''}
+					<span class={wordChirho.glossChirho ? '' : 'text-slate-400'}>
+						{wordChirho.glossChirho ?? `[${wordChirho.textChirho}]`}{indexChirho <
+						dataChirho.wordsChirho.length - 1
+							? ' '
+							: ''}
 					</span>
 				{/each}
+			</p>
+		</div>
+
+		<!-- Keyboard shortcuts help -->
+		<div class="mt-4 text-sm text-slate-500">
+			<p>
+				<strong>Keyboard shortcuts:</strong>
+				<kbd class="rounded bg-slate-200 px-1">Enter</kbd> Approve & next •
+				<kbd class="rounded bg-slate-200 px-1">Shift+Enter</kbd> Previous •
+				<kbd class="rounded bg-slate-200 px-1">Ctrl/Cmd+Enter</kbd> Select for linking •
+				<kbd class="rounded bg-slate-200 px-1">Esc</kbd> Save draft
 			</p>
 		</div>
 
@@ -160,4 +210,24 @@
 			{/if}
 		</div>
 	</div>
+
+	<!-- Word Detail Panel -->
+	<WordDetailPanelChirho
+		wordIdChirho={detailWordIdChirho}
+		languageCodeChirho={dataChirho.codeChirho}
+		bind:isOpenChirho={detailPanelOpenChirho}
+		onCloseChirho={() => {
+			detailPanelOpenChirho = false;
+		}}
+	/>
+
+	<!-- Notes Panel -->
+	<NotesPanelChirho
+		wordIdChirho={notesWordIdChirho}
+		languageCodeChirho={dataChirho.codeChirho}
+		bind:isOpenChirho={notesPanelOpenChirho}
+		onCloseChirho={() => {
+			notesPanelOpenChirho = false;
+		}}
+	/>
 </main>
