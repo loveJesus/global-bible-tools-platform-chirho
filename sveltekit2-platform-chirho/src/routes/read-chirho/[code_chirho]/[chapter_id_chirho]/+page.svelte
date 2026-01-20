@@ -16,6 +16,18 @@
 	let forceRtlChirho = $state<boolean | null>(null); // null = auto, true = force RTL, false = force LTR
 	const isRtlChirho = $derived(forceRtlChirho === null ? isHebrewBookChirho : forceRtlChirho);
 
+	// N-dash toggle - hide n-dashes (–) when true
+	let hideNdashChirho = $state(false);
+
+	// Format gloss text - optionally remove n-dashes
+	function formatGlossChirho(glossChirho: string | null): string {
+		if (!glossChirho) return '—';
+		if (hideNdashChirho) {
+			return glossChirho.replace(/–/g, ' ').replace(/\s+/g, ' ').trim();
+		}
+		return glossChirho;
+	}
+
 	// Get CSS class for gloss based on state - improved styling
 	// Source values: USER (manually entered), MACHINE (AI-generated imports), IMPORT (legacy), null
 	function getGlossClassChirho(stateChirho: string | null, sourceChirho: string | null): string {
@@ -212,6 +224,18 @@
 
 			<span class="text-slate-300">|</span>
 
+			<!-- N-dash toggle -->
+			<label class="flex items-center gap-2 cursor-pointer">
+				<input
+					type="checkbox"
+					bind:checked={hideNdashChirho}
+					class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+				/>
+				<span class="text-slate-600">Hide dashes</span>
+			</label>
+
+			<span class="text-slate-300">|</span>
+
 			<span class="text-slate-600">Reference:</span>
 			<div class="flex rounded border border-slate-300 overflow-hidden">
 				<button
@@ -308,7 +332,7 @@
 										class="text-xs leading-tight {getGlossClassChirho(wordChirho.glossStateChirho, wordChirho.glossSourceChirho)}"
 										style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}"
 									>
-										{wordChirho.glossChirho ?? '—'}
+										{formatGlossChirho(wordChirho.glossChirho)}
 									</span>
 								</span>
 							{/each}
