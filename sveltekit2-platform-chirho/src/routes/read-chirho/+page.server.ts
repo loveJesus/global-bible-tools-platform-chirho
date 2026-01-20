@@ -5,8 +5,28 @@
 import type { PageServerLoad as PageServerLoadChirho } from './$types';
 import { queryRawChirho } from '$lib/server/db-chirho';
 
-export const load: PageServerLoadChirho = async () => {
-	// Get languages with translation stats (gloss count and book count)
+// Cache for language stats (expensive query)
+const CACHE_TTL_MS_CHIRHO = 2 * 60 * 1000; // 2 minutes
+let cachedLanguagesChirho: {
+	dataChirho: Array<{
+		idChirho: string;
+		codeChirho: string;
+		nameChirho: string;
+		glossCountChirho: number;
+		bookCountChirho: number;
+	}>;
+	timestampChirho: number;
+} | null = null;
+
+async function getLanguagesWithStatsCachedChirho() {
+	const nowChirho = Date.now();
+
+	// Return cached data if valid
+	if (cachedLanguagesChirho && nowChirho - cachedLanguagesChirho.timestampChirho < CACHE_TTL_MS_CHIRHO) {
+		return cachedLanguagesChirho.dataChirho;
+	}
+
+	// Query fresh data
 	const languagesChirho = await queryRawChirho<{
 		idChirho: string;
 		codeChirho: string;
@@ -35,7 +55,20 @@ export const load: PageServerLoadChirho = async () => {
 		ORDER BY l.name
 	`, []);
 
+	// Update cache
+	cachedLanguagesChirho = {
+		dataChirho: languagesChirho,
+		timestampChirho: nowChirho
+	};
+
+	return languagesChirho;
+}
+
+export const load: PageServerLoadChirho = async () => {
+	const languagesChirho = await getLanguagesWithStatsCachedChirho();
+
 	return {
 		languagesChirho
 	};
 };
+
