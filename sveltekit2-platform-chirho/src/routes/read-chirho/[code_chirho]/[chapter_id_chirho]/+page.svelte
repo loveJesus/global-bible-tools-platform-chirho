@@ -167,6 +167,16 @@
 				</select>
 			</label>
 
+			<!-- N-dash toggle (next to language) -->
+			<label class="flex items-center gap-1.5 cursor-pointer text-sm">
+				<input
+					type="checkbox"
+					bind:checked={hideNdashChirho}
+					class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+				/>
+				<span class="text-slate-600">Hide dashes</span>
+			</label>
+
 			<label class="flex items-center gap-2">
 				<span class="text-sm text-slate-600">Book:</span>
 				<select
@@ -221,18 +231,6 @@
 					← RTL
 				</button>
 			</div>
-
-			<span class="text-slate-300">|</span>
-
-			<!-- N-dash toggle -->
-			<label class="flex items-center gap-2 cursor-pointer">
-				<input
-					type="checkbox"
-					bind:checked={hideNdashChirho}
-					class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-				/>
-				<span class="text-slate-600">Hide dashes</span>
-			</label>
 
 			<span class="text-slate-300">|</span>
 

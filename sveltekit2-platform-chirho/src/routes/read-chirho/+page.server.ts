@@ -18,20 +18,20 @@ export const load: PageServerLoadChirho = async () => {
 			l.id AS "idChirho",
 			l.code AS "codeChirho",
 			l.name AS "nameChirho",
-			COALESCE(stats.gloss_count, 0)::int AS "glossCountChirho",
-			COALESCE(stats.book_count, 0)::int AS "bookCountChirho"
+			COALESCE(stats_chirho.gloss_count_chirho, 0)::int AS "glossCountChirho",
+			COALESCE(stats_chirho.book_count_chirho, 0)::int AS "bookCountChirho"
 		FROM language l
 		LEFT JOIN LATERAL (
 			SELECT
-				COUNT(DISTINCT g.phrase_id) AS gloss_count,
-				COUNT(DISTINCT SUBSTRING(w.verse_id, 1, 2)) AS book_count
+				COUNT(DISTINCT g.phrase_id) AS gloss_count_chirho,
+				COUNT(DISTINCT SUBSTRING(w.verse_id, 1, 2)) AS book_count_chirho
 			FROM phrase p
 			JOIN phrase_word pw ON pw.phrase_id = p.id
 			JOIN word w ON w.id = pw.word_id
 			JOIN gloss g ON g.phrase_id = p.id AND g.gloss IS NOT NULL
 			WHERE p.language_id = l.id
 				AND p.deleted_at IS NULL
-		) stats ON true
+		) stats_chirho ON true
 		ORDER BY l.name
 	`, []);
 
