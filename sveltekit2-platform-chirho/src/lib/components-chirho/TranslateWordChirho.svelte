@@ -120,14 +120,11 @@
 		autosaveQueuedChirho = false;
 
 		const formDataChirho = new FormData();
-		formDataChirho.set('verseId', verseIdChirho);
+		formDataChirho.set('wordId', wordChirho.idChirho);
 		formDataChirho.set('languageCode', languageChirho.codeChirho);
 		formDataChirho.set('phraseId', phraseChirho.idChirho.toString());
 		formDataChirho.set('state', stateChirho);
 		formDataChirho.set('gloss', inputValueChirho);
-
-		// Source is always USER for manual input (database only accepts USER or IMPORT)
-		formDataChirho.set('method', 'USER');
 
 		try {
 			const responseChirho = await fetch('/api-chirho/gloss-chirho', {
