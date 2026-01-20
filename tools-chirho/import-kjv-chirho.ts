@@ -44,13 +44,16 @@ async function getVerseDataChirho(refChirho: string): Promise<VerseDataChirho | 
         return;
       }
 
-      // Normalize references for comparison (e.g., "Jude 1:1" vs "Jude 1:1")
-      const returnedRefChirho = refMatchChirho[1].trim();
-      const requestedRefChirho = refChirho.trim();
+      // Normalize references for comparison
+      const returnedRefChirho = refMatchChirho[1].trim().toLowerCase();
+      const requestedRefChirho = refChirho.trim().toLowerCase();
 
-      // Check if the returned reference starts with what we asked for
-      // Handle variations like "Jude 1:1" matching "Jude 1:1"
-      if (!returnedRefChirho.toLowerCase().startsWith(requestedRefChirho.toLowerCase().split(':')[0].split(' ')[0])) {
+      // Extract book name from both (e.g., "jude" from "Jude 1:1")
+      const returnedBookChirho = returnedRefChirho.split(/\s+\d/)[0].trim();
+      const requestedBookChirho = requestedRefChirho.split(/\s+\d/)[0].trim();
+
+      // Check if books match (diatheke returns next book when verse doesn't exist)
+      if (returnedBookChirho !== requestedBookChirho) {
         resolveChirho(null);
         return;
       }
