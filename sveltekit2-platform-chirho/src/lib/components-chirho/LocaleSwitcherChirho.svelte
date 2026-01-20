@@ -28,7 +28,7 @@
 	// Initialize from localStorage on mount
 	onMount(() => {
 		const savedChirho = localStorage.getItem('locale-chirho');
-		if (savedChirho && availableLocalesChirho.some((localeItem) => localeItem.codeChirho === savedChirho)) {
+		if (savedChirho && availableLocalesChirho.some((localeItemChirho) => localeItemChirho.codeChirho === savedChirho)) {
 			localeChirho.set(savedChirho);
 			currentCodeChirho = savedChirho;
 		}
@@ -45,7 +45,7 @@
 	}
 
 	const currentLocaleChirho = $derived(
-		availableLocalesChirho.find((localeItem) => localeItem.codeChirho === currentCodeChirho) ||
+		availableLocalesChirho.find((localeItemChirho) => localeItemChirho.codeChirho === currentCodeChirho) ||
 			availableLocalesChirho[0]
 	);
 
