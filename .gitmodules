@@ -5,3 +5,7 @@
 	path = translations-chirho
 	url = https://github.com/loveJesus/bible-translations-chirho.git
 	branch = main_chirho
+[submodule "sveltekit2-platform-chirho"]
+	path = sveltekit2-platform-chirho
+	url = https://github.com/loveJesus/global-bible-tools-sveltekit-chirho.git
+	branch = main_chirho
