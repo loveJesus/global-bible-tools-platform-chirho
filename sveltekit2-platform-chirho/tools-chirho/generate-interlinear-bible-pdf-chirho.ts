@@ -517,8 +517,9 @@ function renderReferenceVerseChirho(
 	}
 
 	// Render reference text in italic, indented
+	// Reset x position to left margin (50) before rendering text
 	docChirho.font(mainFontChirho).fontSize(9).fillColor('#475569');
-	docChirho.text(`  ${textChirho}`, {
+	docChirho.text(`  ${textChirho}`, 50, docChirho.y, {
 		indent: 20,
 		width: 495,
 		align: 'left'

@@ -10,6 +10,61 @@
 		$props();
 
 	let showPasswordFormChirho = $state(false);
+	let previewChirho = $state<string | null>(null);
+	let processingChirho = $state(false);
+	let pictureInputChirho: HTMLInputElement;
+
+	// Image processing - resize to 256x256 and compress to JPEG
+	async function processImageChirho(fileChirho: File): Promise<string> {
+		return new Promise((resolveChirho, rejectChirho) => {
+			const imgChirho = new Image();
+			imgChirho.onload = () => {
+				const canvasChirho = document.createElement('canvas');
+				canvasChirho.width = 256;
+				canvasChirho.height = 256;
+				const ctxChirho = canvasChirho.getContext('2d')!;
+
+				// Calculate crop to center square
+				const sizeChirho = Math.min(imgChirho.width, imgChirho.height);
+				const xChirho = (imgChirho.width - sizeChirho) / 2;
+				const yChirho = (imgChirho.height - sizeChirho) / 2;
+
+				ctxChirho.drawImage(imgChirho, xChirho, yChirho, sizeChirho, sizeChirho, 0, 0, 256, 256);
+				resolveChirho(canvasChirho.toDataURL('image/jpeg', 0.6)); // 60% quality
+			};
+			imgChirho.onerror = () => rejectChirho(new Error('Failed to load image'));
+			imgChirho.src = URL.createObjectURL(fileChirho);
+		});
+	}
+
+	async function handleFileSelectChirho(eventChirho: Event) {
+		const inputChirho = eventChirho.target as HTMLInputElement;
+		const fileChirho = inputChirho.files?.[0];
+		if (!fileChirho) return;
+
+		// Validate file type
+		if (!fileChirho.type.startsWith('image/')) {
+			alert('Please select an image file');
+			return;
+		}
+
+		processingChirho = true;
+		try {
+			previewChirho = await processImageChirho(fileChirho);
+		} catch (errChirho) {
+			console.error('Error processing image:', errChirho);
+			alert('Failed to process image. Please try another file.');
+		} finally {
+			processingChirho = false;
+		}
+	}
+
+	function cancelPreviewChirho() {
+		previewChirho = null;
+		if (pictureInputChirho) {
+			pictureInputChirho.value = '';
+		}
+	}
 
 	function getEmailStatusBadgeClassChirho(statusChirho: string): string {
 		if (statusChirho === 'VERIFIED') return 'bg-emerald-100 text-emerald-700';
@@ -67,6 +122,87 @@
 				{formChirho.passwordErrorChirho}
 			</div>
 		{/if}
+		{#if formChirho?.pictureSuccessChirho}
+			<div
+				class="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-sm"
+			>
+				{formChirho.messageChirho}
+			</div>
+		{/if}
+		{#if formChirho?.pictureErrorChirho}
+			<div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+				{formChirho.pictureErrorChirho}
+			</div>
+		{/if}
+
+		<!-- Profile Picture -->
+		<div class="mt-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+			<h2 class="text-lg font-semibold text-slate-800">Profile Picture</h2>
+
+			<div class="mt-4 flex items-center gap-6">
+				<!-- Current/Preview Picture -->
+				<div class="w-24 h-24 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center flex-shrink-0">
+					{#if previewChirho || dataChirho.userChirho.profilePictureChirho}
+						<img
+							src={previewChirho || dataChirho.userChirho.profilePictureChirho}
+							alt="Profile"
+							class="w-full h-full object-cover"
+						/>
+					{:else}
+						<svg class="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+						</svg>
+					{/if}
+				</div>
+
+				<!-- Upload Controls -->
+				<div class="flex flex-col gap-2">
+					<input
+						type="file"
+						accept="image/*"
+						onchange={handleFileSelectChirho}
+						class="hidden"
+						id="pictureInputChirho"
+						bind:this={pictureInputChirho}
+					/>
+					<label
+						for="pictureInputChirho"
+						class="px-4 py-2 bg-indigo-600 text-white rounded-lg cursor-pointer hover:bg-indigo-700 text-center text-sm"
+					>
+						{processingChirho ? 'Processing...' : 'Choose Image'}
+					</label>
+
+					{#if previewChirho}
+						<form method="POST" action="?/uploadPictureChirho" use:enhanceChirho={() => {
+							return async ({ update: updateChirho }) => {
+								await updateChirho();
+								previewChirho = null;
+								if (pictureInputChirho) pictureInputChirho.value = '';
+							};
+						}}>
+							<input type="hidden" name="picture" value={previewChirho} />
+							<div class="flex gap-2">
+								<button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm">
+									Save
+								</button>
+								<button type="button" onclick={cancelPreviewChirho} class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm">
+									Cancel
+								</button>
+							</div>
+						</form>
+					{/if}
+
+					{#if !previewChirho && dataChirho.userChirho.profilePictureChirho}
+						<form method="POST" action="?/removePictureChirho" use:enhanceChirho>
+							<button type="submit" class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm">
+								Remove Picture
+							</button>
+						</form>
+					{/if}
+				</div>
+			</div>
+			<p class="mt-3 text-xs text-slate-500">Images will be resized to 256x256 pixels and compressed.</p>
+		</div>
 
 		<!-- Account Info -->
 		<div class="mt-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6">

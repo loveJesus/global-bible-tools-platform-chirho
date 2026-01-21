@@ -5,6 +5,8 @@
 <script lang="ts">
 	import type { PageData as PageDataChirho } from './$types';
 	import { goto as gotoChirho } from '$app/navigation';
+	import { browser as browserChirho } from '$app/environment';
+	import { onMount as onMountChirho } from 'svelte';
 	import AudioDialogChirho from '$lib/components-chirho/AudioDialogChirho.svelte';
 	import { tChirho } from '$lib/i18n-chirho';
 
@@ -14,8 +16,8 @@
 	let showAudioChirho = $state(false);
 	let highlightedVerseChirho = $state<string | undefined>(undefined);
 
-	// Reference display mode state
-	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('hidden');
+	// Reference display mode state - default to 'below', but load from localStorage
+	let referenceDisplayModeChirho = $state<'below' | 'side' | 'hidden'>('below');
 
 	// RTL state - auto-detect for Hebrew (OT books 1-39)
 	const isHebrewBookChirho = $derived((dataChirho.bookChirho?.idChirho ?? 40) <= 39);
@@ -24,6 +26,30 @@
 
 	// N-dash toggle - hide n-dashes (–) when true
 	let hideNdashChirho = $state(false);
+
+	// Load user preferences from localStorage on mount
+	onMountChirho(() => {
+		if (browserChirho) {
+			// Reference display mode
+			const savedModeChirho = localStorage.getItem('referenceDisplayModeChirho');
+			if (savedModeChirho && ['below', 'side', 'hidden'].includes(savedModeChirho)) {
+				referenceDisplayModeChirho = savedModeChirho as 'below' | 'side' | 'hidden';
+			}
+			// N-dash preference
+			const savedHideNdashChirho = localStorage.getItem('hideNdashChirho');
+			if (savedHideNdashChirho !== null) {
+				hideNdashChirho = savedHideNdashChirho === 'true';
+			}
+		}
+	});
+
+	// Save preferences when they change
+	$effect(() => {
+		if (browserChirho) {
+			localStorage.setItem('referenceDisplayModeChirho', referenceDisplayModeChirho);
+			localStorage.setItem('hideNdashChirho', String(hideNdashChirho));
+		}
+	});
 
 	// Format gloss text - optionally remove n-dashes
 	function formatGlossChirho(glossChirho: string | null): string {
@@ -130,6 +156,25 @@
 		const bookNameChirho = dataChirho.bookChirho?.nameChirho?.toLowerCase() ?? 'unknown';
 		return `/api-chirho/pdf-chirho/${dataChirho.codeChirho}/${bookNameChirho}?chapter=${dataChirho.chapterChirho}`;
 	}
+
+	// Get BibleHub URL for a Strong's number (lemma ID like H1234 or G5678)
+	function getBibleHubUrlChirho(lemmaIdChirho: string | null): string | null {
+		if (!lemmaIdChirho) return null;
+		const matchChirho = lemmaIdChirho.match(/^([HG])(\d+)/);
+		if (!matchChirho) return null;
+		const [, prefixChirho, numberStrChirho] = matchChirho;
+		const langChirho = prefixChirho === 'H' ? 'hebrew' : 'greek';
+		const numberChirho = parseInt(numberStrChirho, 10);
+		return `https://biblehub.com/${langChirho}/${numberChirho}.htm`;
+	}
+
+	// Handle word click - open BibleHub in new tab
+	function onWordClickChirho(lemmaIdChirho: string | null): void {
+		const urlChirho = getBibleHubUrlChirho(lemmaIdChirho);
+		if (urlChirho) {
+			window.open(urlChirho, '_blank', 'noopener,noreferrer');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -139,8 +184,9 @@
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50">
-	<div class="mx-auto max-w-4xl px-4 py-8">
-		<nav class="mb-4 flex gap-2 text-sm">
+	<div class="mx-auto max-w-4xl px-3 sm:px-4 py-4 sm:py-8">
+		<!-- Breadcrumb - hidden on mobile, shown on larger screens -->
+		<nav class="mb-2 sm:mb-4 hidden sm:flex gap-2 text-sm">
 			<a href="/read-chirho" class="text-blue-600 hover:underline">{$tChirho('common.readChirho.languagesChirho')}</a>
 			<span class="text-slate-400">/</span>
 			<a href="/read-chirho/{dataChirho.codeChirho}" class="text-blue-600 hover:underline">
@@ -150,17 +196,17 @@
 			<span class="text-slate-600">{dataChirho.bookChirho?.nameChirho} {dataChirho.chapterChirho}</span>
 		</nav>
 
-		<h1 class="text-2xl font-bold text-slate-900">
+		<h1 class="text-xl sm:text-2xl font-bold text-slate-900">
 			{dataChirho.bookChirho?.nameChirho} {dataChirho.chapterChirho}
 		</h1>
 
-		<!-- Navigation: Language / Book / Chapter -->
-		<div class="mt-4 flex flex-wrap gap-4 items-center">
+		<!-- Navigation: Language / Book / Chapter - responsive grid -->
+		<div class="mt-3 sm:mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-4 items-center">
 			<!-- Language Switcher -->
-			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">{$tChirho('common.readChirho.languageChirho')}:</span>
+			<label class="flex items-center gap-1 sm:gap-2">
+				<span class="text-xs sm:text-sm text-slate-600 hidden sm:inline">{$tChirho('common.readChirho.languageChirho')}:</span>
 				<select
-					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					class="border border-slate-300 rounded px-2 py-1.5 sm:py-1 text-sm bg-white w-full sm:w-auto"
 					value={dataChirho.codeChirho}
 					onchange={onLanguageChangeChirho}
 				>
@@ -173,20 +219,11 @@
 				</select>
 			</label>
 
-			<!-- N-dash toggle (next to language) -->
-			<label class="flex items-center gap-1.5 cursor-pointer text-sm">
-				<input
-					type="checkbox"
-					bind:checked={hideNdashChirho}
-					class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-				/>
-				<span class="text-slate-600">{$tChirho('common.readChirho.hideDashesChirho')}</span>
-			</label>
-
-			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">{$tChirho('common.bibleChirho.bookChirho')}:</span>
+			<!-- Book Selector -->
+			<label class="flex items-center gap-1 sm:gap-2">
+				<span class="text-xs sm:text-sm text-slate-600 hidden sm:inline">{$tChirho('common.bibleChirho.bookChirho')}:</span>
 				<select
-					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					class="border border-slate-300 rounded px-2 py-1.5 sm:py-1 text-sm bg-white w-full sm:w-auto"
 					value={String(dataChirho.bookChirho?.idChirho ?? '')}
 					onchange={onBookChangeChirho}
 				>
@@ -196,10 +233,11 @@
 				</select>
 			</label>
 
-			<label class="flex items-center gap-2">
-				<span class="text-sm text-slate-600">{$tChirho('common.bibleChirho.chapterChirho')}:</span>
+			<!-- Chapter Selector -->
+			<label class="flex items-center gap-1 sm:gap-2">
+				<span class="text-xs sm:text-sm text-slate-600 hidden sm:inline">{$tChirho('common.bibleChirho.chapterChirho')}:</span>
 				<select
-					class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+					class="border border-slate-300 rounded px-2 py-1.5 sm:py-1 text-sm bg-white w-full sm:w-auto"
 					value={String(dataChirho.chapterChirho ?? '')}
 					onchange={onChapterChangeChirho}
 				>
@@ -209,27 +247,35 @@
 				</select>
 			</label>
 
-			<span class="text-slate-300">|</span>
+			<!-- N-dash toggle -->
+			<label class="flex items-center gap-1.5 cursor-pointer text-sm col-span-1">
+				<input
+					type="checkbox"
+					bind:checked={hideNdashChirho}
+					class="w-4 h-4 sm:w-3.5 sm:h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+				/>
+				<span class="text-slate-600 text-xs sm:text-sm">{$tChirho('common.readChirho.hideDashesChirho')}</span>
+			</label>
 
 			<!-- Audio Button -->
 			<button
 				type="button"
 				onclick={() => (showAudioChirho = true)}
-				class="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-300 text-sm text-slate-600 bg-white hover:bg-slate-50 transition-colors"
+				class="flex items-center justify-center gap-1.5 px-3 py-1.5 sm:py-1 rounded border border-slate-300 text-sm text-slate-600 bg-white hover:bg-slate-50 transition-colors"
 				title={$tChirho('common.readChirho.listenAudioChirho')}
 			>
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
 				</svg>
-				{$tChirho('common.readChirho.audioChirho')}
+				<span class="hidden sm:inline">{$tChirho('common.readChirho.audioChirho')}</span>
 			</button>
 
-			<!-- Biblical Hebrew GPT Link -->
+			<!-- Biblical Hebrew GPT Link - hidden on mobile -->
 			<a
 				href="https://chatgpt.com/g/g-67721a4d937c81918c7daf9e4ad7a803-biblical-hebrew-encyclopedia-and-grammar"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-300 text-sm text-slate-600 bg-white hover:bg-slate-50 transition-colors"
+				class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border border-slate-300 text-sm text-slate-600 bg-white hover:bg-slate-50 transition-colors"
 				title="Biblical Hebrew GPT"
 			>
 				<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -239,41 +285,42 @@
 			</a>
 		</div>
 
-		<!-- Display Controls: RTL toggle + Reference -->
-		<div class="mt-3 flex flex-wrap gap-3 items-center text-sm">
-			<!-- RTL Toggle -->
-			<span class="text-slate-600">{$tChirho('common.readChirho.directionChirho')}:</span>
-			<div class="flex rounded border border-slate-300 overflow-hidden">
+		<!-- Display Controls: RTL toggle + Reference - collapsible on mobile -->
+		<div class="mt-3 flex flex-wrap gap-2 sm:gap-3 items-center text-xs sm:text-sm">
+			<!-- RTL Toggle - compact on mobile -->
+			<span class="text-slate-600 hidden sm:inline">{$tChirho('common.readChirho.directionChirho')}:</span>
+			<div class="flex rounded border border-slate-300 overflow-hidden text-xs sm:text-sm">
 				<button
 					type="button"
-					class="px-2 py-1 {!isRtlChirho ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 {!isRtlChirho ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (forceRtlChirho = false)}
 				>
-					LTR →
+					LTR
 				</button>
 				<button
 					type="button"
-					class="px-2 py-1 border-x border-slate-300 {forceRtlChirho === null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 border-x border-slate-300 {forceRtlChirho === null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (forceRtlChirho = null)}
 				>
 					Auto
 				</button>
 				<button
 					type="button"
-					class="px-2 py-1 {isRtlChirho && forceRtlChirho !== null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 {isRtlChirho && forceRtlChirho !== null ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (forceRtlChirho = true)}
 				>
-					← RTL
+					RTL
 				</button>
 			</div>
 
-			<span class="text-slate-300">|</span>
+			<span class="text-slate-300 hidden sm:inline">|</span>
 
-			<span class="text-slate-600">{$tChirho('common.readChirho.referenceChirho')}:</span>
-			<div class="flex rounded border border-slate-300 overflow-hidden">
+			<!-- Reference Toggle -->
+			<span class="text-slate-600 hidden sm:inline">{$tChirho('common.readChirho.referenceChirho')}:</span>
+			<div class="flex rounded border border-slate-300 overflow-hidden text-xs sm:text-sm">
 				<button
 					type="button"
-					class="px-2 py-1 {referenceDisplayModeChirho === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 {referenceDisplayModeChirho === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'hidden')}
 					aria-label={$tChirho('common.readChirho.closeReferencePanelChirho')}
 				>
@@ -281,14 +328,14 @@
 				</button>
 				<button
 					type="button"
-					class="px-2 py-1 border-x border-slate-300 {referenceDisplayModeChirho === 'below' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 border-x border-slate-300 {referenceDisplayModeChirho === 'below' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
 					onclick={() => (referenceDisplayModeChirho = 'below')}
 				>
 					{$tChirho('common.readChirho.belowChirho')}
 				</button>
 				<button
 					type="button"
-					class="px-2 py-1 {referenceDisplayModeChirho === 'side' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'}"
+					class="px-1.5 sm:px-2 py-1 {referenceDisplayModeChirho === 'side' ? 'bg-slate-200 text-slate-800' : 'bg-white text-slate-600 hover:bg-slate-50'} hidden sm:block"
 					onclick={() => (referenceDisplayModeChirho = 'side')}
 				>
 					{$tChirho('common.readChirho.sideChirho')}
@@ -296,7 +343,7 @@
 			</div>
 			{#if dataChirho.referenceVersionsChirho?.length}
 				<select
-					class="border border-slate-300 rounded px-2 py-1 bg-white text-sm"
+					class="border border-slate-300 rounded px-2 py-1 bg-white text-xs sm:text-sm flex-shrink min-w-0"
 					onchange={onRefVersionChangeChirho}
 				>
 					{#each getGroupedVersionsChirho() as groupChirho}
@@ -315,59 +362,61 @@
 			{/if}
 			<a
 				href={getPdfUrlChirho()}
-				class="ml-auto px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center gap-1"
+				class="ml-auto px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs sm:text-sm flex items-center gap-1"
 				download
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
 				</svg>
-				PDF
+				<span class="hidden sm:inline">PDF</span>
 			</a>
 		</div>
 
-		<!-- Legend for gloss styling -->
-		<div class="mt-4 flex flex-wrap gap-4 text-xs">
+		<!-- Legend for gloss styling - compact on mobile -->
+		<div class="mt-3 sm:mt-4 flex flex-wrap gap-2 sm:gap-4 text-[10px] sm:text-xs">
 			<span class="flex items-center gap-1">
-				<span class="text-emerald-700 font-medium">text</span>
-				<span class="text-slate-600">{$tChirho('common.translateChirho.approvedChirho')}</span>
+				<span class="text-emerald-700 font-medium">✓</span>
+				<span class="text-slate-600 hidden sm:inline">{$tChirho('common.translateChirho.approvedChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
-				<span class="text-amber-700 bg-amber-50 rounded px-1">text</span>
-				<span class="text-slate-600">{$tChirho('common.translateChirho.pendingReviewChirho')}</span>
+				<span class="text-amber-700 bg-amber-50 rounded px-0.5 sm:px-1">?</span>
+				<span class="text-slate-600 hidden sm:inline">{$tChirho('common.translateChirho.pendingReviewChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
-				<span class="text-purple-600 underline decoration-purple-400 decoration-2">text</span>
-				<span class="text-slate-600">{$tChirho('common.translateChirho.importedChirho')}</span>
+				<span class="text-purple-600 underline decoration-purple-400 decoration-2">AI</span>
+				<span class="text-slate-600 hidden sm:inline">{$tChirho('common.translateChirho.importedChirho')}</span>
 			</span>
 			<span class="flex items-center gap-1">
 				<span class="text-slate-400 italic">—</span>
-				<span class="text-slate-600">{$tChirho('common.translateChirho.noTranslationChirho')}</span>
+				<span class="text-slate-600 hidden sm:inline">{$tChirho('common.translateChirho.noTranslationChirho')}</span>
 			</span>
 		</div>
 
-		<div class="mt-6 space-y-6 {referenceDisplayModeChirho === 'side' ? 'mr-80' : ''}">
+		<div class="mt-4 sm:mt-6 space-y-4 sm:space-y-6 {referenceDisplayModeChirho === 'side' ? 'sm:mr-80' : ''}">
 			{#each dataChirho.versesChirho as verseChirho}
 				<div class="verse-container-chirho">
 					<!-- Word-by-word gloss view -->
-					<div class="flex gap-3" dir={isRtlChirho ? 'rtl' : 'ltr'}>
-						<span class="text-sm font-semibold text-slate-400 w-8 pt-1 flex-shrink-0">
+					<div class="flex gap-2 sm:gap-3" dir={isRtlChirho ? 'rtl' : 'ltr'}>
+						<span class="text-xs sm:text-sm font-semibold text-slate-400 w-6 sm:w-8 pt-1 flex-shrink-0">
 							{verseChirho.verseNumberChirho}
 						</span>
-						<div class="flex flex-wrap gap-x-1 gap-y-3">
+						<div class="flex flex-wrap gap-x-0.5 sm:gap-x-1 gap-y-2 sm:gap-y-3">
 							{#each verseChirho.wordsChirho as wordChirho}
-								<span
-									class="inline-flex flex-col items-center hover:bg-yellow-50 cursor-pointer rounded px-1 py-0.5 transition-colors"
+								<button
+									type="button"
+									class="inline-flex flex-col items-center hover:bg-yellow-50 active:bg-yellow-100 cursor-pointer rounded px-1 py-1 sm:py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 min-w-[2.5rem] sm:min-w-0"
 									dir="ltr"
-									title="{wordChirho.lemmaIdChirho ?? ''} | {wordChirho.grammarChirho ?? ''}"
+									title="{wordChirho.lemmaIdChirho ?? ''} | {wordChirho.grammarChirho ?? ''} — Click for BibleHub"
+									onclick={() => onWordClickChirho(wordChirho.lemmaIdChirho)}
 								>
-									<span class="text-slate-800 text-sm">{wordChirho.textChirho}</span>
+									<span class="text-slate-800 text-xs sm:text-sm">{wordChirho.textChirho}</span>
 									<span
-										class="text-xs leading-tight {getGlossClassChirho(wordChirho.glossStateChirho, wordChirho.glossSourceChirho)}"
+										class="text-[10px] sm:text-xs leading-tight {getGlossClassChirho(wordChirho.glossStateChirho, wordChirho.glossSourceChirho)}"
 										style="font-family: {dataChirho.languageChirho?.fontChirho ?? 'Noto Sans'}"
 									>
 										{formatGlossChirho(wordChirho.glossChirho)}
 									</span>
-								</span>
+								</button>
 							{/each}
 						</div>
 					</div>
@@ -376,7 +425,7 @@
 					{#if referenceDisplayModeChirho === 'below'}
 						{@const refTextChirho = getReferenceTextChirho(verseChirho.verseIdChirho)}
 						{#if refTextChirho}
-							<div class="ml-8 mt-2 text-sm text-slate-600 border-l-2 border-slate-200 pl-3">
+							<div class="ml-6 sm:ml-8 mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-600 border-l-2 border-slate-200 pl-2 sm:pl-3">
 								{@html refTextChirho}
 							</div>
 						{/if}
@@ -385,9 +434,9 @@
 			{/each}
 		</div>
 
-		<!-- Side panel mode for reference translations -->
+		<!-- Side panel mode for reference translations - hidden on mobile (use 'below' instead) -->
 		{#if referenceDisplayModeChirho === 'side'}
-			<aside class="fixed right-0 top-0 w-80 h-full bg-white shadow-lg border-l border-slate-200 overflow-y-auto z-40">
+			<aside class="hidden sm:block fixed right-0 top-0 w-80 h-full bg-white shadow-lg border-l border-slate-200 overflow-y-auto z-40">
 				<div class="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center">
 					<h3 class="font-semibold text-slate-800">{dataChirho.selectedRefVersionNameChirho}</h3>
 					<button

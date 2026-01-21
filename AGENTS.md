@@ -351,3 +351,133 @@ docker exec nextjs-platform-chirho-db-1 pg_dump -U postgres --data-only > /tmp/d
 # Import to sveltekit
 docker exec -i sveltekit2-platform-chirho-db-chirho-1 psql -U postgres < /tmp/data.sql
 ```
+
+---
+
+## Development Best Practices
+
+These guidelines help maintain quality during AI-assisted rapid development.
+
+### Incremental Commits
+
+**Commit early and often.** Don't accumulate large changesets.
+
+| Changeset Size | Commit Frequency |
+|----------------|------------------|
+| Single file fix | Commit immediately |
+| Feature (2-5 files) | Commit per logical unit |
+| Large refactor | Commit every 15-30 minutes |
+
+**Benefits:**
+- Easy rollback if something breaks
+- Clear history of what changed when
+- Reduces merge conflicts
+- Documents decision points
+
+```bash
+# Good: Frequent, descriptive commits
+git add src/routes/login-chirho/
+git commit -m "Add login page UI with form validation"
+
+git add src/lib/server/auth-chirho.ts
+git commit -m "Implement session management"
+
+# Bad: One massive commit
+git add .
+git commit -m "Add authentication"  # What changed? Hard to review.
+```
+
+### Validation Checkpoints
+
+**Test at natural breakpoints**, not just at the end.
+
+| Checkpoint | What to Verify |
+|------------|----------------|
+| After schema changes | Run migrations, check DB state |
+| After API changes | Test endpoints with curl/httpie |
+| After UI changes | Visual check in browser |
+| After deploy scripts | Run in test environment first |
+
+**Checkpoint Script Pattern:**
+```bash
+# After each major change:
+bun run build           # Does it compile?
+bun run check           # TypeScript errors?
+bun run test            # Tests pass?
+# Only then: git commit
+```
+
+### Understand Before Proceeding
+
+**Never copy-paste generated code without understanding it.**
+
+Questions to ask before accepting AI-generated code:
+1. What does this code do?
+2. Why is it structured this way?
+3. What could go wrong?
+4. How would I debug this?
+
+**Red flags to watch for:**
+- Code that "looks right" but you can't explain
+- Complex regex or algorithms you don't understand
+- External API calls you haven't verified
+- Security-sensitive operations (auth, crypto, file I/O)
+
+### Scope Management
+
+**Break large tasks into smaller, verifiable pieces.**
+
+```
+# Instead of:
+"Implement user authentication"
+
+# Break into:
+1. Create user table schema
+2. Add registration endpoint
+3. Add login endpoint
+4. Implement session management
+5. Add auth middleware
+6. Protect routes
+7. Add logout
+8. Test full flow
+```
+
+Each step should be:
+- Independently testable
+- Independently committable
+- Rollback-able without affecting other steps
+
+### Error Recovery
+
+**When something breaks:**
+
+1. **Don't panic** - Git has your back
+2. **Identify the last working state** - `git log --oneline`
+3. **Isolate the change** - `git diff HEAD~1`
+4. **Decide: fix forward or rollback** - Depends on complexity
+5. **Document what happened** - Future you will thank you
+
+```bash
+# Quick rollback of last commit (keeps changes staged)
+git reset --soft HEAD~1
+
+# Full rollback (discards changes)
+git reset --hard HEAD~1
+
+# Rollback specific file
+git checkout HEAD~1 -- path/to/file.ts
+```
+
+### AI Collaboration Guidelines
+
+**Working effectively with AI assistants:**
+
+| Do | Don't |
+|----|-------|
+| Verify output before committing | Blindly trust generated code |
+| Ask for explanations | Accept "magic" solutions |
+| Test incrementally | Wait until everything is "done" |
+| Keep context focused | Mix unrelated tasks |
+| Commit working states | Let changes accumulate |
+
+**The 200x Rule:** AI can accelerate development 200x, but a bug introduced at 200x speed is still a bug. Quality gates remain essential.

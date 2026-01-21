@@ -17,15 +17,22 @@
 		{
 			nameChirho: 'KJV Interlinear Bible',
 			descriptionChirho: 'Hebrew & Greek text with English word-by-word translation and King James Version text',
-			pathChirho: '/bibles-chirho/interlinear-kjv-chirho.pdf',
-			sizeChirho: '136 MB',
+			pathChirho: '/bibles-chirho/interlinear-eng-kjv-chirho.pdf',
+			sizeChirho: '137 MB',
 			versesChirho: '31,102'
 		},
 		{
 			nameChirho: 'WEB Interlinear Bible',
 			descriptionChirho: 'Hebrew & Greek text with English word-by-word translation and World English Bible text',
-			pathChirho: '/bibles-chirho/interlinear-web-chirho.pdf',
-			sizeChirho: '136 MB',
+			pathChirho: '/bibles-chirho/interlinear-eng-web-chirho.pdf',
+			sizeChirho: '137 MB',
+			versesChirho: '31,102'
+		},
+		{
+			nameChirho: 'Hindi ERV Interlinear Bible',
+			descriptionChirho: 'Hebrew & Greek text with Hindi word-by-word translation and Hindi Easy-to-Read Version text',
+			pathChirho: '/bibles-chirho/interlinear-hin-hinerv-chirho.pdf',
+			sizeChirho: '139 MB',
 			versesChirho: '31,102'
 		}
 	];

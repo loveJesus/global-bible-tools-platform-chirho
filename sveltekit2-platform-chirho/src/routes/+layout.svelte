@@ -7,16 +7,17 @@
 	import { page as pageChirho } from '$app/state';
 	import type { LayoutData as LayoutDataChirho } from './$types';
 	import LocaleSwitcherChirho from '$lib/components-chirho/LocaleSwitcherChirho.svelte';
+	import FeedbackBubbleChirho from '$lib/components-chirho/FeedbackBubbleChirho.svelte';
 	import { tChirho, localeChirho } from '$lib/i18n-chirho';
+
+	let { children: childrenChirho, data: dataChirho }: { children: any; data: LayoutDataChirho } = $props();
 
 	// Initialize locale from server data
 	$effect(() => {
-		if (data.localeChirho) {
-			localeChirho.set(data.localeChirho);
+		if (dataChirho.localeChirho) {
+			localeChirho.set(dataChirho.localeChirho);
 		}
 	});
-
-	let { children, data }: { children: any; data: LayoutDataChirho } = $props();
 
 	let userMenuOpenChirho = $state(false);
 
@@ -62,7 +63,7 @@
 			</div>
 			<div class="flex items-center gap-3">
 				<LocaleSwitcherChirho />
-				{#if data.userChirho}
+				{#if dataChirho.userChirho}
 					<div class="relative">
 						<button
 							type="button"
@@ -72,9 +73,9 @@
 							aria-expanded={userMenuOpenChirho}
 						>
 							<div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-								{getInitialsChirho(data.userChirho.nameChirho, data.userChirho.emailChirho)}
+								{getInitialsChirho(dataChirho.userChirho.nameChirho, dataChirho.userChirho.emailChirho)}
 							</div>
-							<span class="hidden sm:block text-sm text-slate-700">{data.userChirho.nameChirho ?? data.userChirho.emailChirho}</span>
+							<span class="hidden sm:block text-sm text-slate-700">{dataChirho.userChirho.nameChirho ?? dataChirho.userChirho.emailChirho}</span>
 							<svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 							</svg>
@@ -83,8 +84,8 @@
 						{#if userMenuOpenChirho}
 							<div class="absolute right-0 top-full mt-1 z-50 min-w-[180px] rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5" role="menu">
 								<div class="px-4 py-2 border-b border-slate-100">
-									<p class="text-sm font-medium text-slate-900">{data.userChirho.nameChirho ?? 'User'}</p>
-									<p class="text-xs text-slate-500 truncate">{data.userChirho.emailChirho}</p>
+									<p class="text-sm font-medium text-slate-900">{dataChirho.userChirho.nameChirho ?? 'User'}</p>
+									<p class="text-xs text-slate-500 truncate">{dataChirho.userChirho.emailChirho}</p>
 								</div>
 
 								<a href="/profile-chirho" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors" role="menuitem">
@@ -94,7 +95,7 @@
 									{$tChirho('common.navChirho.profileChirho')}
 								</a>
 
-								{#if data.userChirho.isAdminChirho}
+								{#if dataChirho.userChirho.isAdminChirho}
 									<a href="/admin-chirho" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors" role="menuitem">
 										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -132,7 +133,7 @@
 	{/if}
 
 	<main class="flex-1">
-		{@render children()}
+		{@render childrenChirho()}
 	</main>
 
 	{#if !isLandingPageChirho}
@@ -142,4 +143,7 @@
 		</div>
 	</footer>
 	{/if}
+
+	<!-- Feedback bubble - appears on all pages -->
+	<FeedbackBubbleChirho />
 </div>

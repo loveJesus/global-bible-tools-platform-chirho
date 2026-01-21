@@ -8,6 +8,8 @@ import { userTableChirho } from '$lib/server/schema-chirho/users-chirho';
 import { fail as failChirho, redirect as redirectChirho } from '@sveltejs/kit';
 import { PasswordChirho } from '$lib/modules-chirho/users-chirho/model-chirho/password-chirho';
 
+const MAX_PICTURE_SIZE_CHIRHO = 70000; // ~50KB base64 limit
+
 interface LanguageMembershipRowChirho {
 	languageIdChirho: string;
 	languageCodeChirho: string;
@@ -55,7 +57,8 @@ export const load: PageServerLoadChirho = async ({ locals: localsChirho }) => {
 			nameChirho: userChirho.nameChirho,
 			emailChirho: userChirho.emailChirho,
 			emailStatusChirho: userChirho.emailStatusChirho,
-			hasPasswordChirho: !!userChirho.hashedPasswordChirho
+			hasPasswordChirho: !!userChirho.hashedPasswordChirho,
+			profilePictureChirho: userChirho.profilePictureChirho ?? null
 		},
 		languagesChirho,
 		isAdminChirho: adminCheckChirho[0]?.isAdminChirho ?? false
@@ -87,6 +90,59 @@ export const actions: ActionsChirho = {
 		} catch (errChirho) {
 			console.error('Error updating name:', errChirho);
 			return failChirho(500, { errorChirho: 'Failed to update name' });
+		}
+	},
+
+	// Upload profile picture (base64 data URI)
+	uploadPictureChirho: async ({ request: requestChirho, locals: localsChirho }) => {
+		const userChirho = localsChirho.userChirho;
+		if (!userChirho) {
+			return failChirho(401, { pictureErrorChirho: 'Unauthorized' });
+		}
+
+		const formDataChirho = await requestChirho.formData();
+		const pictureChirho = formDataChirho.get('picture') as string;
+
+		// Validate it's a proper data URI
+		if (!pictureChirho?.startsWith('data:image/jpeg;base64,')) {
+			return failChirho(400, { pictureErrorChirho: 'Invalid image format. Please use JPEG.' });
+		}
+
+		// Check size (~50KB limit for base64)
+		if (pictureChirho.length > MAX_PICTURE_SIZE_CHIRHO) {
+			return failChirho(400, { pictureErrorChirho: 'Image too large. Please use a smaller image.' });
+		}
+
+		try {
+			await dbChirho
+				.update(userTableChirho)
+				.set({ profilePictureChirho: pictureChirho })
+				.where(eqChirho(userTableChirho.idChirho, userChirho.idChirho));
+
+			return { pictureSuccessChirho: true, messageChirho: 'Profile picture updated' };
+		} catch (errChirho) {
+			console.error('Error uploading profile picture:', errChirho);
+			return failChirho(500, { pictureErrorChirho: 'Failed to upload profile picture' });
+		}
+	},
+
+	// Remove profile picture
+	removePictureChirho: async ({ locals: localsChirho }) => {
+		const userChirho = localsChirho.userChirho;
+		if (!userChirho) {
+			return failChirho(401, { pictureErrorChirho: 'Unauthorized' });
+		}
+
+		try {
+			await dbChirho
+				.update(userTableChirho)
+				.set({ profilePictureChirho: null })
+				.where(eqChirho(userTableChirho.idChirho, userChirho.idChirho));
+
+			return { pictureSuccessChirho: true, messageChirho: 'Profile picture removed' };
+		} catch (errChirho) {
+			console.error('Error removing profile picture:', errChirho);
+			return failChirho(500, { pictureErrorChirho: 'Failed to remove profile picture' });
 		}
 	},
 

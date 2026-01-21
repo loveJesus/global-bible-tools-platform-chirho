@@ -125,5 +125,17 @@
 		"aboutDownloadsChirho": "About These Downloads",
 		"aboutDescription1Chirho": "Each PDF contains the complete Bible with original Hebrew (Old Testament) and Greek (New Testament) text, Strong's numbers with links to BibleHub, and word-by-word interlinear translation. The reference translation text appears below each verse for easy reading.",
 		"aboutDescription2Chirho": "These PDFs are provided free of charge for personal study and ministry use. All reference Bible texts used are in the public domain."
+	},
+	"feedbackChirho": {
+		"titleChirho": "Feedback",
+		"thankYouChirho": "Thank you!",
+		"receivedChirho": "Your feedback has been received.",
+		"bugChirho": "Bug",
+		"suggestionChirho": "Idea",
+		"praiseChirho": "Praise",
+		"messagePlaceholderChirho": "Tell us what you think...",
+		"emailPlaceholderChirho": "Email (optional)",
+		"sendChirho": "Send Feedback",
+		"sendingChirho": "Sending..."
 	}
 }

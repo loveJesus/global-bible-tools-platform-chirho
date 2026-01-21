@@ -328,6 +328,26 @@ docker compose logs -f
 | `db-chirho` | 5432 | PostgreSQL 16 |
 | `minio-chirho` | 9000, 9001 | S3-compatible storage |
 
+### Cron Jobs
+
+The landing page displays translation statistics that require an expensive database query (~15s). To avoid slow page loads, these stats are cached and refreshed via cron:
+
+```bash
+# Add to crontab (runs every 5 minutes)
+crontab -e
+
+# Add this line:
+*/5 * * * * curl -s -X POST https://global-tools.bible.systems/api-chirho/cron-chirho/refresh-stats-chirho > /dev/null 2>&1
+```
+
+**Manual refresh:**
+```bash
+curl -X POST https://global-tools.bible.systems/api-chirho/cron-chirho/refresh-stats-chirho
+# Returns: {"successChirho":true,"languagesChirho":7,"durationMsChirho":15234}
+```
+
+**Note:** On server restart, the cache is empty. The landing page will show without stats until the first cron run or manual refresh.
+
 ### Cloudflare Configuration
 
 1. Add A record: `global-tools.bible.systems` → VPS IP

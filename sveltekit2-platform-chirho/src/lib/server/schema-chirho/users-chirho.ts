@@ -15,7 +15,8 @@ export const userTableChirho = pgTable('users', {
 	emailChirho: text('email').notNull().unique(),
 	emailStatusChirho: emailStatusEnumChirho('email_status').default('UNVERIFIED').notNull(),
 	hashedPasswordChirho: text('hashed_password'),
-	statusChirho: userStatusEnumChirho('status').default('active').notNull()
+	statusChirho: userStatusEnumChirho('status').default('active').notNull(),
+	profilePictureChirho: text('profile_picture_chirho') // base64 data URI (256x256 JPEG)
 });
 
 // Session table

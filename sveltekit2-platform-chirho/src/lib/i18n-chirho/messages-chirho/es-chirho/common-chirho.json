@@ -125,5 +125,17 @@
 		"aboutDownloadsChirho": "Acerca de estas descargas",
 		"aboutDescription1Chirho": "Cada PDF contiene la Biblia completa con el texto original hebreo (Antiguo Testamento) y griego (Nuevo Testamento), números de Strong con enlaces a BibleHub, y traducción interlineal palabra por palabra. El texto de traducción de referencia aparece debajo de cada versículo para facilitar la lectura.",
 		"aboutDescription2Chirho": "Estos PDFs se proporcionan de forma gratuita para estudio personal y uso ministerial. Todos los textos bíblicos de referencia utilizados son de dominio público."
+	},
+	"feedbackChirho": {
+		"titleChirho": "Comentarios",
+		"thankYouChirho": "¡Gracias!",
+		"receivedChirho": "Hemos recibido sus comentarios.",
+		"bugChirho": "Error",
+		"suggestionChirho": "Idea",
+		"praiseChirho": "Alabanza",
+		"messagePlaceholderChirho": "Cuéntenos qué piensa...",
+		"emailPlaceholderChirho": "Correo (opcional)",
+		"sendChirho": "Enviar comentarios",
+		"sendingChirho": "Enviando..."
 	}
 }
