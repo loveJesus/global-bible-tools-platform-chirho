@@ -37,6 +37,5 @@ coverage/
 *.db-shm
 *.db-wal
 
-# Claude Code local config
-.claude/
+# Claude Code local config (agents and commands are shared, not local config)
 .mcp.json
