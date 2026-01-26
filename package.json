@@ -13,7 +13,9 @@
     "check-consistency-chirho": "bun run tools-chirho/check-consistency-chirho.ts",
     "generate-sql-chirho": "bun run tools-chirho/generate-translation-sql-chirho.ts",
     "generate-verse-sql-chirho": "bun run tools-chirho/generate-verse-sql-chirho.ts",
-    "expand-glosses-chirho": "bun run tools-chirho/expand-glosses-chirho.ts"
+    "expand-glosses-chirho": "bun run tools-chirho/expand-glosses-chirho.ts",
+    "export-sword-chirho": "bun run tools-chirho/export-sword-chirho.ts",
+    "generate-sword-chirho": "bun run tools-chirho/generate-sword-module-chirho.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

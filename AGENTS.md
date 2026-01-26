@@ -44,6 +44,32 @@ ALL identifiers created by us (outside the submodule) must have the `Chirho` suf
 | **React/Next Components**                             | `PascalCase`      | `Chirho`                | `HeaderChirho.tsx`, `FooterChirho.tsx`                                                                      |
 | **Custom OAuth Scopes**                               | `snake_case`      | `_chirho:action_chirho` | `sites_chirho:read_chirho`                                                                                  |
 
+### Rust-Specific Naming (Leptos Platform)
+
+| Type                          | Case Style        | Suffix          | Example                                          |
+|-------------------------------|-------------------|-----------------|--------------------------------------------------|
+| **Variables/Functions**       | `snake_case`      | `_chirho`       | `user_data_chirho`, `fetch_users_chirho()`       |
+| **Structs/Enums/Traits**      | `PascalCase`      | `Chirho`        | `UserChirho`, `AuthErrorChirho`, `DatabaseChirho`|
+| **Constants**                 | `SCREAMING_SNAKE` | `_CHIRHO`       | `MAX_CONNECTIONS_CHIRHO`, `DEFAULT_PORT_CHIRHO`  |
+| **Modules**                   | `snake_case`      | `_chirho`       | `auth_chirho`, `db_chirho`, `routes_chirho`      |
+| **Crate/Package names**       | `kebab-case`      | `-chirho`       | `leptos-platform-chirho`, `auth-lib-chirho`      |
+| **Lifetimes**                 | `snake_case`      | `_chirho`       | `'a_chirho`, `'static` (no suffix for 'static)   |
+| **Type Parameters**           | `PascalCase`      | `Chirho`        | `TChirho`, `EChirho`, `ItemChirho`               |
+| **Macros**                    | `snake_case!`     | `_chirho!`      | `log_chirho!`, `query_chirho!`                   |
+
+## Claude Code Skills
+
+The `.claude/skills/` directory contains skill files that Claude Code uses for consistent development practices:
+
+| Skill | Description |
+|-------|-------------|
+| `chirho-naming-chirho` | Enforces the Chirho naming convention for all identifiers |
+| `code-quality-chirho` | DRY principles, code structure, and quality standards |
+| `database-practices-chirho` | PostgreSQL best practices, migrations, query safety |
+| `test-coverage-chirho` | Test coverage requirements and testing patterns |
+
+These skills are automatically loaded by Claude Code and enforce our development standards.
+
 ## Project Structure
 
 ```
@@ -54,6 +80,12 @@ platform-chirho/
 ├── .gitignore
 ├── .gitmodules                   # Submodule config
 ├── .env                          # Environment variables
+├── .claude/                      # Claude Code configuration
+│   └── skills/                   # Development practice skills
+│       ├── chirho-naming-chirho/
+│       ├── code-quality-chirho/
+│       ├── database-practices-chirho/
+│       └── test-coverage-chirho/
 ├── erd-bible-chirho.txt          # Bible data ERD diagram
 ├── erd-translation-chirho.txt    # Translation workflow ERD
 ├── sveltekit2-platform-chirho/   # PRIMARY: SvelteKit 2 app (Chirho naming)
@@ -65,6 +97,17 @@ platform-chirho/
 │   ├── src/modules/              # Feature modules
 │   ├── db/migrations/            # SQL migrations
 │   └── compose.yaml              # Docker services
+├── leptos-platform-chirho/       # Rust/Leptos app (Chirho naming)
+│   ├── src/
+│   │   ├── app_chirho.rs         # Main app component
+│   │   ├── routes_chirho/        # Page components
+│   │   ├── components_chirho/    # Reusable components
+│   │   ├── server_chirho/        # Server functions
+│   │   └── db_chirho/            # SQLx database layer
+│   ├── migrations_chirho/        # SQLx migrations
+│   ├── style/                    # Tailwind CSS
+│   ├── Cargo.toml
+│   └── compose.yaml              # Docker services
 ├── translations-chirho/          # [SUBMODULE] Translation SQL files
 ├── tools-chirho/                 # Bun tooling scripts (MCP server)
 ├── scripts-chirho/               # Build and utility scripts
@@ -73,6 +116,72 @@ platform-chirho/
     ├── database-architecture-chirho.md
     └── sveltekit-rewrite-plan-chirho.md
 ```
+
+## Leptos Platform (Rust)
+
+The `leptos-platform-chirho/` directory contains a Rust implementation using Leptos framework.
+
+### Tech Stack
+- **Leptos 0.8** - Full-stack Rust web framework with fine-grained reactivity
+- **Axum 0.8** - Async HTTP server
+- **SQLx 0.8** - Compile-time checked SQL queries
+- **Tailwind CSS** - Utility-first styling
+- **Tokio** - Async runtime
+
+### Running Locally
+```bash
+cd leptos-platform-chirho
+
+# Install cargo-leptos
+cargo install cargo-leptos
+
+# Install WASM target
+rustup target add wasm32-unknown-unknown
+
+# Start database
+docker compose up -d db-chirho
+
+# Run development server
+cargo leptos watch
+```
+
+### Services (Local Development)
+| Service | Port | URL |
+|---------|------|-----|
+| Leptos Server | 3000 | http://localhost:3000 |
+| Hot Reload | 3001 | WebSocket for dev |
+| PostgreSQL | 5436 | postgresql://postgres:asdfasdf@localhost:5436/postgres |
+
+### Key Paths
+- `src/app_chirho.rs` - Main app component and routing
+- `src/routes_chirho/` - Page components
+- `src/components_chirho/` - Reusable UI components
+- `src/server_chirho/` - Server functions and auth
+- `src/db_chirho/` - SQLx models and queries
+- `migrations_chirho/` - Database migrations
+
+### Routes (Same as SvelteKit)
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/login-chirho` | User login |
+| `/register-chirho` | User registration |
+| `/profile-chirho` | User profile |
+| `/read-chirho/:code/:chapter` | Bible reader |
+| `/translate-chirho/:code/:verse` | Translation interface |
+| `/admin-chirho` | Admin dashboard |
+| `/admin-chirho/users-chirho` | User management |
+| `/admin-chirho/languages-chirho` | Language management |
+| `/admin-chirho/feedback-chirho` | Feedback management |
+| `/admin-chirho/jobs-chirho` | Background jobs |
+| `/admin-chirho/analytics-chirho` | Analytics dashboard |
+
+### Building for Production
+```bash
+cargo leptos build --release
+```
+
+---
 
 ## SvelteKit Platform (Primary)
 
@@ -481,3 +590,126 @@ git checkout HEAD~1 -- path/to/file.ts
 | Commit working states | Let changes accumulate |
 
 **The 200x Rule:** AI can accelerate development 200x, but a bug introduced at 200x speed is still a bug. Quality gates remain essential.
+
+---
+
+## DRY Principles (Don't Repeat Yourself)
+
+### Identify Before Writing
+Before writing new code, search for existing:
+- Helper functions that do similar work
+- Components with similar UI patterns
+- Database queries with similar logic
+- API handlers with similar validation
+
+### Extract Common Patterns
+When you see similar code 2+ times:
+1. Extract to a shared utility function in `$lib/utils-chirho/`
+2. Create a reusable component in `$lib/components-chirho/`
+3. Build a shared type/interface in `$lib/types-chirho/`
+
+### Rule of Three
+- First occurrence: Just write it
+- Second occurrence: Note the duplication
+- Third occurrence: Extract and refactor
+
+---
+
+## Code Quality Requirements
+
+### TypeScript Standards
+- **No `any` types** - Use proper typing or `unknown` with type guards
+- **Explicit return types** on exported functions
+- **Interface over type** for object shapes (better error messages)
+- **Const assertions** for literal types
+
+### Function Guidelines
+- Functions should do ONE thing well
+- Under 30 lines preferred (not strict)
+- Extract validation, transformation, persistence into separate functions
+- Descriptive names that explain what, not how
+
+### Error Handling
+```typescript
+// Always use structured errors
+throw errorChirho(404, 'User not found');
+throw errorChirho(400, 'Invalid email format');
+
+// Log with context
+console.error('Failed to process:', { userIdChirho, errorChirho });
+```
+
+### Security Checklist
+- [ ] SQL queries use parameterized placeholders (`$1`, `$2`)
+- [ ] User input is validated before use
+- [ ] Sensitive data is not logged
+- [ ] Auth checks on all protected routes
+- [ ] CSRF protection on form submissions
+
+---
+
+## Database Standards
+
+### Query Safety (REQUIRED)
+```typescript
+// ALWAYS use parameterized queries
+const resultChirho = await queryRawChirho(
+  `SELECT * FROM users_chirho WHERE id_chirho = $1`,
+  [userIdChirho]  // Parameters go here, NEVER in the query string
+);
+```
+
+### Schema Requirements
+- Every table needs: `id_chirho`, `created_at_chirho`, `updated_at_chirho`
+- Foreign keys for referential integrity
+- Indexes on columns used in WHERE/ORDER BY
+
+### Migration Rules
+- Use `IF NOT EXISTS` for idempotency
+- Include rollback comments
+- Test on staging before production
+- Never drop tables without backup
+
+---
+
+## Testing Requirements
+
+### Coverage Targets
+| Area | Target | Focus |
+|------|--------|-------|
+| Business Logic | 80% | Translation workflow, permissions |
+| API Endpoints | 70% | Happy path + error cases |
+| Utilities | 90% | Pure functions |
+| Components | 50% | User interactions |
+
+### Critical Paths (Must Test)
+- User authentication flow
+- Translation CRUD operations
+- Permission checks (admin vs user)
+- Data validation and sanitization
+
+### Test Before Commit
+```bash
+bun run build     # Compiles?
+bun run check     # Type errors?
+bun run test      # Tests pass?
+# Only then: git commit
+```
+
+---
+
+## i18n Requirements
+
+### All User-Facing Text Must Be Translated
+- Use `$tChirho('key.path')` for all UI text
+- Add keys to all language files (en, es, hi, fr, de, pt, ru, zh, ar, ja, ko, id, it, nl)
+- Never hardcode English strings in components
+
+### Translation Key Structure
+```json
+{
+  "common": { "save": "Save", "cancel": "Cancel" },
+  "admin": { "title": "Administration" },
+  "landing": { "heroTitle": "..." }
+}
+```
