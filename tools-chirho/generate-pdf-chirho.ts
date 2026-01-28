@@ -33,23 +33,42 @@ import { initPgConnectionChirho, queryPgChirho, closePgChirho } from './db-chirh
 
 // Book name mappings
 const BOOK_NAMES_CHIRHO: Record<string, { idChirho: number; nameChirho: string; chaptersChirho: number }> = {
+	// Old Testament
 	genesis: { idChirho: 1, nameChirho: 'Genesis', chaptersChirho: 50 },
 	exodus: { idChirho: 2, nameChirho: 'Exodus', chaptersChirho: 40 },
 	leviticus: { idChirho: 3, nameChirho: 'Leviticus', chaptersChirho: 27 },
 	numbers: { idChirho: 4, nameChirho: 'Numbers', chaptersChirho: 36 },
 	deuteronomy: { idChirho: 5, nameChirho: 'Deuteronomy', chaptersChirho: 34 },
+	psalms: { idChirho: 19, nameChirho: 'Psalms', chaptersChirho: 150 },
+	proverbs: { idChirho: 20, nameChirho: 'Proverbs', chaptersChirho: 31 },
+	// New Testament
 	matthew: { idChirho: 40, nameChirho: 'Matthew', chaptersChirho: 28 },
 	mark: { idChirho: 41, nameChirho: 'Mark', chaptersChirho: 16 },
 	luke: { idChirho: 42, nameChirho: 'Luke', chaptersChirho: 24 },
 	john: { idChirho: 43, nameChirho: 'John', chaptersChirho: 21 },
 	acts: { idChirho: 44, nameChirho: 'Acts', chaptersChirho: 28 },
 	romans: { idChirho: 45, nameChirho: 'Romans', chaptersChirho: 16 },
+	'1corinthians': { idChirho: 46, nameChirho: '1 Corinthians', chaptersChirho: 16 },
+	'2corinthians': { idChirho: 47, nameChirho: '2 Corinthians', chaptersChirho: 13 },
+	galatians: { idChirho: 48, nameChirho: 'Galatians', chaptersChirho: 6 },
+	ephesians: { idChirho: 49, nameChirho: 'Ephesians', chaptersChirho: 6 },
+	philippians: { idChirho: 50, nameChirho: 'Philippians', chaptersChirho: 4 },
+	colossians: { idChirho: 51, nameChirho: 'Colossians', chaptersChirho: 4 },
+	'1thessalonians': { idChirho: 52, nameChirho: '1 Thessalonians', chaptersChirho: 5 },
+	'2thessalonians': { idChirho: 53, nameChirho: '2 Thessalonians', chaptersChirho: 3 },
+	'1timothy': { idChirho: 54, nameChirho: '1 Timothy', chaptersChirho: 6 },
+	'2timothy': { idChirho: 55, nameChirho: '2 Timothy', chaptersChirho: 4 },
+	titus: { idChirho: 56, nameChirho: 'Titus', chaptersChirho: 3 },
+	philemon: { idChirho: 57, nameChirho: 'Philemon', chaptersChirho: 1 },
+	hebrews: { idChirho: 58, nameChirho: 'Hebrews', chaptersChirho: 13 },
+	james: { idChirho: 59, nameChirho: 'James', chaptersChirho: 5 },
+	'1peter': { idChirho: 60, nameChirho: '1 Peter', chaptersChirho: 5 },
+	'2peter': { idChirho: 61, nameChirho: '2 Peter', chaptersChirho: 3 },
 	'1john': { idChirho: 62, nameChirho: '1 John', chaptersChirho: 5 },
-	'1jn': { idChirho: 62, nameChirho: '1 John', chaptersChirho: 5 },
+	'2john': { idChirho: 63, nameChirho: '2 John', chaptersChirho: 1 },
+	'3john': { idChirho: 64, nameChirho: '3 John', chaptersChirho: 1 },
 	jude: { idChirho: 65, nameChirho: 'Jude', chaptersChirho: 1 },
 	revelation: { idChirho: 66, nameChirho: 'Revelation', chaptersChirho: 22 },
-	psalms: { idChirho: 19, nameChirho: 'Psalms', chaptersChirho: 150 },
-	proverbs: { idChirho: 20, nameChirho: 'Proverbs', chaptersChirho: 31 }
 };
 
 // SWORD module mappings by language

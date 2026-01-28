@@ -44,6 +44,29 @@ ALL identifiers created by us (outside the submodule) must have the `Chirho` suf
 | **React/Next Components**                             | `PascalCase`      | `Chirho`                | `HeaderChirho.tsx`, `FooterChirho.tsx`                                                                      |
 | **Custom OAuth Scopes**                               | `snake_case`      | `_chirho:action_chirho` | `sites_chirho:read_chirho`                                                                                  |
 
+### Naming Exceptions for External Protocols
+
+Some identifiers intentionally do NOT use the chirho suffix because they must comply with external protocol standards:
+
+| Context | Convention | Reason | Example |
+|---------|------------|--------|---------|
+| **SWORD Module Names** | `PascalCase` (no suffix) | CrossWire SWORD protocol; appears in Bible apps | `LJMTIntSpa`, `LJMTIntHin`, `LJMTIntBen` |
+| **SWORD Conf Keys** | Standard SWORD keys | Protocol compliance | `DataPath`, `ModDrv`, `SourceType` |
+| **Upstream Submodule** | No suffix | `nextjs-platform-chirho/` is external code | Tables: `User`, `Language`, `Gloss` |
+
+**SWORD Module Naming Rationale:**
+- Module names like `LJMTIntSpa` (Love Jesus Machine Translation Interlinear - Spanish) appear in:
+  - User-facing Bible applications (Xiphos, BibleTime, AndBible)
+  - SWORD InstallMgr repository listings
+  - Download URLs and package managers
+- Adding `Chirho` suffix would confuse end users who see these names in their Bible software
+- The repository folder (`sword-repo-chirho/`) and output folders (`translations-chirho/genesis-spa-chirho/`) DO use chirho naming
+
+**What uses chirho naming in SWORD context:**
+- Repository directory: `sword-repo-chirho/`
+- Translation output folders: `translations-chirho/genesis-spa-chirho/`
+- Internal code referencing SWORD modules: `const moduleNameChirho = 'LJMTIntSpa'`
+
 ### Rust-Specific Naming (Leptos Platform)
 
 | Type                          | Case Style        | Suffix          | Example                                          |
@@ -109,6 +132,11 @@ platform-chirho/
 │   ├── Cargo.toml
 │   └── compose.yaml              # Docker services
 ├── translations-chirho/          # [SUBMODULE] Translation SQL files
+├── sword-repo-chirho/            # SWORD module repository (external naming - see exceptions)
+│   ├── mods.d/                   # Module conf files (ljmtint*.conf)
+│   ├── modules/texts/ztext/      # Module data (LJMTIntSpa/, LJMTIntHin/, LJMTIntBen/)
+│   ├── raw/                      # Downloadable zip files
+│   └── index.html                # Repository landing page
 ├── tools-chirho/                 # Bun tooling scripts (MCP server)
 ├── scripts-chirho/               # Build and utility scripts
 └── spec-chirho/                  # Specifications and AI notes

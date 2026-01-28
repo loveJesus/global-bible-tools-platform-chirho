@@ -53,6 +53,8 @@ const LANGUAGE_NAMES_CHIRHO: Record<string, { nameChirho: string; nativeNameChir
   zho: { nameChirho: "Chinese", nativeNameChirho: "中文" },
   jpn: { nameChirho: "Japanese", nativeNameChirho: "日本語" },
   kor: { nameChirho: "Korean", nativeNameChirho: "한국어" },
+  heb: { nameChirho: "Hebrew", nativeNameChirho: "עברית" },
+  urd: { nameChirho: "Urdu", nativeNameChirho: "اردو" },
 };
 
 // OSIS book ID mappings (SWORD standard)
@@ -645,8 +647,8 @@ async function mainChirho(): Promise<void> {
     nativeNameChirho: langCodeChirho.toUpperCase(),
   };
 
-  // Module ID (e.g., GBTIntSpa for Spanish)
-  const moduleIdChirho = `GBTInt${langCodeChirho.charAt(0).toUpperCase()}${langCodeChirho.slice(1)}`;
+  // Module ID (e.g., LJMTIntSpa for Spanish - Love Jesus Machine Translation)
+  const moduleIdChirho = `LJMTInt${langCodeChirho.charAt(0).toUpperCase()}${langCodeChirho.slice(1)}`;
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`Generating SWORD Module: ${moduleIdChirho}`);
