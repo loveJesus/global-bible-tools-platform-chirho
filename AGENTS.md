@@ -50,22 +50,14 @@ Some identifiers intentionally do NOT use the chirho suffix because they must co
 
 | Context | Convention | Reason | Example |
 |---------|------------|--------|---------|
-| **SWORD Module Names** | `PascalCase` (no suffix) | CrossWire SWORD protocol; appears in Bible apps | `LJMTIntSpa`, `LJMTIntHin`, `LJMTIntBen` |
+| **SWORD Module Names** | `PascalCase` + `Chirho` | Chirho naming applies to all our identifiers | `LJMTIntSpaChirho`, `LJMTIntHinChirho`, `LJMTIntBenChirho` |
 | **SWORD Conf Keys** | Standard SWORD keys | Protocol compliance | `DataPath`, `ModDrv`, `SourceType` |
 | **Upstream Submodule** | No suffix | `nextjs-platform-chirho/` is external code | Tables: `User`, `Language`, `Gloss` |
 
-**SWORD Module Naming Rationale:**
-- Module names like `LJMTIntSpa` (Love Jesus Machine Translation Interlinear - Spanish) appear in:
-  - User-facing Bible applications (Xiphos, BibleTime, AndBible)
-  - SWORD InstallMgr repository listings
-  - Download URLs and package managers
-- Adding `Chirho` suffix would confuse end users who see these names in their Bible software
-- The repository folder (`sword-repo-chirho/`) and output folders (`translations-chirho/genesis-spa-chirho/`) DO use chirho naming
-
-**What uses chirho naming in SWORD context:**
-- Repository directory: `sword-repo-chirho/`
-- Translation output folders: `translations-chirho/genesis-spa-chirho/`
-- Internal code referencing SWORD modules: `const moduleNameChirho = 'LJMTIntSpa'`
+**SWORD Module Naming:**
+- Module names like `LJMTIntSpaChirho` (Love Jesus Machine Translation Interlinear - Spanish + Chirho) include the Chirho suffix
+- Repository: https://sword-modules-chirho.bible.systems
+- All modules follow Chirho naming: `LJMTIntSpaChirho`, `LJMTIntHinChirho`, `LJMTIntBenChirho`, `LJMTIntPorChirho`, `LJMTIntIndChirho`, `LJMTIntHebChirho`, `LJMTIntUrdChirho`
 
 ### Rust-Specific Naming (Leptos Platform)
 
@@ -137,7 +129,7 @@ platform-chirho/
 │   ├── modules/texts/ztext/      # Module data (LJMTIntSpa/, LJMTIntHin/, LJMTIntBen/)
 │   ├── raw/                      # Downloadable zip files
 │   └── index.html                # Repository landing page
-├── tools-chirho/                 # Bun tooling scripts (MCP server)
+├── tools-chirho/                 # Bun tooling scripts 
 ├── scripts-chirho/               # Build and utility scripts
 └── spec-chirho/                  # Specifications and AI notes
     ├── platform-overview-chirho.md
@@ -741,3 +733,7 @@ bun run test      # Tests pass?
   "landing": { "heroTitle": "..." }
 }
 ```
+
+### Interlinear tool:
+sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts
+please see the correct name
