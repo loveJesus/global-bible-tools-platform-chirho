@@ -40,6 +40,7 @@ const OUTPUT_DIR_CHIRHO = join(import.meta.dir, "..", "sword-modules-chirho");
 
 // Language name mappings for module metadata
 const LANGUAGE_NAMES_CHIRHO: Record<string, { nameChirho: string; nativeNameChirho: string }> = {
+  eng: { nameChirho: "English", nativeNameChirho: "English" },
   spa: { nameChirho: "Spanish", nativeNameChirho: "Español" },
   hin: { nameChirho: "Hindi", nativeNameChirho: "हिन्दी" },
   ben: { nameChirho: "Bengali", nativeNameChirho: "বাংলা" },
