@@ -15,11 +15,15 @@
     "generate-verse-sql-chirho": "bun run tools-chirho/generate-verse-sql-chirho.ts",
     "expand-glosses-chirho": "bun run tools-chirho/expand-glosses-chirho.ts",
     "export-sword-chirho": "bun run tools-chirho/export-sword-chirho.ts",
-    "generate-sword-chirho": "bun run tools-chirho/generate-sword-module-chirho.ts"
+    "generate-sword-chirho": "bun run tools-chirho/generate-sword-module-chirho.ts",
+    "translate-2ki-1ch-swa-chirho": "bun run tools-chirho/translate-2ki-1ch-swa-chirho.ts",
+    "generate-2ki-1ch-swa-glosses-chirho": "bun run tools-chirho/generate-2ki-1ch-swa-glosses-chirho.ts",
+    "translate-2ki-1ch-swa-final-chirho": "bun run tools-chirho/translate-2ki-1ch-swa-final-chirho.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "pdfkit": "^0.17.2",
+    "pg": "^8.17.2",
     "postgres": "^3.4.4"
   },
   "devDependencies": {
