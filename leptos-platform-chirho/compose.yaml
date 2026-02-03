@@ -1,0 +1,55 @@
+# For God so loved the world, that He gave His only begotten Son,
+# that all who believe in Him should not perish but have everlasting life.
+# — John 3:16
+
+services:
+  # PostgreSQL database
+  db-chirho:
+    image: postgres:17
+    container_name: leptos-platform-db-chirho
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: asdfasdf
+      POSTGRES_DB: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - leptos-db-data-chirho:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Leptos application (development)
+  app-chirho:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: leptos-platform-app-chirho
+    restart: unless-stopped
+    depends_on:
+      db-chirho:
+        condition: service_healthy
+    environment:
+      DATABASE_URL_CHIRHO: postgresql://postgres:asdfasdf@db-chirho:5432/postgres
+      LEPTOS_OUTPUT_NAME: leptos-platform-chirho
+      LEPTOS_SITE_ROOT: site
+      LEPTOS_SITE_PKG_DIR: pkg
+      LEPTOS_SITE_ADDR: 0.0.0.0:3000
+      LEPTOS_RELOAD_PORT: 3001
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./src:/app/src:ro
+      - ./style:/app/style:ro
+      - ./public:/app/public:ro
+      - leptos-target-chirho:/app/target
+      - leptos-cargo-chirho:/root/.cargo
+
+volumes:
+  leptos-db-data-chirho:
+  leptos-target-chirho:
+  leptos-cargo-chirho:

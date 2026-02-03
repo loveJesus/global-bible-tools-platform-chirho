@@ -39,3 +39,13 @@ coverage/
 
 # Claude Code local config (agents and commands are shared, not local config)
 .mcp.json
+
+# Generated output files (PDFs, SQL exports)
+output-chirho/
+
+# SWORD module build artifacts (modules are in sword-repo-chirho submodule)
+sword-modules-chirho/
+sword-export-chirho/
+
+# Static large files
+static/*.pdf
