@@ -51,6 +51,7 @@ const LANGUAGE_NAMES_CHIRHO: Record<string, { nameChirho: string; nativeNameChir
   fra: { nameChirho: "French", nativeNameChirho: "Français" },
   deu: { nameChirho: "German", nativeNameChirho: "Deutsch" },
   ara: { nameChirho: "Arabic", nativeNameChirho: "العربية" },
+  arb: { nameChirho: "Arabic", nativeNameChirho: "العربية" },
   zho: { nameChirho: "Chinese", nativeNameChirho: "中文" },
   jpn: { nameChirho: "Japanese", nativeNameChirho: "日本語" },
   kor: { nameChirho: "Korean", nativeNameChirho: "한국어" },
