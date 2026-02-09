@@ -9,6 +9,10 @@ description: "Enforces DRY principles, code quality standards, and best practice
 
 # Code Quality Skill
 
+## Model Policy
+
+**OPUS ONLY** — NEVER use Sonnet or Haiku for any agents or subagents. This is the Bible; quality is paramount. Always use the most capable model available. Do not pass `model: "sonnet"` or `model: "haiku"` to Task tool invocations.
+
 ## Purpose
 
 Maintain high code quality through DRY principles, clean architecture, and consistent practices.

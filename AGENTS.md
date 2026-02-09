@@ -24,6 +24,10 @@ This project provides:
 
 **Bun-only runtime** - NEVER use npm/npx/yarn. Always use `bun` or `bunx`.
 
+## Model Policy
+
+**Opus-only for all agents and subagents.** NEVER use Sonnet or Haiku for translation agents or any subagent work. This is the Bible - quality is paramount. Always use the most capable model (Opus) for all tasks. Do not pass `model: "sonnet"` or `model: "haiku"` to Task tool invocations.
+
 ## The Suffix Rule
 
 **IMPORTANT:** The `nextjs-platform-chirho/` submodule is upstream code and does NOT follow Chirho naming.
@@ -82,6 +86,10 @@ The `.claude/skills/` directory contains skill files that Claude Code uses for c
 | `code-quality-chirho` | DRY principles, code structure, and quality standards |
 | `database-practices-chirho` | PostgreSQL best practices, migrations, query safety |
 | `test-coverage-chirho` | Test coverage requirements and testing patterns |
+| `interlinear-pdf-chirho` | Interlinear Bible PDF generation with PDFKit |
+| `sword-modules-chirho` | SWORD module creation and repository management |
+| `font-merging-chirho` | Font subsetting and merging for multi-script PDFs |
+| `r2-media-chirho` | Cloudflare R2 storage for PDFs and media files |
 
 These skills are automatically loaded by Claude Code and enforce our development standards.
 
@@ -266,6 +274,95 @@ This removes the cached volume so it gets populated fresh from the rebuilt image
 - `/read-chirho/[code]/[chapter]` - Reader view
 - `/translate-chirho/[code]/[verse]` - Translation view
 - `/login-chirho` - Authentication
+
+---
+
+## Cloudflare R2 Media Storage
+
+All generated PDFs and large media files are stored in Cloudflare R2 for backup and CDN delivery.
+
+### Configuration
+| Setting | Value |
+|---------|-------|
+| **Bucket** | `global-bible-tools-media-chirho` |
+| **Custom Domain** | `https://media-global-tools.bible.systems` |
+
+### Credentials (from .env)
+```bash
+LOVEJESUS_R2_KEY_CHIRHO      # Access Key ID
+LOVEJESUS_R2_SECRET_CHIRHO   # Secret Access Key
+LOVEJESUS_R2_ENDPOINT_CHIRHO # S3-compatible endpoint
+```
+
+### File Structure
+```
+global-bible-tools-media-chirho/
+└── bibles-chirho/
+    ├── interlinear-eng-chirho.pdf
+    ├── interlinear-spa-rv1909-chirho.pdf
+    ├── interlinear-swa-swhulb-chirho.pdf
+    └── ... (all interlinear PDFs)
+```
+
+### Uploading Files
+
+**Using rclone (recommended for large files):**
+```bash
+# Configure rclone environment
+export RCLONE_CONFIG_R2_TYPE="s3"
+export RCLONE_CONFIG_R2_PROVIDER="Cloudflare"
+export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$LOVEJESUS_R2_KEY_CHIRHO"
+export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$LOVEJESUS_R2_SECRET_CHIRHO"
+export RCLONE_CONFIG_R2_ENDPOINT="$LOVEJESUS_R2_ENDPOINT_CHIRHO"
+
+# Upload single file
+rclone copy myfile.pdf r2:global-bible-tools-media-chirho/bibles-chirho/ \
+  --s3-chunk-size 5M --retries 5 -v
+
+# Sync directory
+rclone sync ./pdfs/ r2:global-bible-tools-media-chirho/bibles-chirho/ \
+  --exclude ".DS_Store" --s3-chunk-size 5M
+```
+
+**Using AWS CLI:**
+```bash
+export AWS_ACCESS_KEY_ID="$LOVEJESUS_R2_KEY_CHIRHO"
+export AWS_SECRET_ACCESS_KEY="$LOVEJESUS_R2_SECRET_CHIRHO"
+
+aws s3 cp myfile.pdf s3://global-bible-tools-media-chirho/bibles-chirho/ \
+  --endpoint-url="$LOVEJESUS_R2_ENDPOINT_CHIRHO" \
+  --content-type "application/pdf"
+```
+
+**Using wrangler:**
+```bash
+# Get zone ID for bible.systems (from Cloudflare API or dashboard)
+ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=bible.systems" \
+  -H "X-Auth-Email: $CLOUDFLARE_GLOBAL_API_EMAIL_CHIRHO" \
+  -H "X-Auth-Key: $CLOUDFLARE_GLOBAL_API_KEY_CHIRHO" | jq -r '.result[0].id')
+
+# Add custom domain to bucket
+wrangler r2 bucket domain add global-bible-tools-media-chirho \
+  --domain media-global-tools.bible.systems \
+  --zone-id "$ZONE_ID" \
+  --force
+
+# List custom domains
+wrangler r2 bucket domain list global-bible-tools-media-chirho
+```
+
+### Accessing Files
+Files are publicly accessible via the custom domain:
+```
+https://media-global-tools.bible.systems/bibles-chirho/<filename>
+```
+
+### Cache Headers
+R2 automatically serves files with:
+- `cache-control: max-age=14400` (4 hours)
+- Proper `etag` and `last-modified` headers
+
+For cache busting after updates, use versioned filenames or query parameters.
 
 ---
 
@@ -737,3 +834,19 @@ bun run test      # Tests pass?
 ### Interlinear tool:
 sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts
 please see the correct name
+
+
+## Additional
+
+- keep a spec-chirho dir, in it make an sqlite db progress-chirho.sqlite with at least the following table: steps_taken_chirho (id_chirho, agent_code_chirho, timestamp_start_chirho, timestamp_end_chirho, action_taken_chirho, result_of_action_chirho, overview_of_result_chirho )
+id_chirho: autoincrement id
+agent_code_chirho: Assign yourself some name, each agent or subagent as well, that can be used to identify the agent that inserted or updated this log
+timestamp_start_chirho, timestamp_end_chirho where you log when you started a task, at task start, and when you are done, when you share the result and your overview
+action_taken_chirho: what action you took, may include command line, and brief reasoning as to why
+result_of_action_chirho: how this action changed the state of the project (files, databases, etc)
+overview_of_result_chirho: Did this go as planned, did you learn anything from this, how does this impact your next decision
+
+How granular tis should be is up to you
+
+You can modify  the following section
+### Agent Self Modifications (For the agent to keep things present in its context)

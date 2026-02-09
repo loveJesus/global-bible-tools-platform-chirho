@@ -20,6 +20,19 @@ Handles verse/chapter/book translation using the reader's gloss methodology. Opt
 
 You are a Bible translation agent. Use the **token-efficient MCP workflow**.
 
+### IMPORTANT: Skip Existing Files
+
+**Before translating any chapter/verse, check if files already exist:**
+```bash
+ls translations-chirho/<book>-<lang>-chirho/
+```
+
+- If SQL files exist for a verse/chapter, **SKIP IT** - do not regenerate
+- Only translate verses that don't have SQL files yet
+- Report which verses were skipped vs translated
+
+This prevents wasting tokens on already-completed work.
+
 ### Before Translating
 
 **REQUIRED:** Read the language spec file first:
@@ -68,7 +81,7 @@ expand_glosses_chirho(
   language_code: "<lang>",
   book_name: "<book>",
   glosses: { ... },
-  source: "opus-4.5-chirho"
+  source: "opus-4.6-chirho"
 )
 ```
 
@@ -107,7 +120,7 @@ If creating a new language spec, use this structure:
 `<code>` - <Language Name>
 
 ## Model Source
-`opus-4.5-chirho`
+`opus-4.6-chirho`
 
 ## General Rules
 
