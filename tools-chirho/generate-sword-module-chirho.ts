@@ -59,6 +59,13 @@ const LANGUAGE_NAMES_CHIRHO: Record<string, { nameChirho: string; nativeNameChir
   urd: { nameChirho: "Urdu", nativeNameChirho: "اردو" },
   ind: { nameChirho: "Indonesian", nativeNameChirho: "Bahasa Indonesia" },
   jav: { nameChirho: "Javanese", nativeNameChirho: "Basa Jawa" },
+  ita: { nameChirho: "Italian", nativeNameChirho: "Italiano" },
+  mya: { nameChirho: "Burmese", nativeNameChirho: "မြန်မာ" },
+  fas: { nameChirho: "Persian", nativeNameChirho: "فارسی" },
+  tam: { nameChirho: "Tamil", nativeNameChirho: "தமிழ்" },
+  tha: { nameChirho: "Thai", nativeNameChirho: "ไทย" },
+  amh: { nameChirho: "Amharic", nativeNameChirho: "አማርኛ" },
+  vie: { nameChirho: "Vietnamese", nativeNameChirho: "Tiếng Việt" },
 };
 
 // OSIS book ID mappings (SWORD standard)

@@ -33,7 +33,7 @@ Merge Latin character subsets from NotoSans into script-specific fonts.
 | Tamil | NotoSansTamil | NotoSansTamilMergedChirho.ttf | ✅ Complete |
 | Gurmukhi | NotoSansGurmukhi | NotoSansGurmukhiMergedChirho.ttf | ✅ Complete |
 | Telugu | NotoSansTelugu | — | ❌ Font incompatible |
-| Ethiopic | NotoSansEthiopic | — | ❌ Font incompatible |
+| Ethiopic | NotoSansEthiopic | NotoSansEthiopicMergedChirho.ttf | ✅ Complete |
 
 ## Fonts That Already Have Latin Glyphs (No Merge Needed)
 
@@ -209,9 +209,9 @@ Some fonts have incompatible internal structures:
 Error: KeyError: 'glyf'
 ```
 
-**Cause:** Font uses CFF outlines instead of TrueType (glyf). Telugu and Ethiopic have this issue.
+**Cause:** Font uses CFF outlines instead of TrueType (glyf). Telugu has this issue. Ethiopic was previously thought to be incompatible, but the actual failure was caused by `vhea`/`vmtx` vertical metrics tables — removing those before merging fixed it.
 
-**Solution:** These fonts must remain unmerged. Add special handling in sanitization to convert punctuation to native equivalents.
+**Solution:** For CFF-outline fonts (like Telugu), these must remain unmerged. For fonts with vertical metrics tables causing merge errors, drop `vhea`/`vmtx` tables before merging.
 
 ### Missing Glyphs After Merge
 
@@ -271,3 +271,4 @@ This is because Arabic readers prefer native punctuation. Other scripts (Bengali
 | NotoSansGujaratiMergedChirho.ttf | 210 KB | Gujarati |
 | NotoSansTamilMergedChirho.ttf | 93 KB | Tamil |
 | NotoSansGurmukhiMergedChirho.ttf | 74 KB | Punjabi |
+| NotoSansEthiopicMergedChirho.ttf | 380 KB | Amharic/Ethiopic |

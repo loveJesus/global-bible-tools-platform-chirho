@@ -77,7 +77,8 @@ const SWORD_MODULES_CHIRHO: Record<string, string[]> = {
 	spa: ['SpaRV1909'],
 	hin: ['KJV'], // Fallback to KJV until Hindi module available
 	fra: ['KJV'],
-	deu: ['KJV']
+	deu: ['KJV'],
+	kor: ['KorRV']
 };
 
 // Page sizes in points (72 points = 1 inch)

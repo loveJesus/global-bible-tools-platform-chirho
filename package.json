@@ -27,6 +27,7 @@
     "postgres": "^3.4.4"
   },
   "devDependencies": {
+    "@aws-sdk/lib-storage": "^3.983.0",
     "@types/bun": "latest",
     "typescript": "^5.0.0"
   }
