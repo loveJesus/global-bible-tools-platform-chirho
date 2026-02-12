@@ -271,8 +271,8 @@ This removes the cached volume so it gets populated fresh from the rebuilt image
 - `compose.yaml` - Docker services
 
 ### Routes
-- `/read-chirho/[code]/[chapter]` - Reader view
-- `/translate-chirho/[code]/[verse]` - Translation view
+- `/read-chirho/[code]/[chapter]` - Reader view (`?type=readers` for natural reading mode)
+- `/translate-chirho/[code]/[verse]` - Translation view (always terse)
 - `/login-chirho` - Authentication
 
 ---
@@ -298,11 +298,12 @@ LOVEJESUS_R2_ENDPOINT_CHIRHO # S3-compatible endpoint
 ```
 global-bible-tools-media-chirho/
 └── bibles-chirho/
-    ├── interlinear-eng-chirho.pdf
+    ├── interlinear-eng-kjv-chirho.pdf           # Terse (word-by-word)
     ├── interlinear-spa-rv1909-chirho.pdf
-    ├── interlinear-swa-swhulb-chirho.pdf
+    ├── interlinear-readers-hin-hinfbi-chirho.pdf # Readers edition
     └── ... (all interlinear PDFs)
 ```
+**Naming convention:** Terse = `interlinear-<ref>-chirho.pdf`, Readers = `interlinear-readers-<ref>-chirho.pdf`
 
 ### Uploading Files
 
@@ -404,6 +405,8 @@ docker compose logs -f      # View logs
 **Translation Data (per language):**
 - `Language` - Target languages
 - `Phrase`, `PhraseWord` - Translation units
+  - `Phrase.translation_type_chirho`: `NULL` = terse (word-by-word), `'readers'` = natural reading
+  - Both types coexist per language — queries use `IS NOT DISTINCT FROM` to filter
 - `Gloss`, `GlossHistory` - Translations and audit trail
 - `MachineGloss` - AI suggestions
 
@@ -475,7 +478,9 @@ The `bible-translation-chirho` MCP server provides these tools directly to Claud
 - `set_decision_chirho` - Record translation decision for consistency
 - `get_decisions_chirho` - List all recorded decisions
 - `check_consistency_chirho` - Find inconsistent translations
-- `generate_translation_sql_chirho` - Generate idempotent SQL
+- `expand_glosses_chirho` - TOKEN-EFFICIENT: Takes word_id→gloss JSON, writes SQL files per verse
+- `get_words_for_translation_chirho` - Get source words for a book/chapter
+- `generate_translation_sql_chirho` - Generate idempotent SQL (legacy)
 
 ### CLI Commands
 ```bash
@@ -490,11 +495,27 @@ bun run generate-sql-chirho fra translations.json
 ```
 
 ### Translation Philosophy
-1. **Literal word-for-word** - Each Hebrew/Greek word gets a translation
+
+**Two translation types** coexist per language in the database:
+
+| Type | `translation_type_chirho` | Description |
+|------|--------------------------|-------------|
+| **Terse** | `NULL` (default) | Strict word-by-word interlinear, particles hyphenated |
+| **Readers** | `'readers'` | Natural readable glosses, smooth target-language phrasing |
+
+**Common rules (both types):**
+1. Each Hebrew/Greek word gets a translation
 2. **Lemma consistency** - Same root word → same translation
-3. **Particles hyphenated** with n-dash: "the–heavens", "in–beginning"
-4. **Names transliterated from Greek** with accents (e.g., Iēsoûs, Christós, Pétros)
-5. **Word order preserved** unless meaning would be lost
+3. **Names transliterated from Greek** with accents (e.g., Iēsoûs, Christós, Pétros)
+
+**Terse-specific:**
+- Particles hyphenated with n-dash: "the–heavens", "in–beginning"
+- Word order preserved unless meaning would be lost
+
+**Readers-specific:**
+- Natural target-language word order
+- Smooth, readable glosses (still one per source word)
+- Particles as natural constructions
 
 ### Token-Efficient Translation Workflow (MCP Tools)
 
@@ -520,10 +541,14 @@ bun run generate-sql-chirho fra translations.json
    expand_glosses_chirho(
      language_code: "spa",
      book_name: "jude",
-     glosses: {"6500100101": "Ioudas", ...}
+     glosses: {"6500100101": "Ioudas", ...},
+     translation_type_chirho: "terse"   // or "readers"
    )
    ```
    This fetches Greek/lemmas from DB and writes SQL files automatically.
+   - `"terse"` (default) → `translation_type_chirho = NULL` in DB, files in `terse-chirho/`
+   - `"readers"` → `translation_type_chirho = 'readers'` in DB, files in `readers-chirho/`
+   - Both types create **separate** phrase records — they don't overwrite each other.
 
 **Token savings:** ~70% vs verbose JSON. Agent outputs only gloss decisions.
 
@@ -831,9 +856,17 @@ bun run test      # Tests pass?
 }
 ```
 
-### Interlinear tool:
-sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts
-please see the correct name
+### Interlinear PDF Tool
+```bash
+# Terse (default)
+bun run sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts hin ./Hindi.pdf hinfbi
+
+# Readers edition
+bun run sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts hin ./Hindi-Readers.pdf hinfbi --type readers
+
+# Large font
+bun run sveltekit2-platform-chirho/tools-chirho/generate-interlinear-bible-pdf-chirho.ts hin ./Hindi-Large.pdf hinfbi --large-font
+```
 
 
 ## Additional

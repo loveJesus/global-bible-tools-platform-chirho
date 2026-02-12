@@ -111,9 +111,17 @@ const BOOK_NAME_MAP_CHIRHO: Record<string, string> = {
   '1john': '1john', '2john': '2john', '3john': '3john', revelation: 'revelation',
 };
 
+// Canonical book names (the only valid output values)
+const CANONICAL_BOOKS_CHIRHO = new Set(Object.values(BOOK_NAME_MAP_CHIRHO));
+
 function normalizeBookNameChirho(inputChirho: string): string {
-  const lowerChirho = inputChirho.toLowerCase().replace(/\s+/g, '');
-  return BOOK_NAME_MAP_CHIRHO[lowerChirho] ?? lowerChirho;
+  // Strip spaces, hyphens between number prefix and name, and trailing/leading whitespace
+  const lowerChirho = inputChirho.trim().toLowerCase().replace(/\s+/g, '').replace(/^(\d+)-/, '$1');
+  const resolvedChirho = BOOK_NAME_MAP_CHIRHO[lowerChirho];
+  if (resolvedChirho) return resolvedChirho;
+  // Reject unknown book names to prevent inconsistent directory creation
+  const suggestionsChirho = [...CANONICAL_BOOKS_CHIRHO].filter(bChirho => bChirho.includes(lowerChirho) || lowerChirho.includes(bChirho)).slice(0, 3);
+  throw new Error(`Unknown book name: "${inputChirho}". ${suggestionsChirho.length ? `Did you mean: ${suggestionsChirho.join(', ')}?` : `Valid names: ${[...CANONICAL_BOOKS_CHIRHO].join(', ')}`}`);
 }
 
 const serverChirho = new Server(
@@ -292,6 +300,11 @@ serverChirho.setRequestHandler(ListToolsRequestSchema, async () => {
             source_chirho: {
               type: "string",
               description: 'Model/source identifier (default: "opus-4.5-chirho")',
+            },
+            translation_type_chirho: {
+              type: "string",
+              description: 'Translation type: "terse" (word-by-word dictionary) or "readers" (natural readable). Default: "terse". Determines output directory structure.',
+              enum: ["terse", "readers"],
             },
           },
           required: ["language_code_chirho", "book_name_chirho", "glosses_chirho"],
@@ -636,8 +649,9 @@ ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLU
 
         const sortedVersesChirho = Array.from(verseGroupsChirho.entries()).sort((aChirho, bChirho) => aChirho[0].localeCompare(bChirho[0]));
 
-        // Create output directory
-        const outDirChirho = joinChirho(process.cwd(), 'translations-chirho', `${bookNameChirho.toLowerCase()}-${langCodeChirho}-chirho`);
+        // Create output directory: translations-chirho/{type}-chirho/{lang}-chirho/{book}-chirho/
+        const typeChirho = (argsChirho?.translation_type_chirho as string) ?? 'terse';
+        const outDirChirho = joinChirho(process.cwd(), 'translations-chirho', `${typeChirho}-chirho`, `${langCodeChirho}-chirho`, `${bookNameChirho.toLowerCase()}-chirho`);
         mkdirSyncChirho(outDirChirho, { recursive: true });
 
         const headerChirho = `-- For God so loved the world, that He gave His only begotten Son,
@@ -649,13 +663,16 @@ ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLU
         // Statement 1: Creates phrase + phrase_word if they don't exist
         // Statement 2: Always inserts/updates gloss (works whether phrase existed or was just created)
         // Note: source is enum {USER, IMPORT}, model tracked in comments
+        // translation_type_chirho: NULL = terse, 'readers' = natural reading
+        const translationTypeValueChirho = typeChirho === 'readers' ? `'readers'` : 'NULL';
         const genWordSqlChirho = (wIdChirho: string, glChirho: string, txtChirho: string, lemChirho: string) => `-- ${wIdChirho}: ${txtChirho} (${lemChirho}) → "${glChirho}" [${modelChirho}]
 WITH np AS (
-  INSERT INTO phrase (language_id, created_at)
-  SELECT (SELECT id FROM language WHERE code = '${langCodeChirho}'), NOW()
+  INSERT INTO phrase (language_id, created_at, translation_type_chirho)
+  SELECT (SELECT id FROM language WHERE code = '${langCodeChirho}'), NOW(), ${translationTypeValueChirho}
   WHERE NOT EXISTS (
     SELECT 1 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
     WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL
+      AND p.translation_type_chirho IS NOT DISTINCT FROM ${translationTypeValueChirho}
   )
   RETURNING id
 )
@@ -664,6 +681,7 @@ INSERT INTO gloss (phrase_id, gloss, state, updated_at, source)
 SELECT p.id, '${escChirho(glChirho)}', 'UNAPPROVED', NOW(), '${sourceChirho}'
 FROM phrase p JOIN phrase_word pw ON pw.phrase_id = p.id
 WHERE pw.word_id = '${wIdChirho}' AND p.language_id = (SELECT id FROM language WHERE code = '${langCodeChirho}') AND p.deleted_at IS NULL
+  AND p.translation_type_chirho IS NOT DISTINCT FROM ${translationTypeValueChirho}
 ON CONFLICT (phrase_id) DO UPDATE SET gloss = EXCLUDED.gloss, updated_at = EXCLUDED.updated_at, source = EXCLUDED.source;\n`;
 
         let filesGeneratedChirho = 0;
