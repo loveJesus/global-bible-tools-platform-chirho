@@ -90,6 +90,7 @@ The `.claude/skills/` directory contains skill files that Claude Code uses for c
 | `sword-modules-chirho` | SWORD module creation and repository management |
 | `font-merging-chirho` | Font subsetting and merging for multi-script PDFs |
 | `r2-media-chirho` | Cloudflare R2 storage for PDFs and media files |
+| `publish-language-chirho` | End-to-end checklist: SQL import → PDF → R2 → downloads page → production deploy |
 
 These skills are automatically loaded by Claude Code and enforce our development standards.
 
@@ -501,21 +502,46 @@ bun run generate-sql-chirho fra translations.json
 | Type | `translation_type_chirho` | Description |
 |------|--------------------------|-------------|
 | **Terse** | `NULL` (default) | Strict word-by-word interlinear, particles hyphenated |
-| **Readers** | `'readers'` | Natural readable glosses, smooth target-language phrasing |
+| **Readers** | `'readers'` | Natural readable glosses, contextually smooth phrasing |
+
+**CRITICAL — Source Word Order Must Be Preserved (Both Types):**
+This is an **interlinear** Bible. Each gloss sits directly under its source word in the PDF/reader.
+The gloss order MUST match the original Hebrew/Greek word order — NEVER reorder glosses to match
+target language grammar. Instead, choose glosses that read as naturally as possible **in the
+original source language order**. The reader sees source text above and glosses below, word by word.
 
 **Common rules (both types):**
-1. Each Hebrew/Greek word gets a translation
-2. **Lemma consistency** - Same root word → same translation
+1. **One gloss per source word** — in the order of the original language
+2. **Lemma consistency** — Same root word → same translation
 3. **Names transliterated from Greek** with accents (e.g., Iēsoûs, Christós, Pétros)
+4. **Source word order preserved** — glosses must align with source words positionally
+
+**En-dash word separation (BOTH types):**
+- Multi-word glosses use en-dash (–) as separator: "the–heavens", "in–beginning", "and–said"
+- This applies to BOTH terse and readers modes
+- En-dashes are important for the interlinear display and can be filtered for other uses
 
 **Terse-specific:**
-- Particles hyphenated with n-dash: "the–heavens", "in–beginning"
-- Word order preserved unless meaning would be lost
+- Maximally literal, dictionary-style glosses
+- Strict morphological mapping
 
 **Readers-specific:**
-- Natural target-language word order
-- Smooth, readable glosses (still one per source word)
-- Particles as natural constructions
+- One gloss per source word, **in source word order** (same positional alignment as terse)
+- Choose the most contextually natural gloss for each word so the line reads as smoothly as possible in source word order
+- Word order *within* a multi-word gloss may differ from terse for naturalness
+- Still uses en-dashes for multi-word glosses (same as terse)
+- The difference from terse is gloss *quality/naturalness* and even word-within-gloss order
+- **Square brackets for translator-supplied words:** Any word in the gloss that is NOT encoded in the source word's morphology must be wrapped in square brackets `[word]`. This makes transparent what the original text says vs. what the translator added for readability.
+  - **Bracket these** (not in source morphology):
+    - "a/an" — Hebrew has no indefinite article, ever. Always bracket: `[an]–apple`
+    - "the" when NO definite article is present — e.g., `בְּרֵאשִׁית` (shva under Beth = no article) → `in–[the]–beginning`
+    - "is/are/was" in verbless clauses — Hebrew often has no copula: `God [is] good`
+    - Supplied pronouns, connectors, or any word needed for target grammar but absent from source
+  - **Do NOT bracket these** (encoded in source morphology):
+    - "in" from Hebrew Beth prefix (ב) — it IS the prefix
+    - "the" when the definite article IS absorbed — e.g., `בַּתַּפּוּחַ` (patach under Beth = absorbed הַ) → `in–the–apple` (no brackets)
+    - "the" from a Greek article word (ὁ, ἡ, τό) — it IS the source word
+    - Any meaning directly encoded in the source word's prefixes, suffixes, or root
 
 ### Token-Efficient Translation Workflow (MCP Tools)
 
