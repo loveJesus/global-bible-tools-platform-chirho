@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+
+# SvelteKit
+.svelte-kit/
+build/
+
+# Wrangler
+.wrangler/
+
+# output
+out/
+dist/
+*.tgz
+
+# logs
+logs/
+*.log
+
+# dotenv
+.env
+.env.*
+!.env.example
+
+# caches
+.eslintcache
+.cache/
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Bun
+bun.lockb

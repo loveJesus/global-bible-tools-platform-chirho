@@ -1,0 +1,30 @@
+{
+  "name": "workers-platform-chirho",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev-chirho": "wrangler dev",
+    "build-chirho": "vite build",
+    "preview-chirho": "wrangler dev --local",
+    "deploy-chirho": "wrangler deploy",
+    "check-chirho": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "@sveltejs/adapter-cloudflare": "^6.0.0",
+    "@sveltejs/kit": "^2.50.0",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@tailwindcss/vite": "^4.1.18",
+    "svelte": "^5",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "sveltekit-i18n": "^2.4.2",
+    "zod": "^4.3.5"
+  }
+}
