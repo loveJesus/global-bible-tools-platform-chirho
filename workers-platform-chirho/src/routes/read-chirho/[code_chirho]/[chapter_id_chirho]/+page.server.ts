@@ -121,11 +121,23 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, url: ur
 	}
 
 	// =========================================================================
-	// HOT PATH: Single query for entire chapter (replaces PG LATERAL JOIN loop)
-	// Uses a subquery for phrase+gloss to avoid duplicate rows when a word
-	// has both terse and readers phrases in phrase_word.
+	// HOT PATH: flattened joins so SQLite uses the real indexes instead of
+	// materializing the phrase+gloss subquery and building an automatic
+	// covering index on every request.
 	// =========================================================================
 	const typeFilterChirho = isNotDistinctFromD1Chirho('p.translation_type_chirho');
+	const ipaJoinChirho = ipaParamChirho === 'off'
+		? ''
+		: 'LEFT JOIN word_ipa_chirho ipa ON ipa.word_text_chirho = w.text';
+	const ipaSelectChirho = ipaParamChirho === 'off'
+		? 'NULL AS ipaChirho'
+		: `CASE ?1
+				WHEN 'erasmian' THEN ipa.greek_erasmian_chirho
+				WHEN 'koine' THEN ipa.greek_koine_chirho
+				WHEN 'modern' THEN ipa.greek_modern_chirho
+				WHEN 'tiberian' THEN ipa.hebrew_tiberian_chirho
+				ELSE COALESCE(ipa.hebrew_tiberian_chirho, ipa.greek_erasmian_chirho)
+			END AS ipaChirho`;
 
 	const chapterWordsChirho = await queryD1Chirho<ChapterWordRowChirho>(
 		dbChirho,
@@ -136,34 +148,20 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, url: ur
 			w.text,
 			lf.lemma_id AS lemmaId,
 			lf.grammar,
-			pg.gloss,
-			pg.state,
-			pg.source,
-			CASE ?1
-				WHEN 'erasmian' THEN ipa.greek_erasmian_chirho
-				WHEN 'koine' THEN ipa.greek_koine_chirho
-				WHEN 'modern' THEN ipa.greek_modern_chirho
-				WHEN 'tiberian' THEN ipa.hebrew_tiberian_chirho
-				ELSE COALESCE(ipa.hebrew_tiberian_chirho, ipa.greek_erasmian_chirho)
-			END AS ipaChirho
-		FROM word w
-		JOIN verse v ON v.id = w.verse_id
+			g.gloss,
+			g.state,
+			g.source,
+			${ipaSelectChirho}
+		FROM verse v
+		JOIN word w ON w.verse_id = v.id
 		LEFT JOIN lemma_form lf ON lf.id = w.form_id
-		LEFT JOIN word_ipa_chirho ipa ON ipa.word_text_chirho = w.text
-		LEFT JOIN (
-			SELECT pw.word_id, g.gloss, g.state, g.source
-			FROM phrase_word pw
-			JOIN phrase p ON p.id = pw.phrase_id
-				AND p.language_id = ?2
-				AND p.deleted_at IS NULL
-				AND ${typeFilterChirho}
-			LEFT JOIN gloss g ON g.phrase_id = p.id
-			WHERE pw.word_id IN (
-				SELECT w2.id FROM word w2
-				JOIN verse v2 ON v2.id = w2.verse_id
-				WHERE v2.book_id = ?5 AND v2.chapter = ?6
-			)
-		) pg ON pg.word_id = w.id
+		${ipaJoinChirho}
+		LEFT JOIN phrase_word pw ON pw.word_id = w.id
+		LEFT JOIN phrase p ON p.id = pw.phrase_id
+			AND p.language_id = ?2
+			AND p.deleted_at IS NULL
+			AND ${typeFilterChirho}
+		LEFT JOIN gloss g ON g.phrase_id = p.id
 		WHERE v.book_id = ?5 AND v.chapter = ?6
 		ORDER BY v.number, w.id`,
 		[ipaParamChirho, languageChirho.id, translationTypeDbChirho, translationTypeDbChirho, bookIdChirho, chapterChirho]
