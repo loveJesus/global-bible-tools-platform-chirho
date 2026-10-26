@@ -184,7 +184,9 @@ the part before " Interlinear Bible". Include native-script name of the Bible in
 
 The bible.systems homepage (repo `bible.systems-chirho`) hard-codes a grid of PDF links to
 `https://media-global-tools.bible.systems/bibles-chirho/`; add the new PDF there too if it should
-be featured.
+be featured. That repo's `src/lib/data_chirho/global-tools-catalog-chirho.ts` holds the reader
+language count, the PDF count and the featured language cards shown on its homepage and features
+page: bump the counts (and add a card if the language should be featured), then deploy that site.
 
 ---
 

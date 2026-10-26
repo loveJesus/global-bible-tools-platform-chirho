@@ -39,6 +39,12 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
       local/D1. (No origin cert to revoke: the Caddy certs were self-signed.)
 - [x] 11. L.J.: fix the bible.systems links to the PDFs. bible.systems homepage grid and the
       global-tools language pages' PDF buttons pointed at VPS-only paths; repoint both to R2
+- [x] 12. L.J. on the step 11 findings: route www.bible.systems on Cloudflare (was 522); fix the
+      rsword-chirho.bible.systems certificate; inspect the bible.systems source repo and make it
+      public; complete the homepage language cards
+- [ ] 13. L.J.: later, switch the bible.systems repo remote from the embedded GitHub token to our
+      SSH key (not a token or credential helper), then revoke that token. Its 5 unpushed commits
+      (f49f892..f83a882) wait on L.J.'s word to push
 
 ## Outcomes
 
@@ -83,3 +89,25 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
   deploy also turned off the Worker's `*.workers.dev` URL (nothing referenced it); `wrangler.toml`
   now says so explicitly. Reference-text-only PDFs exist nowhere now; generating them into R2 is
   open, after checking each reference text's license.
+- **bible.systems follow-ups (step 12):** www.bible.systems is a proxied CNAME to the apex, but the
+  Worker was bound only to `bible.systems`, so www fell through to the `100::` placeholder (522).
+  The zone route `www.bible.systems/*` now reaches `bible-systems-chirho`, whose
+  `hooks.server.ts` answers with a 301 to `https://bible.systems` keeping path and query
+  (bible.systems commits a531379, f83a882; versions 9f8d5de6 then 0625f8f1, previous 51e1d984).
+  rsword-chirho.bible.systems: GitHub Pages had the custom domain but had never issued a
+  certificate (`https_certificate` null); removing and re-adding the domain through the API got a
+  Let's Encrypt certificate (expires 2027-01-24) and HTTPS is now enforced. GitHub committed
+  "Delete CNAME" (930484a) and "Create CNAME" (92201c3) to loveJesus/rsword-chirho, so the local
+  clone needs a pull. loveJesus/bible.systems-chirho is public, after gitleaks over all 53
+  commits, a token-pattern and PII scan, a content-license review (KJV and TSK public domain) and
+  a check of GitHub extras (no Actions, issues, releases, tags or wiki). Its homepage GitHub links
+  had pointed at `loveJesus/gh_chirho` since 25d68d4 (that name redirects to
+  semantic-lexicon-chirho); they now use `SOURCE_REPO_URL_CHIRHO`. An MIT LICENSE (the site already
+  said MIT) and a real README are committed locally (14d8b9a). Language cards: production D1 has
+  glosses in all 66 books for each of the 11 featured languages, so all read "66 books"; the site
+  said 43 languages and 19 PDFs, production has 29 and 35. The counts and cards now live in
+  `src/lib/data_chirho/global-tools-catalog-chirho.ts` there (6ff126d). D1 also showed gaps worth a
+  re-sync check: Swahili 1 Samuel 28% of words glossed, Hindi Hosea 55%, Bengali Revelation 78%,
+  Russian Romans 87%. That repo's Svelte 5.46.1 (acorn 8.15.0, acorn-typescript 1.0.8) cannot
+  parse `type`, `interface` or annotations in `.svelte` scripts (only `as const`), which is why its
+  28 remaining svelte-check errors cannot be fixed in the components yet.
