@@ -78,7 +78,7 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
   links to the VPS's on-demand generator (404). Commit 96ec20e moves the 35-entry list into
   `workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts`, so each language page
   shows its interlinear PDFs (29/29 languages, 35 links, all 200 `application/pdf`); Worker
-  version a4ad55e4 (previous df9350ae), built from a clean export because
+  version 90a25d4e at a7ca345 (previous df9350ae), built from a clean export because
   `word-detail-chirho/+server.ts` has someone's uncommitted, never-deployed cache header. That
   deploy also turned off the Worker's `*.workers.dev` URL (nothing referenced it); `wrangler.toml`
   now says so explicitly. Reference-text-only PDFs exist nowhere now; generating them into R2 is
