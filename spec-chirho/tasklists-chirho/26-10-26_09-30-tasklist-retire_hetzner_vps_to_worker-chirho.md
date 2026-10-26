@@ -31,7 +31,7 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
       history, untracked scripts, `static/downloads-chirho`, `static/sword-modules`,
       `/opt/translations-chirho`, `/root`; PDFs only where R2 lacks them
 - [x] 7. Shut down the VPS (`hcloud server shutdown 117871386`)
-- [ ] 8. L.J. decides: delete now / snapshot then delete / keep powered off
+- [x] 8. L.J. decides: delete now / snapshot then delete / keep powered off → snapshot, then delete
 - [x] 9. Docs that still call the VPS production: AGENTS.md, sveltekit README,
       publish-language skill; add the Worker deploy workflow DAG
 - [ ] 10. Follow-ups: rotate keys that lived on the server (2SMTP, R2 if shared, API_KEY), draft a
@@ -54,7 +54,14 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
   to the live counts); `server-files-chirho.tar.gz` 188 MB (5,881 entries, equal to the server-side
   count); the one PDF missing from R2 (`interlinear-por-acf-chirho.pdf`), sha256-verified. 20 of
   22 server PDFs were already on R2 at identical sizes. MinIO was empty.
-- **Server** 117871386 is off and not yet deleted.
+- **Server deleted 10:15 EDT.** Snapshot 448346058 (33.8 GB, labels `retired-chirho=2026-10-26`,
+  `compromised-chirho=true`) is kept in Hetzner: never boot it, delete it after 2026-11-26. Primary
+  IPv4 46.224.100.134 and IPv6 auto-deleted with the server; firewall 11896167 deleted.
+- **Unused IPv4 check (L.J.):** all 8 IPv4s in the Hetzner project (the only project; 136 `.env`
+  files share one token) were attached to servers, and there were no floating IPs, so nothing else
+  to remove. DNS was scanned but not changed: 304 A records / 187 IPs across 100 zones, about 60
+  pointing at Hetzner IPs outside this project (likely clients' or third-party servers). A
+  dangling-record audit would be separate work.
 - **Git remotes:** at L.J.'s direction, renamed our GitHub remotes to the standard `gh_chirho`
   (platform: was `github_chirho`; `sveltekit2-platform-chirho` and `sword-repo-chirho`: were
   `origin`). `nextjs-platform-chirho` keeps `origin` (upstream globalbibletools).
