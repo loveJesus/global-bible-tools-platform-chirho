@@ -37,6 +37,8 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
 - [ ] 10. Follow-ups: rotate keys that lived on the server (2SMTP, R2 if shared, API_KEY), draft a
       note to the 13 users for L.J., compare prod-only data (users, feedback, gloss_history) with
       local/D1. (No origin cert to revoke: the Caddy certs were self-signed.)
+- [x] 11. L.J.: fix the bible.systems links to the PDFs. bible.systems homepage grid and the
+      global-tools language pages' PDF buttons pointed at VPS-only paths; repoint both to R2
 
 ## Outcomes
 
@@ -65,3 +67,19 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
 - **Git remotes:** at L.J.'s direction, renamed our GitHub remotes to the standard `gh_chirho`
   (platform: was `github_chirho`; `sveltekit2-platform-chirho` and `sword-repo-chirho`: were
   `origin`). `nextjs-platform-chirho` keeps `origin` (upstream globalbibletools).
+- **PDF links (step 11):** the bible.systems homepage (separate Worker `bible-systems-chirho`, repo
+  `/Volumes/ENC_4TB_WDB_CHIRHO/dev-aleluya/personal-aleluya/bible.systems-chirho`) linked 19 PDFs
+  at `global-tools.bible.systems/bibles-chirho/`, which only the VPS served; they now point at R2
+  (`media-global-tools.bible.systems/bibles-chirho/`), and two reader links were fixed (`cmn` →
+  `zho`, `eng/jhn/3` → `eng/43003`). Commit f49f892 there, deployed as version 51e1d984 (previous
+  01ff88b5), built from a clean worktree: that repo's working tree holds someone's uncommitted
+  2026-03-14 global-tools → global-chirho link swap, left in place with its PDF lines moved to R2.
+  On global-tools, every `/read-chirho/<code>` page's only PDF buttons were "reference text only"
+  links to the VPS's on-demand generator (404). Commit 96ec20e moves the 35-entry list into
+  `workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts`, so each language page
+  shows its interlinear PDFs (29/29 languages, 35 links, all 200 `application/pdf`); Worker
+  version a4ad55e4 (previous df9350ae), built from a clean export because
+  `word-detail-chirho/+server.ts` has someone's uncommitted, never-deployed cache header. That
+  deploy also turned off the Worker's `*.workers.dev` URL (nothing referenced it); `wrangler.toml`
+  now says so explicitly. Reference-text-only PDFs exist nowhere now; generating them into R2 is
+  open, after checking each reference text's license.
