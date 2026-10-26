@@ -7,6 +7,7 @@ import { error as errorChirho } from '@sveltejs/kit';
 import { resolveLanguageDbChirho } from '$lib/server/d1-resolver-chirho';
 import { queryD1Chirho, queryD1OneChirho } from '$lib/server/db-d1-chirho';
 import { getBookNameChirho } from '$lib/shared-chirho/book-names-chirho';
+import { pdfDownloadsForLanguageChirho, pdfShortLabelChirho } from '$lib/shared-chirho/pdf-downloads-chirho';
 
 interface LanguageRowChirho {
 	id: string;
@@ -18,14 +19,6 @@ interface LanguageRowChirho {
 interface BookRowChirho {
 	id: number;
 	name: string;
-}
-
-interface RefVersionRowChirho {
-	id: number;
-	code: string;
-	name: string;
-	language_code: string;
-	verseCount: number;
 }
 
 export const load: PageServerLoadChirho = async ({ params: paramsChirho, platform: platformChirho }) => {
@@ -51,16 +44,6 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, platfor
 		`SELECT id, name FROM book ORDER BY id`
 	);
 
-	// Reference versions for this language (simple lookup, no count)
-	const referenceVersionsChirho = await queryD1Chirho<RefVersionRowChirho>(
-		dbChirho,
-		`SELECT id, code, name, language_code, 0 AS verseCount
-		 FROM reference_version_chirho
-		 WHERE language_code = ?
-		 ORDER BY name`,
-		[codeChirho]
-	);
-
 	return {
 		codeChirho,
 		languageChirho: {
@@ -73,14 +56,12 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, platfor
 			idChirho: bChirho.id,
 			nameChirho: getBookNameChirho(bChirho.id, codeChirho)
 		})),
-		referenceVersionsChirho: referenceVersionsChirho.map((vChirho) => ({
-			idChirho: vChirho.id,
-			codeChirho: vChirho.code,
-			nameChirho: vChirho.name,
-			languageCodeChirho: vChirho.language_code,
-			verseCountChirho: vChirho.verseCount
-		})),
-		hasInterlinearPdfChirho: false,
-		interlinearVersionsChirho: [] as Array<{ pdfPathChirho: string; nameChirho: string; badgeChirho: string | null }>
+		// Interlinear PDFs on R2. Reference-text-only PDFs were generated on demand by the retired
+		// VPS (/api-chirho/pdf-chirho/full-bible-chirho/*); nothing on the Worker serves them.
+		interlinearVersionsChirho: pdfDownloadsForLanguageChirho(codeChirho).map((pdfChirho) => ({
+			pdfPathChirho: pdfChirho.pathChirho,
+			nameChirho: pdfShortLabelChirho(pdfChirho),
+			badgeChirho: pdfChirho.badgeChirho ?? null
+		}))
 	};
 };

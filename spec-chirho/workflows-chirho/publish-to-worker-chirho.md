@@ -20,11 +20,17 @@ flowchart TD
   create_chirho --> sync_chirho["d1-migration-chirho/sync-per-language-chirho.ts LANG --remote"]
   sync_chirho --> stats_chirho["update-stats-chirho.ts"]
   stats_chirho --> verify_chirho["verify-d1-data-chirho.ts"]
-  r2_chirho --> downloads_chirho["Worker downloads page entry"]
+  r2_chirho --> catalog_chirho["PDF catalog entry: workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts"]
   verify_chirho --> deploy_chirho["workers-platform-chirho: build-chirho, deploy-chirho"]
-  downloads_chirho --> deploy_chirho
+  catalog_chirho --> deploy_chirho
   deploy_chirho --> live_chirho["global-tools.bible.systems + global-chirho.bible.systems"]
+  r2_chirho -. optional .-> home_chirho["bible.systems homepage PDF grid (repo bible.systems-chirho)"]
 ```
+
+The PDF catalog feeds both the downloads page and the PDF buttons on `/read-chirho/<code>`. Every
+PDF link points at R2 (`media-global-tools.bible.systems`); nothing on the Worker serves PDFs or
+generates them, so links to `global-tools.bible.systems/bibles-chirho/*.pdf` or
+`/api-chirho/pdf-chirho/*` (old VPS paths) are broken.
 
 `wrangler deploy` replaces the Worker's custom-domain set with the `routes` list in
 `workers-platform-chirho/wrangler.toml`, so both hostnames must stay listed there.

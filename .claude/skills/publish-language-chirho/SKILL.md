@@ -153,28 +153,38 @@ tel: [
 ],
 ```
 
-This drives the **Download PDF** button on the reader page (`/read-chirho/tel`).
+This drives the **Download PDF** button in the local SvelteKit app. Production's buttons come
+from the Worker catalog in Step 5.
 
 ---
 
-## Step 5: Add to Downloads Page
+## Step 5: Add to the Production PDF Catalog
 
-File: `sveltekit2-platform-chirho/src/routes/downloads-chirho/+page.svelte`
+File: `workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts`
 
-Add to `downloadsChirho` array (before closing `]`):
+Add to `PDF_DOWNLOADS_CHIRHO` (before the closing `]`). The Worker's downloads page lists every
+entry, and `/read-chirho/LANG` shows the entries whose `languageCodeChirho` is `LANG`:
 
 ```typescript
 {
+    languageCodeChirho: 'tel',
     nameChirho: 'Telugu Interlinear Bible (Natural Reading)',
     descriptionChirho: 'Hebrew & Greek text with Telugu natural-reading translation and Telugu IRV (2019) reference text (తెలుగు అంతర్రేఖ బైబిల్)',
-    pathChirho: 'https://media-global-tools.bible.systems/bibles-chirho/interlinear-readers-tel-telirv-chirho.pdf',
+    pathChirho: `${PDF_MEDIA_BASE_URL_CHIRHO}/interlinear-readers-tel-telirv-chirho.pdf`,
     sizeChirho: '??? MB',    // Fill in actual size after Step 2
     versesChirho: '31,102',
     badgeChirho: 'Readers Edition'
 },
 ```
 
-Include native-script name of the Bible in description (like Japanese `日本語逐語対照聖書`).
+Keep `nameChirho` in the form `<Name> Interlinear Bible ...`: the language page's button label is
+the part before " Interlinear Bible". Include native-script name of the Bible in description
+(like Japanese `日本語逐語対照聖書`). The local app's own downloads page
+(`sveltekit2-platform-chirho/src/routes/downloads-chirho/+page.svelte`) is optional.
+
+The bible.systems homepage (repo `bible.systems-chirho`) hard-codes a grid of PDF links to
+`https://media-global-tools.bible.systems/bibles-chirho/`; add the new PDF there too if it should
+be featured.
 
 ---
 
@@ -300,9 +310,9 @@ bun run verify-d1-data-chirho.ts
 
 ## Step 9: Deploy the Worker
 
-Add the PDF entry to `workers-platform-chirho/src/routes/downloads-chirho/+page.svelte`, then:
+With the catalog entry from Step 5 in place:
 ```bash
-git add workers-platform-chirho/src/routes/downloads-chirho/+page.svelte workers-platform-chirho/wrangler.toml
+git add workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts workers-platform-chirho/wrangler.toml
 git add tools-chirho/generate-sword-module-chirho.ts
 git commit -m "Publish LANG readers interlinear Bible on the Worker"
 git push gh_chirho main_chirho
@@ -318,7 +328,8 @@ and is no longer deployed anywhere.
 
 Verify live:
 - https://global-tools.bible.systems/downloads-chirho — new entry appears
-- https://global-tools.bible.systems/read-chirho/LANG — the reader loads the language
+- https://global-tools.bible.systems/read-chirho/LANG — the reader loads the language and shows its
+  PDF button
 - https://sword-modules-chirho.bible.systems — new module listed
 
 ---
@@ -332,8 +343,8 @@ Verify live:
 - [ ] PDF generated and opens correctly
 - [ ] PDF size noted (for downloads page)
 - [ ] PDF uploaded to R2, HTTP 200 confirmed
-- [ ] `interlinear-pdfs-chirho.ts` updated (drives reader page Download button)
-- [ ] `downloads-chirho/+page.svelte` updated with correct size
+- [ ] `interlinear-pdfs-chirho.ts` updated (local app's reader Download button)
+- [ ] Worker catalog `pdf-downloads-chirho.ts` entry added (correct size, `languageCodeChirho`)
 - [ ] Telugu added to `LANGUAGE_NAMES_CHIRHO` in `generate-sword-module-chirho.ts`
 - [ ] SWORD module generated
 - [ ] Module zip copied to `sword-repo-chirho/raw/`
@@ -342,8 +353,8 @@ Verify live:
 - [ ] `index.html` updated with new language row
 - [ ] sword-repo-chirho committed and pushed
 - [ ] D1 database + `DB_LANG_<CODE>_CHIRHO` binding exist; language synced; `verify-d1-data-chirho.ts` passes
-- [ ] Worker downloads page updated; Worker built and deployed
-- [ ] Downloads page live with new entry
+- [ ] Worker built and deployed
+- [ ] Downloads page and `/read-chirho/LANG` show the new PDF
 - [ ] Reader loads the language: `/read-chirho/LANG`
 - [ ] SWORD repo lists new module: `https://sword-modules-chirho.bible.systems`
 - [ ] MEMORY.md updated (PDF size, completion date)
