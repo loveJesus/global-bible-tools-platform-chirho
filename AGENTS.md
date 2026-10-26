@@ -214,22 +214,31 @@ cargo leptos build --release
 
 ## SvelteKit Platform (Primary)
 
-The `sveltekit2-platform-chirho/` directory is our primary development environment.
-**Production:** https://global-tools.bible.systems
+The `sveltekit2-platform-chirho/` directory is our primary development environment (translation
+UI, auth, admin, PDF tooling). It runs locally only.
 
-### Production VPS (Hetzner)
-- **IP:** 46.224.100.134
-- **SSH:** `ssh root@46.224.100.134`
-- **App Directory:** `/opt/app-chirho`
-- **Deployment Repo:** Uses `global-bible-tools-sveltekit-chirho` (separate from platform repo)
+### Production: Cloudflare Worker
+**https://global-tools.bible.systems** (also global-chirho.bible.systems) is served by the Worker
+`bible-reader-chirho` in `workers-platform-chirho/`: SvelteKit on Workers, reading one D1 database
+per language. It covers the landing page, reader, downloads, feedback, word detail and
+`/api-chirho/v1-chirho/*`. Login, translate and admin exist only in the local SvelteKit app.
+
+Both hostnames are Workers custom domains declared in `workers-platform-chirho/wrangler.toml`.
+`wrangler deploy` replaces the Worker's custom-domain set with that list, so keep both entries.
+Publishing a language's data means syncing it to D1 (see the `publish-language-chirho` skill).
 
 **To deploy updates:**
 ```bash
-ssh root@46.224.100.134
-cd /opt/app-chirho
-git pull origin main_chirho
-docker compose down && docker compose up -d --build
+cd workers-platform-chirho
+bun run build-chirho
+bun run deploy-chirho
 ```
+
+**Retired 2026-10-26:** the Hetzner VPS (46.224.100.134, `/opt/app-chirho`) that used to serve
+global-tools ran `vite dev` with Postgres, MinIO and dev-server ports open to the internet, and
+both Postgres containers were compromised by a cryptominer. It was backed up to the encrypted
+volume and shut down; do not redeploy it. Details:
+`spec-chirho/tasklists-chirho/26-10-26_09-30-tasklist-retire_hetzner_vps_to_worker-chirho.md`
 
 ### Running Locally
 ```bash

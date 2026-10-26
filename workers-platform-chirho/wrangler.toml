@@ -8,12 +8,15 @@ compatibility_date = "2025-02-26"
 compatibility_flags = ["nodejs_compat"]
 account_id = "aecd5616f7ef88323e52b6406ba384bd"
 
+# Custom domains. Must stay above [assets]: keys after a table header belong to that table.
+# `wrangler deploy` replaces the Worker's custom-domain set with this list, so keep both.
+routes = [
+  { pattern = "global-tools.bible.systems", custom_domain = true },
+  { pattern = "global-chirho.bible.systems", custom_domain = true }
+]
+
 [assets]
 directory = ".svelte-kit/cloudflare"
-
-routes = [
-  { pattern = "global-chirho.bible.systems/*", zone_name = "bible.systems" }
-]
 
 # Meta database — language listing, stats, feedback
 [[d1_databases]]

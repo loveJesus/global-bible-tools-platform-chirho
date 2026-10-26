@@ -266,59 +266,59 @@ Find the table of languages in `index.html` and add a row following the existing
 cd sword-repo-chirho
 git add raw/LJMTIntTelRChirho.zip mods.d/ljmtinttelrchirho.conf mods.d.tar.gz index.html
 git commit -m "Add Telugu readers interlinear module LJMTIntTelRChirho"
-git push origin main
+git push gh_chirho main
 # Auto-deploys via GitHub Pages to https://sword-modules-chirho.bible.systems
 ```
 
 ---
 
-## Step 8: Import SQL to Production DB
+## Step 8: Sync the Language to D1 (Production Reads D1)
 
+Production (https://global-tools.bible.systems) is the Cloudflare Worker `bible-reader-chirho`
+in `workers-platform-chirho/`. It reads one D1 database per language, resolved by binding name
+`DB_LANG_<CODE>_CHIRHO`. The Hetzner VPS and its Postgres were retired on 2026-10-26 after a
+compromise: never `ssh root@46.224.100.134` or import into `app-chirho-db-chirho-1` again.
+
+For a language with no D1 database yet:
 ```bash
-# Option A: Tar + copy + SSH import
-tar czf /tmp/LANG-sql-chirho.tar.gz translations-chirho/readers-chirho/LANG-chirho/
-
-scp /tmp/LANG-sql-chirho.tar.gz root@46.224.100.134:/tmp/
-
-ssh root@46.224.100.134 << 'EOF'
-cd /tmp && tar xzf LANG-sql-chirho.tar.gz
-for d in translations-chirho/readers-chirho/LANG-chirho/*/; do
-    cat "$d/all-verses-chirho.sql" | docker exec -i app-chirho-db-chirho-1 psql -U postgres -q
-done
-echo "Production import done"
-EOF
+cd d1-migration-chirho
+bunx wrangler d1 create bible-lang-LANG-chirho
+# Add LANG to LANGUAGES_CHIRHO in create-language-dbs-chirho.sh so the list stays complete
+bunx wrangler d1 list --json | bun run wrangler-bindings-gen-chirho.ts
+# Paste the DB_LANG_LANG_CHIRHO entry into workers-platform-chirho/wrangler.toml
 ```
 
-Verify on production:
+Sync from the local Postgres (the source of truth), refresh stats, verify:
 ```bash
-ssh root@46.224.100.134 "docker exec app-chirho-db-chirho-1 psql -U postgres -t -c \
-  \"SELECT COUNT(*) FROM phrase p JOIN language l ON l.id = p.language_id \
-    WHERE l.code = 'LANG' AND p.deleted_at IS NULL \
-    AND p.translation_type_chirho IS NOT DISTINCT FROM 'readers';\""
+cd d1-migration-chirho
+bun run sync-per-language-chirho.ts LANG --remote
+bun run update-stats-chirho.ts
+bun run verify-d1-data-chirho.ts
 ```
 
 ---
 
-## Step 9: Deploy SvelteKit
+## Step 9: Deploy the Worker
 
+Add the PDF entry to `workers-platform-chirho/src/routes/downloads-chirho/+page.svelte`, then:
 ```bash
-git add sveltekit2-platform-chirho/src/lib/server/interlinear-pdfs-chirho.ts
-git add sveltekit2-platform-chirho/src/routes/downloads-chirho/+page.svelte
-git add sveltekit2-platform-chirho/static/fonts-chirho/  # if font was fixed
+git add workers-platform-chirho/src/routes/downloads-chirho/+page.svelte workers-platform-chirho/wrangler.toml
 git add tools-chirho/generate-sword-module-chirho.ts
-git commit -m "Add Telugu readers interlinear Bible: PDF, SWORD module, downloads page"
-git push origin main_chirho
+git commit -m "Publish LANG readers interlinear Bible on the Worker"
+git push gh_chirho main_chirho
 
-ssh root@46.224.100.134 << 'EOF'
-cd /opt/app-chirho
-git pull origin main_chirho
-docker compose down && docker compose up -d --build
-EOF
+cd workers-platform-chirho
+bun run build-chirho
+bun run deploy-chirho   # wrangler.toml lists both custom domains; a deploy replaces the set
 ```
 
-Verify live (after ~60s):
+Commit the local SvelteKit app changes (`interlinear-pdfs-chirho.ts`, its downloads page, fonts)
+inside `sveltekit2-platform-chirho/` as before; that app is the local translation environment
+and is no longer deployed anywhere.
+
+Verify live:
 - https://global-tools.bible.systems/downloads-chirho — new entry appears
-- https://global-tools.bible.systems/read-chirho/LANG — **Download PDF** button visible
+- https://global-tools.bible.systems/read-chirho/LANG — the reader loads the language
 - https://sword-modules-chirho.bible.systems — new module listed
 
 ---
@@ -341,9 +341,9 @@ Verify live (after ~60s):
 - [ ] `mods.d.tar.gz` regenerated
 - [ ] `index.html` updated with new language row
 - [ ] sword-repo-chirho committed and pushed
-- [ ] SQL imported to production DB — phrase count matches local
-- [ ] SvelteKit committed, pushed, and deployed
+- [ ] D1 database + `DB_LANG_<CODE>_CHIRHO` binding exist; language synced; `verify-d1-data-chirho.ts` passes
+- [ ] Worker downloads page updated; Worker built and deployed
 - [ ] Downloads page live with new entry
-- [ ] Reader page shows Download PDF button: `/read-chirho/LANG`
+- [ ] Reader loads the language: `/read-chirho/LANG`
 - [ ] SWORD repo lists new module: `https://sword-modules-chirho.bible.systems`
 - [ ] MEMORY.md updated (PDF size, completion date)
