@@ -38,12 +38,9 @@
 		if (browserChirho) {
 			localStorage.setItem('translationTypeChirho', typeChirho);
 		}
+		// Always name the type: without ?type= the server picks per chapter and may pick readers.
 		const urlChirho = new URL(window.location.href);
-		if (typeChirho === 'readers') {
-			urlChirho.searchParams.set('type', 'readers');
-		} else {
-			urlChirho.searchParams.delete('type');
-		}
+		urlChirho.searchParams.set('type', typeChirho);
 		gotoChirho(urlChirho.pathname + urlChirho.search);
 	}
 

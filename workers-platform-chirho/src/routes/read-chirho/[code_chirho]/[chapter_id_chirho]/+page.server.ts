@@ -9,6 +9,7 @@ import { resolveLanguageDbChirho, getMetaDbChirho } from '$lib/server/d1-resolve
 import { queryD1Chirho, queryD1OneChirho, isNotDistinctFromD1Chirho } from '$lib/server/db-d1-chirho';
 import type { BookRowChirho, ReferenceVersionRowChirho, ReferenceVerseRowChirho } from '$lib/server/db-d1-chirho';
 import { getBookNameChirho } from '$lib/shared-chirho/book-names-chirho';
+import { chooseTranslationTypeChirho, countChapterGlossesChirho } from '$lib/server/translation-type-chirho';
 
 // ============================================================================
 // Types
@@ -98,15 +99,10 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, url: ur
 	const hasTerseChirho = Boolean(typeCheckChirho?.hasTerseChirho);
 	const hasReadersChirho = Boolean(typeCheckChirho?.hasReadersChirho);
 
-	// Determine effective type
-	let effectiveTypeChirho: 'terse' | 'readers';
-	if (typeParamChirho === 'readers' && hasReadersChirho) {
-		effectiveTypeChirho = 'readers';
-	} else if (typeParamChirho === 'terse' && hasTerseChirho) {
-		effectiveTypeChirho = 'terse';
-	} else {
-		effectiveTypeChirho = hasTerseChirho ? 'terse' : (hasReadersChirho ? 'readers' : 'terse');
-	}
+	const effectiveTypeChirho = await chooseTranslationTypeChirho(
+		{ requestedChirho: typeParamChirho, hasTerseChirho, hasReadersChirho },
+		() => countChapterGlossesChirho(dbChirho, languageChirho.id, bookIdChirho, chapterChirho)
+	);
 
 	const translationTypeDbChirho: string | null = effectiveTypeChirho === 'readers' ? 'readers' : null;
 

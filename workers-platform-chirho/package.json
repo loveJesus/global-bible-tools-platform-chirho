@@ -8,7 +8,8 @@
     "build-chirho": "vite build",
     "preview-chirho": "wrangler dev --local",
     "deploy-chirho": "wrangler deploy",
-    "check-chirho": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+    "check-chirho": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "test-chirho": "bun test tests-chirho"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
