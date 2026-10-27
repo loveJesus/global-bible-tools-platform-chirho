@@ -25,7 +25,7 @@ flowchart TD
   catalog_chirho --> deploy_chirho
   deploy_chirho --> live_chirho["global-tools.bible.systems + global-chirho.bible.systems"]
   r2_chirho -. optional .-> home_chirho["bible.systems homepage PDF grid (repo bible.systems-chirho)"]
-  live_chirho -. counts .-> counts_chirho["bible.systems language + PDF counts: global-tools-catalog-chirho.ts (repo bible.systems-chirho)"]
+  live_chirho -. counts .-> counts_chirho["bible.systems language, PDF + SWORD counts: global-tools-catalog-chirho.ts (repo bible.systems-chirho)"]
 ```
 
 The PDF catalog feeds both the downloads page and the PDF buttons on `/read-chirho/<code>`. Every

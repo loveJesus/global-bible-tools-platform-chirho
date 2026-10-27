@@ -110,6 +110,9 @@ GlobalOptionFilter=OSISGlosses
 6. Add to `sword-repo-chirho/raw/` and `sword-repo-chirho/mods.d/`
 7. Regenerate `mods.d.tar.gz`
 8. Commit and push to GitHub
+9. A new language: bump `SWORD_MODULE_LANGUAGE_COUNT_CHIRHO` in the bible.systems repo's
+   `src/lib/data_chirho/global-tools-catalog-chirho.ts` (it counts distinct `Lang=` values, not
+   modules) and deploy that site
 
 ## Note on Module Names
 
