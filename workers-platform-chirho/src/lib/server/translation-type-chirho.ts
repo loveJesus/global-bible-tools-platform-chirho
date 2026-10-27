@@ -17,22 +17,25 @@ export interface TranslationTypeOptionsChirho {
 	hasReadersChirho: boolean;
 }
 
-/** Words in one chapter with a non-empty gloss, per type. */
-export interface ChapterGlossCountsChirho {
-	terseGlossedChirho: number;
-	readersGlossedChirho: number;
+/** A chapter's word count, and how many of its words have a phrase of each type. */
+export interface ChapterCoverageChirho {
+	wordsChirho: number;
+	terseCoveredChirho: number;
+	readersCoveredChirho: number;
 }
 
 /**
- * An explicit ?type= wins when the language has that type. Otherwise terse is the default, unless
- * this chapter's readers glosses outnumber its terse glosses more than two to one: some languages
- * (hin, ben, guj, jpn, tel, tha in 2026-10) have a complete readers edition and only a small terse
- * sample, and a language-wide terse default opened nearly every chapter without glosses. The
- * chapter is counted only when both types exist and none was requested.
+ * An explicit ?type= wins when the language has that type. Otherwise terse is the default wherever
+ * it covers the whole chapter; where it does not, the chapter opens in whichever type covers more of
+ * it. Some languages (hin, ben, guj, jpn, tel, tha in 2026-10) have a complete readers edition and
+ * only a terse sample, and a sample can cover part of a chapter (hin terse: 880 of Matthew 27's
+ * 1,042 words). Coverage counts words that have a phrase, so the edition's deliberate blank glosses
+ * (H0853, paragraph markers) do not make a complete chapter look incomplete. The chapter is counted
+ * only when both types exist and none was requested.
  */
 export async function chooseTranslationTypeChirho(
 	optionsChirho: TranslationTypeOptionsChirho,
-	countGlossesChirho: () => Promise<ChapterGlossCountsChirho>
+	countCoverageChirho: () => Promise<ChapterCoverageChirho>
 ): Promise<TranslationTypeChirho> {
 	const { requestedChirho, hasTerseChirho, hasReadersChirho } = optionsChirho;
 	if (requestedChirho === 'readers' && hasReadersChirho) return 'readers';
@@ -40,34 +43,36 @@ export async function chooseTranslationTypeChirho(
 	if (!hasReadersChirho) return 'terse';
 	if (!hasTerseChirho) return 'readers';
 
-	const { terseGlossedChirho, readersGlossedChirho } = await countGlossesChirho();
-	return readersGlossedChirho > terseGlossedChirho * 2 ? 'readers' : 'terse';
+	const { wordsChirho, terseCoveredChirho, readersCoveredChirho } = await countCoverageChirho();
+	if (terseCoveredChirho >= wordsChirho) return 'terse';
+	return readersCoveredChirho > terseCoveredChirho ? 'readers' : 'terse';
 }
 
 /**
- * Count one chapter's glossed words per type. The LEFT JOINs keep SQLite on the chapter's indexes
- * (verse → word → phrase_word → phrase → gloss); written with inner joins, it may start from the
- * language's whole phrase table instead, which exceeded D1's CPU limit on 2026-10-27.
+ * Count one chapter's words and those with a phrase of each type. The LEFT JOINs keep SQLite on the
+ * chapter's indexes (verse → word → phrase_word → phrase); written with inner joins, it may start
+ * from the language's whole phrase table instead, which exceeded D1's CPU limit on 2026-10-27. A
+ * word with no phrase reaches the CASEs with p.id NULL, so terse needs `p.id IS NOT NULL` as well.
  */
-export async function countChapterGlossesChirho(
+export async function countChapterCoverageChirho(
 	dbChirho: D1Database,
 	languageIdChirho: string,
 	bookIdChirho: number,
 	chapterChirho: number
-): Promise<ChapterGlossCountsChirho> {
+): Promise<ChapterCoverageChirho> {
 	const rowChirho = await dbChirho
 		.prepare(
 			`SELECT
-				COUNT(DISTINCT CASE WHEN p.translation_type_chirho IS NULL AND g.gloss <> '' THEN w.id END) AS terseGlossedChirho,
-				COUNT(DISTINCT CASE WHEN p.translation_type_chirho = 'readers' AND g.gloss <> '' THEN w.id END) AS readersGlossedChirho
+				COUNT(DISTINCT w.id) AS wordsChirho,
+				COUNT(DISTINCT CASE WHEN p.id IS NOT NULL AND p.translation_type_chirho IS NULL THEN w.id END) AS terseCoveredChirho,
+				COUNT(DISTINCT CASE WHEN p.translation_type_chirho = 'readers' THEN w.id END) AS readersCoveredChirho
 			FROM verse v
 			JOIN word w ON w.verse_id = v.id
 			LEFT JOIN phrase_word pw ON pw.word_id = w.id
 			LEFT JOIN phrase p ON p.id = pw.phrase_id AND p.language_id = ?1 AND p.deleted_at IS NULL
-			LEFT JOIN gloss g ON g.phrase_id = p.id
 			WHERE v.book_id = ?2 AND v.chapter = ?3`
 		)
 		.bind(languageIdChirho, bookIdChirho, chapterChirho)
-		.first<ChapterGlossCountsChirho>();
-	return rowChirho ?? { terseGlossedChirho: 0, readersGlossedChirho: 0 };
+		.first<ChapterCoverageChirho>();
+	return rowChirho ?? { wordsChirho: 0, terseCoveredChirho: 0, readersCoveredChirho: 0 };
 }

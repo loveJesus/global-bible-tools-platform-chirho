@@ -9,7 +9,7 @@ import { resolveLanguageDbChirho, getMetaDbChirho } from '$lib/server/d1-resolve
 import { queryD1Chirho, queryD1OneChirho, isNotDistinctFromD1Chirho } from '$lib/server/db-d1-chirho';
 import type { BookRowChirho, ReferenceVersionRowChirho, ReferenceVerseRowChirho } from '$lib/server/db-d1-chirho';
 import { getBookNameChirho } from '$lib/shared-chirho/book-names-chirho';
-import { chooseTranslationTypeChirho, countChapterGlossesChirho } from '$lib/server/translation-type-chirho';
+import { chooseTranslationTypeChirho, countChapterCoverageChirho } from '$lib/server/translation-type-chirho';
 
 // ============================================================================
 // Types
@@ -101,7 +101,7 @@ export const load: PageServerLoadChirho = async ({ params: paramsChirho, url: ur
 
 	const effectiveTypeChirho = await chooseTranslationTypeChirho(
 		{ requestedChirho: typeParamChirho, hasTerseChirho, hasReadersChirho },
-		() => countChapterGlossesChirho(dbChirho, languageChirho.id, bookIdChirho, chapterChirho)
+		() => countChapterCoverageChirho(dbChirho, languageChirho.id, bookIdChirho, chapterChirho)
 	);
 
 	const translationTypeDbChirho: string | null = effectiveTypeChirho === 'readers' ? 'readers' : null;
