@@ -56,8 +56,27 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
         merge verse files that already existed (expand_glosses overwrites a verse file with only
         the words passed, and rewrites the book's all-verses-chirho.sql with only that call's
         words), import only the new blocks, publish with --since, check D1 and the live page
-    - [ ] Batch 1 (running): hin readers Matthew 27 (1,042), ukr readers Jeremiah 49-50 (1,306),
-          ukr readers Jeremiah 51 (905)
+    - [x] Batch 1: hin readers Matthew 27 (1,042), ukr readers Jeremiah 49-50 (1,306), ukr
+          readers Jeremiah 51 (905); all validated, imported, published with --since, checked in
+          D1 and live; translations 172ac7d. hin Matthew 27 still opened in terse (an 880-word
+          terse sample sits in that chapter), so the reader rule changed again: terse only where
+          terse covers every word, else the type covering more (workers 4077b42, version
+          0f0c3911, previous 9a5fed18, cache purged; live: hin Matt 27 and eng Mark 16 open in
+          readers, eng John 3 and jpn Gen 1 stay terse)
+      - [x] hin Matthew 27 review notes: names where the edition disagrees with itself (पिलातुस,
+            राज्यपाल, सरकण्डा, शमौन, बरब्बा…); 27:4 and 27:46 (ἵνα τί → क्यों क्या) copy
+            awkward earlier choices; one bracket in 27:19
+      - [x] ukr Jeremiah 49-50 review notes: lemma tags that do not fit (50:17 H6105a, 50:11
+            H1877, 50:44 H0970), אֲדֹנָי יְהוִה as "Господь БОГ"; full text for review in the
+            scratchpad file review-jer49-50-chirho.txt
+      - [x] ukr Jeremiah 51: 905/905 validated (no missing, no extra, ukr/readers in every
+            block), imported, published (`--since '2026-10-27 21:40'`), D1 905 words / 857 glossed
+            (48 deliberate blanks: 26 H0853, 10 ס, 8 ketiv, 4 prepositions before a direct object),
+            live page checked. 51:15-16 match the edition's 10:12-13 word for word.
+            For review: 51:3 follows the vowels and Ohienko ("Проти…", eng/srp readers chose "let
+            not"), and the DB lemma tags of 2405100306 (H0408) and 2405100309 (H0413) look
+            swapped; the existing Jer 10:14 ("Нерозумний кожен людина від–знання") and 10:16
+            (נַחֲלָתוֹ as "спадкоємця–Його") look wrong and were left as they are
     - [ ] Next: hin Matthew 28 / Hosea 6-14 / Acts 1-5 / Mark 1-7 / Nehemiah; ukr Jeremiah 52,
           Isaiah 2; tel Acts 28, Jeremiah 52, 2 Kings 23-24, 1 Chronicles 29; rus Romans 5-16;
           tur, jav, nep Psalms 83-92, urd Luke 5-7, kor Acts 1-5, ben Hebrews 11-13 / 2-3 John /
