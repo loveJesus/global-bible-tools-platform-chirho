@@ -75,7 +75,7 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
   old `/read-chirho/<book>/<chapter>` URLs. Also found: the feedback form's Turnstile uses
   Cloudflare's always-pass test keys, so it has no bot protection.
 - **Gloss gaps (steps 6-7a):** full report (per-language and 269-row per-book tables, SQL, fix
-  commands) in the session scratchpad, `gloss-gap-report-chirho.md`. D1 equals local Postgres as of
+  commands): `26-10-27_07-20-report-gloss_gaps-chirho.md` beside this tasklist. D1 equals local Postgres as of
   the 2026-03-09/10 sync. 35,396 words have no phrase in their language's main type, across 26
   languages (deu, ita, vie have none); largest swa 13,666, hin 5,541, ukr 3,208, amh 2,748, tel
   2,201, heb 1,690, rus 1,646, tur 1,108. Empty glosses on H0853, G3588, H0413, H5921a, compound
