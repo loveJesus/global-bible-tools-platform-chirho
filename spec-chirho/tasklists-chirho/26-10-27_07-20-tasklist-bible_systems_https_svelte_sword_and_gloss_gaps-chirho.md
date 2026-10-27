@@ -77,11 +77,24 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
             not"), and the DB lemma tags of 2405100306 (H0408) and 2405100309 (H0413) look
             swapped; the existing Jer 10:14 ("Нерозумний кожен людина від–знання") and 10:16
             (נַחֲלָתוֹ as "спадкоємця–Його") look wrong and were left as they are
-    - [ ] Next: hin Matthew 28 / Hosea 6-14 / Acts 1-5 / Mark 1-7 / Nehemiah; ukr Jeremiah 52,
-          Isaiah 2; tel Acts 28, Jeremiah 52, 2 Kings 23-24, 1 Chronicles 29; rus Romans 5-16;
-          tur, jav, nep Psalms 83-92, urd Luke 5-7, kor Acts 1-5, ben Hebrews 11-13 / 2-3 John /
-          Jude; the long tail. Small identical gaps across languages (1 Samuel 16-20, Isaiah 36-37,
-          Mark 16:9-20) look like source words added after those books were translated
+    - [x] Batch 2: hin readers Hosea 6:10-14:9 (1,220; ketiv blank, ¶ for markers as Hosea 1-6
+          does), hin readers Matthew 28 (336), ukr readers Jeremiah 52 (569) + Isaiah 2 (256) +
+          Ezekiel's 155 blank-type tokens (merged into the 111 existing verse files, blocks kept,
+          summary line recomputed); validated, imported, published, D1 and live checked;
+          translations 75cc78e, 41b4b27. Ukrainian readers now lacks only 17 words
+    - [x] Held (not imported), copies on the encrypted volume under
+          `gloss-gaps-held-chirho/26-10-27-chirho/`: hin Acts 1-5 (850 gap words) and ukr Zech
+          5-7 / Hab 1:4 / Job 36:12 (17) with a 175-id realignment proposal. In those verses the
+          existing glosses sit on the wrong source words, so filling only the gaps repeats text
+    - [ ] **Decision for L.J.: re-gloss misaligned verses whole, replacing their glosses.** After
+          batches 1-2, 29,174 words remain and no whole verse is missing anywhere: 10,092 words
+          in 3,231 verses are trailing gaps (the verse's last words; hin 2,064, tel 2,028, rus
+          1,173, tur 820, nep 725, jav 568, urd 469, kor 283, eng 265…), 14,827 are holes (swa
+          12,472, mostly in the VPS dump; amh 616; hin Acts 850; ben 342), 4,255 marker-only.
+          Samples: rus Romans 8:1 shifted one word from τοῖς on; tel Acts 28:1 a Telugu sentence
+          over the first slots; hin Acts 1:1 Θεόφιλε = "येशू"; swa 1 Samuel 14:1 correctly placed
+          but partial. Trailing gaps are the misalignment signature; misaligned verses without
+          gaps (hin Acts 2:31, Zech 5:5) need a separate detector
   - [ ] 7g. Re-sync each changed language (`sync-per-language-chirho.ts LANG --remote
         --skip-source`, ~40-60 min each, upserts only), then update-stats and verify
 - [ ] 8. Downstream of 7: PDFs (R2) and SWORD modules built from gapped data get rebuilt (the
