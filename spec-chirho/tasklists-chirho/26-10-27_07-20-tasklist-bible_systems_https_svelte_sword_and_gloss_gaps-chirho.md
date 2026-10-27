@@ -33,21 +33,47 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
 - [ ] 7. Fill the gaps at their source, then verify in D1 and on the live reader:
   - [x] 7a. Reader default type: languages with a complete readers edition and a small terse
         sample (hin, ben, guj, jpn, tel, tha) no longer open chapters without glosses
-  - [ ] 7b. L.J.: open Docker Desktop at the console (it crashes when an agent session launches
-        it); then back up local Postgres to the encrypted volume before anything else
-  - [ ] 7c. Find or restore the translations-chirho working tree (the link, made 2026-05-11,
-        points at a folder that does not exist; committed SQL through b9d9a64 is in .git/modules)
-  - [ ] 7d. Import committed SQL that never reached Postgres: rus Matthew 4 (430 words), 3 amh words
+  - [x] 7b. Local Postgres found and backed up. It was never in Docker Desktop (no containers or
+        volumes there): it lives in colima (`docker --context colima`, stopped since 2026-10-08).
+        Started with `colima start --activate=false`; `pg_dump -Fc` to the encrypted volume
+        (`local-postgres-backup-chirho/26-10-27-chirho/`, 253 MB + globals), restored into a scratch
+        DB: all 25 tables match row for row, 51/51 indexes. PG equals D1 (newest phrase 2026-03-03)
+  - [x] 7c. Translations working tree restored from the submodule git dir (b9d9a64; GitHub's
+        6e7d7f4 is its parent) at the symlink's target on the encrypted volume: 715,346 files,
+        14 GB, clean. The platform's `git status` already failed on the symlinked submodule (Apple
+        git 2.54); `submodule.translations-chirho.ignore=all` in .git/config fixes it
+  - [x] 7d. rus Matthew 4 (430 words) and 3 amh words (Gen 24:23, 27, 30) imported to Postgres and
+        published to D1. The committed rus Matthew 4 SQL said `code = 'swa'` (why it never reached
+        rus; replayed, it would have overwritten Swahili); fixed in translations 7781e42. A scan of
+        all 46 type/language dirs found no other wrong-language files
+  - [x] 7g′. `sync-per-language-chirho.ts --since '<PG time>'` publishes only changed rows (seconds
+        instead of ~1 h per language); used for rus and amh, verified in D1 and on the live reader
   - [ ] 7e. Swahili: 13,654 words are glossed in the VPS dump (created 2026-01-21 and 2026-02-06);
         validate them (the dump came from a compromised server), import, with L.J.'s yes
-  - [ ] 7f. Translate the remaining ~21,300 words (Opus agents, at most 3 at a time, ~4 chapters
-        each); largest runs: ukr Jeremiah 49-52, hin Matthew 27-28 / Hosea 6-14 / Acts 1-5, rus
-        Romans 5-16, nep Psalms 79-92, tel, urd Luke 5-7, amh and heb scattered words
+  - [ ] 7f. Translate the remaining words (Opus agents, at most 3 at a time). Work list from
+        Postgres after 7d: 34,963 words, of which swa 13,654 may come from the VPS dump (7e) and
+        ~1,700 amh/heb paragraph markers stay blank, so ~19,600 to translate. After each batch:
+        merge verse files that already existed (expand_glosses overwrites a verse file with only
+        the words passed, and rewrites the book's all-verses-chirho.sql with only that call's
+        words), import only the new blocks, publish with --since, check D1 and the live page
+    - [ ] Batch 1 (running): hin readers Matthew 27 (1,042), ukr readers Jeremiah 49-50 (1,306),
+          ukr readers Jeremiah 51 (905)
+    - [ ] Next: hin Matthew 28 / Hosea 6-14 / Acts 1-5 / Mark 1-7 / Nehemiah; ukr Jeremiah 52,
+          Isaiah 2; tel Acts 28, Jeremiah 52, 2 Kings 23-24, 1 Chronicles 29; rus Romans 5-16;
+          tur, jav, nep Psalms 83-92, urd Luke 5-7, kor Acts 1-5, ben Hebrews 11-13 / 2-3 John /
+          Jude; the long tail. Small identical gaps across languages (1 Samuel 16-20, Isaiah 36-37,
+          Mark 16:9-20) look like source words added after those books were translated
   - [ ] 7g. Re-sync each changed language (`sync-per-language-chirho.ts LANG --remote
         --skip-source`, ~40-60 min each, upserts only), then update-stats and verify
 - [ ] 8. Downstream of 7: PDFs (R2) and SWORD modules built from gapped data get rebuilt (the
       Swahili PDF and module date from 2026-02-04, before the 2026-02-06 Swahili import)
 - [ ] 9. Records: this tasklist, progress log, skills, memory; commits (no push without L.J.)
+- [ ] 10. Found on the way (L.J. to decide): the landing cards say "448,269 verses" and the reader
+      index shows "words" above the Bible's total, because `language_stats_chirho` (meta D1)
+      stores phrase counts and no script writes it (`update-stats-chirho.ts` writes an unbound DB);
+      `d1-migration-chirho/` (the production publish scripts) has never been committed; GitHub's
+      translations repo lacks b9d9a64 and 7781e42; two stray Cyrillic glosses (tel 1 Chr 19:19 w3,
+      tur Joel 2:17 w9)
 
 ## Outcomes
 

@@ -7,7 +7,8 @@
 Production is the Cloudflare Worker `bible-reader-chirho` (`workers-platform-chirho/`) on the
 custom domains global-tools.bible.systems and global-chirho.bible.systems. The local Postgres is
 the source of truth; production only reads D1 and R2. (The Hetzner VPS path was retired
-2026-10-26.) Step-by-step commands: `.claude/skills/publish-language-chirho/SKILL.md`.
+2026-10-26.) That Postgres runs in colima (`DOCKER_CONTEXT=colima`), not Docker Desktop.
+Step-by-step commands: `.claude/skills/publish-language-chirho/SKILL.md`.
 
 ```mermaid
 flowchart TD
@@ -18,7 +19,9 @@ flowchart TD
   exists_chirho -- no --> create_chirho["wrangler d1 create + DB_LANG_LANG_CHIRHO binding in wrangler.toml"]
   exists_chirho -- yes --> sync_chirho
   create_chirho --> sync_chirho["d1-migration-chirho/sync-per-language-chirho.ts LANG --remote"]
-  sync_chirho --> stats_chirho["update-stats-chirho.ts"]
+  exists_chirho -- "yes, a few changed words" --> since_chirho["sync-per-language-chirho.ts LANG --remote --since 'PG time'"]
+  since_chirho --> verify_chirho
+  sync_chirho --> stats_chirho["update-stats-chirho.ts (bible-translations-chirho, unread by the Worker)"]
   stats_chirho --> verify_chirho["verify-d1-data-chirho.ts"]
   r2_chirho --> catalog_chirho["PDF catalog entry: workers-platform-chirho/src/lib/shared-chirho/pdf-downloads-chirho.ts"]
   verify_chirho --> deploy_chirho["workers-platform-chirho: build-chirho, deploy-chirho"]

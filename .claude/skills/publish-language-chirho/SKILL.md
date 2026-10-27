@@ -12,6 +12,13 @@ disable-model-invocation: true
 
 Full end-to-end checklist for going from 100% SQL files → live on production.
 
+**The local Postgres runs in colima, not Docker Desktop** (container
+`sveltekit2-platform-chirho-db-chirho-1`, volume `sveltekit2-platform-chirho_db-data-chirho`; Docker
+Desktop has no copy of it). Start it with `colima start --activate=false` (leaves other sessions'
+Docker context alone), then `export DOCKER_CONTEXT=colima` before the `docker` commands below.
+A verified backup from 2026-10-27 is on the encrypted volume under
+`.../platform-chirho/local-postgres-backup-chirho/`.
+
 ## Variables (fill in before starting)
 
 | Variable | Example (Telugu) | Description |
@@ -304,10 +311,27 @@ bunx wrangler d1 list --json | bun run wrangler-bindings-gen-chirho.ts
 Sync from the local Postgres (the source of truth), refresh stats, verify:
 ```bash
 cd d1-migration-chirho
-bun run sync-per-language-chirho.ts LANG --remote
+eval "$(grep -E '^export CLOUDFLARE_GLOBAL_API_(EMAIL|KEY)_CHIRHO=' ../.env)"
+export CLOUDFLARE_EMAIL="$CLOUDFLARE_GLOBAL_API_EMAIL_CHIRHO" CLOUDFLARE_API_KEY="$CLOUDFLARE_GLOBAL_API_KEY_CHIRHO"
+export DOCKER_CONTEXT=colima
+bun run sync-per-language-chirho.ts LANG --remote          # whole language: ~1.35M rows, 40-60 min
 bun run update-stats-chirho.ts
 bun run verify-d1-data-chirho.ts
 ```
+
+To publish only what changed (filled gaps, corrections), pass the Postgres time (UTC) the import
+started; it sends the phrases created or re-glossed since then and skips the source tables and the
+reference Bible, so a few hundred words take seconds:
+```bash
+bun run sync-per-language-chirho.ts LANG --remote --since '2026-10-27 21:00'
+```
+Neither mode deletes D1 rows.
+
+Stats caveat (2026-10-27): `update-stats-chirho.ts` rewrites `translation_stats_chirho` in
+`bible-translations-chirho`, which the Worker no longer binds. The landing page and reader index
+read `language_stats_chirho` in `bible-lang-meta-chirho`, which no script here writes; its
+`verse_count_chirho` and `word_count_chirho` hold phrase counts, so the cards show "448,269
+verses".
 
 ---
 
