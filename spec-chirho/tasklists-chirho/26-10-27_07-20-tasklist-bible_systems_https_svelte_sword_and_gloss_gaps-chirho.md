@@ -95,6 +95,17 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
           over the first slots; hin Acts 1:1 Θεόφιλε = "येशू"; swa 1 Samuel 14:1 correctly placed
           but partial. Trailing gaps are the misalignment signature; misaligned verses without
           gaps (hin Acts 2:31, Zech 5:5) need a separate detector
+      - Cause (found 2026-10-28): the Feb-Mar 2026 Opus 4.5 agents numbered word ids in sequence
+        instead of taking each word's own id. rus Romans: Greek articles got no gloss (Russian
+        has none) but the ids kept counting, so each later gloss sits one slot early per article
+        (in 198 of the 277 broken verses the unglossed tail equals the article count exactly;
+        259 within one). hin/tel readers: a target-language sentence chunked over the ids, as the
+        readers rule then asked ("Natural target-language word order", AGENTS.md until ce6259f
+        on 2026-03-03; Hindi's glosses predate the readers type and became its readers edition on
+        2026-02-12). `expand_glosses_chirho` accepts any id map and "complete" counted verses, so
+        nothing flagged it; its per-word file comments show the mismatch (`πάντων → हे–थियुफिलुस`).
+        Prevention: a coverage/shift check in the tool and a lemma-based shift detector. The
+        agent definition's fix (source order for readers too) has sat uncommitted since 2026-02-26
   - [ ] 7g. Re-sync each changed language (`sync-per-language-chirho.ts LANG --remote
         --skip-source`, ~40-60 min each, upserts only), then update-stats and verify
 - [ ] 8. Downstream of 7: PDFs (R2) and SWORD modules built from gapped data get rebuilt (the
