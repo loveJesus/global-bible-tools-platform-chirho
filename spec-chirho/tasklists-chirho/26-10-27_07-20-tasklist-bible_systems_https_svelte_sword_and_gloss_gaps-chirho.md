@@ -106,6 +106,13 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
         nothing flagged it; its per-word file comments show the mismatch (`πάντων → हे–थियुफिलुस`).
         Prevention: a coverage/shift check in the tool and a lemma-based shift detector. The
         agent definition's fix (source order for readers too) has sat uncommitted since 2026-02-26
+      - Not a word-split change (checked 2026-10-28, on L.J.'s question): the word table is the
+        same in local Postgres, the VPS dump (row by row) and all 29 production D1s (per-book
+        fingerprints); the words recorded in every gloss file (10,256,552 lines) are today's words
+        at the same ids, apart from 38 cosmetic differences from hand-written scripts; in 2,689 of
+        the 3,231 slipped verses Postgres holds exactly the file's glosses (507 have no committed
+        file: tel, nep, tha, guj, mya, jpn). Translations do differ: the VPS also had hin and ben
+        terse and 13,654 swa words. Scripts: `gloss-gaps-held-chirho/26-10-27-chirho/scripts-chirho/word-checks-chirho/`
   - [ ] 7g. Re-sync each changed language (`sync-per-language-chirho.ts LANG --remote
         --skip-source`, ~40-60 min each, upserts only), then update-stats and verify
 - [ ] 8. Downstream of 7: PDFs (R2) and SWORD modules built from gapped data get rebuilt (the
