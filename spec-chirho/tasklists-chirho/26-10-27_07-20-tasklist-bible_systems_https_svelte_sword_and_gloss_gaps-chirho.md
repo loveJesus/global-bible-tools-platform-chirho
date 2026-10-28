@@ -117,17 +117,20 @@ swap on two pages); work happens in a scratch worktree and those edits are carri
         --skip-source`, ~40-60 min each, upserts only), then update-stats and verify
 - [ ] 8. Downstream of 7: PDFs (R2) and SWORD modules built from gapped data get rebuilt (the
       Swahili PDF and module date from 2026-02-04, before the 2026-02-06 Swahili import)
-- [ ] 9. Records: this tasklist, progress log, skills, memory; commits (no push without L.J.)
+- [ ] 9. Records: this tasklist, progress log, skills, memory; commits. Pushed at L.J.'s word on
+      2026-10-28 over our SSH key (remotes unchanged), after gitleaks and a PII scan of each range
+      (all three repos are public): platform 2186c7f..7940efc, bible.systems ac50b7d..d5e7235,
+      translations 6e7d7f4..41b4b27
 - [ ] 10. Found on the way (L.J. to decide): the landing cards say "448,269 verses" and the reader
       index shows "words" above the Bible's total, because `language_stats_chirho` (meta D1)
       stores phrase counts and no script writes it (`update-stats-chirho.ts` writes an unbound DB);
-      `d1-migration-chirho/` (the production publish scripts) has never been committed; GitHub's
-      translations repo lacks b9d9a64 and 7781e42; two stray Cyrillic glosses (tel 1 Chr 19:19 w3,
+      `d1-migration-chirho/` (the production publish scripts) has never been committed; two stray
+      Cyrillic glosses (tel 1 Chr 19:19 w3,
       tur Joel 2:17 w9)
 
 ## Outcomes
 
-- **bible.systems (steps 1-5):** commits 368ec75..d5e7235 in that repo (main_chirho, not pushed),
+- **bible.systems (steps 1-5):** commits 368ec75..d5e7235 in that repo (main_chirho, pushed 2026-10-28),
   deployed as version d0fcac73-6444-4e39-b7a3-2155b4e2ef37 (previous 0625f8f1). Svelte 5.46.1 →
   5.57.2 with kit 2.70.3, vite-plugin-svelte 6.2.4 (4.x had expected Vite 5), svelte-check 4.7.7,
   vite 6.4.4 and adapter-cloudflare 4.9.0 → 7.2.9; set-cookie-parser is held at 3.1.4 by

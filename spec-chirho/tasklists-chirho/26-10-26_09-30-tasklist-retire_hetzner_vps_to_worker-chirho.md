@@ -43,8 +43,9 @@ Backups go to the encrypted volume, outside git (other people's data + secrets):
       rsword-chirho.bible.systems certificate; inspect the bible.systems source repo and make it
       public; complete the homepage language cards
 - [ ] 13. L.J.: later, switch the bible.systems repo remote from the embedded GitHub token to our
-      SSH key (not a token or credential helper), then revoke that token. Its 5 unpushed commits
-      (f49f892..f83a882) wait on L.J.'s word to push
+      SSH key (not a token or credential helper), then revoke that token. Its commits through
+      d5e7235 were pushed over the SSH key on 2026-10-28 at L.J.'s word; the remote URL still
+      carries the token
 
 ## Outcomes
 
